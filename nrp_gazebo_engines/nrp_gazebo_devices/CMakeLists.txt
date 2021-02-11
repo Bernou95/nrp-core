@@ -25,6 +25,7 @@ set(LIB_SRC_FILES
 	nrp_gazebo_devices/physics_camera.cpp
 	nrp_gazebo_devices/physics_joint.cpp
 	nrp_gazebo_devices/physics_link.cpp
+	nrp_gazebo_devices/dummy_device.cpp
 )
 
 # List of python module build files

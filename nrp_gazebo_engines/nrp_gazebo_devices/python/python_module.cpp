@@ -24,6 +24,7 @@
 #include "nrp_gazebo_devices/physics_camera.h"
 #include "nrp_gazebo_devices/physics_joint.h"
 #include "nrp_gazebo_devices/physics_link.h"
+#include "nrp_gazebo_devices/dummy_device.h"
 
 #include "nrp_general_library/device_interface/device.h"
 #include "nrp_general_library/device_interface/python_device.h"
@@ -76,6 +77,8 @@ BOOST_PYTHON_MODULE(GAZEBO_PYTHON_MODULE_NAME)
 	python_property_device_class<PhysicsJoint>::create();
 
 	python_property_device_class<PhysicsLink>::create();
+
+	python_property_device_class<DummyDevice>::create();
 }
 
 

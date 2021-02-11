@@ -115,6 +115,7 @@ message GetDeviceReply
 	    GazeboCamera camera = 2;
 		GazeboLink   link   = 3;
 		GazeboJoint  joint  = 4;
+        DummyDevice  dummy  = 5;
     }
 }
 
@@ -158,6 +159,14 @@ message GazeboJoint
     float position = 1;
     float velocity = 2;
     float effort   = 3;
+}
+
+message DummyDevice
+{
+    float          scalar = 1;
+    repeated float array  = 2;
+    string         string = 3;
+    repeated int64 vector = 4;
 }
 
 // EOF

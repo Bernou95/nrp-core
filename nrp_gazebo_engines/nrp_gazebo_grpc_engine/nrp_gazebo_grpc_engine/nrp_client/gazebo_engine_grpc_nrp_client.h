@@ -29,6 +29,7 @@
 #include "nrp_gazebo_grpc_engine/devices/grpc_physics_camera.h"
 #include "nrp_gazebo_grpc_engine/devices/grpc_physics_joint.h"
 #include "nrp_gazebo_grpc_engine/devices/grpc_physics_link.h"
+#include "nrp_gazebo_devices/dummy_device.h"
 
 #include "nrp_gazebo_grpc_engine/config/gazebo_grpc_config.h"
 
@@ -39,7 +40,7 @@
  *  \brief NRP - Gazebo Communicator on the NRP side. Converts DeviceInterface classes from/to JSON objects
  */
 class GazeboEngineGrpcNRPClient
-        : public EngineGrpcClient<GazeboEngineGrpcNRPClient, GazeboGrpcConfig, PhysicsCamera, PhysicsJoint, PhysicsLink>
+        : public EngineGrpcClient<GazeboEngineGrpcNRPClient, GazeboGrpcConfig, PhysicsCamera, PhysicsJoint, PhysicsLink, DummyDevice>
 {
 	public:
 		GazeboEngineGrpcNRPClient(EngineConfigConst::config_storage_t &config, ProcessLauncherInterface::unique_ptr &&launcher);

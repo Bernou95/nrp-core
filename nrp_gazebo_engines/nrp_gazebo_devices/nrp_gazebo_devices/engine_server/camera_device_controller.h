@@ -25,6 +25,7 @@
 #include "nrp_general_library/engine_interfaces/engine_device_controller.h"
 
 #include "nrp_gazebo_devices/physics_camera.h"
+#include "nrp_gazebo_devices/dummy_device.h"
 
 #include <gazebo/gazebo.hh>
 #include <gazebo/sensors/CameraSensor.hh>
@@ -32,6 +33,32 @@
 
 namespace gazebo
 {
+	template<class SERIALIZER>
+	class DummyDeviceController
+	        : public EngineDeviceController<SERIALIZER, DummyDevice>
+	{
+
+		public:
+			DummyDeviceController(const std::string &devName)
+			    : EngineDeviceController<SERIALIZER, DummyDevice>(DummyDevice::createID(devName, "")),
+			      _data(DeviceIdentifier(*this))
+			{}
+
+			virtual void handleDeviceDataCallback(DummyDevice &&data) override
+			{
+				this->_data.setScalar(data.getScalar());
+				this->_data.setArray(data.getArray());
+				this->_data.setVector(data.getVector());
+			}
+
+			virtual const DummyDevice *getDeviceInformationCallback() override
+			{
+				return &this->_data;
+			}
+
+			DummyDevice _data;
+	};
+
 	template<class SERIALIZER>
 	class CameraDeviceController
 	        : public EngineDeviceController<SERIALIZER, PhysicsCamera>
