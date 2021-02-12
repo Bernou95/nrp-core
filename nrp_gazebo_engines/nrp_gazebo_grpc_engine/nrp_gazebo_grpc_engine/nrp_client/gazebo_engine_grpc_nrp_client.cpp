@@ -28,6 +28,7 @@
 #include <sys/wait.h>
 
 #include <chrono>
+#include <iostream>
 
 GazeboEngineGrpcNRPClient::GazeboEngineGrpcNRPClient(EngineConfigConst::config_storage_t &config, ProcessLauncherInterface::unique_ptr &&launcher)
     : EngineGrpcClient(config, std::move(launcher))
@@ -35,6 +36,7 @@ GazeboEngineGrpcNRPClient::GazeboEngineGrpcNRPClient(EngineConfigConst::config_s
 
 void GazeboEngineGrpcNRPClient::initialize()
 {
+	std::cout << "\n From gazebo_engine_grpc_nrp_client.cpp \n \n";
 	// Wait for Gazebo to load world
 	auto confDat = this->engineConfig()->writeConfig();
 	try

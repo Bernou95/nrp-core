@@ -54,7 +54,6 @@ class EngineGrpcClient
             : Engine<ENGINE, ENGINE_CONFIG>(config, std::move(launcher))
         {
             std::string serverAddress = this->engineConfig()->engineServerAddress();
-
             // Timeouts of less than 1ms will be rounded up to 1ms
 
             SimulationTime timeout = toSimulationTime<float, std::ratio<1>>(this->engineConfig()->engineCommandTimeout());
@@ -94,9 +93,10 @@ class EngineGrpcClient
             prepareRpcContext(&context);
 
             request.set_json(data.dump());
+            std::cout << data.dump() << std::endl;
 
             grpc::Status status = _stub->init(&context, request, &reply);
-
+            std::cout << "From engine_grpc_client.h\n";
             if(!status.ok())
             {
                 const auto errMsg = "Engine server initialization failed: " + status.error_message() + " (" + std::to_string(status.error_code()) + ")";
