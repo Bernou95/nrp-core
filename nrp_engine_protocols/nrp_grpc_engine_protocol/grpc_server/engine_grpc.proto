@@ -115,6 +115,7 @@ message GetDeviceReply
 	    GazeboCamera camera = 2;
 		GazeboLink   link   = 3;
 		GazeboJoint  joint  = 4;
+        OpensimJoint joint_1 = 5;
     }
 }
 
@@ -158,6 +159,11 @@ message GazeboJoint
     float position = 1;
     float velocity = 2;
     float effort   = 3;
+}
+
+message OpensimJoint
+{
+
 }
 
 // EOF

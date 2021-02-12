@@ -24,7 +24,7 @@
 
 #include "nrp_general_library/utils/nrp_exceptions.h"
 #include "nrp_python_json_engine/engine_server/python_engine_json_device_controller.h"
-
+#include <iostream>
 
 PyEngineScript::~PyEngineScript()
 {
@@ -62,6 +62,7 @@ void PyEngineScript::registerDevice(std::string deviceName)
 boost::python::object &PyEngineScript::getDevice(const std::string &deviceName)
 {
 	auto devIt = this->_nameDeviceMap.find(deviceName);
+
 	if(devIt == this->_nameDeviceMap.end())
 		throw NRPException::logCreate("Could not find device with name \"" + deviceName + "\"");
 
@@ -69,7 +70,10 @@ boost::python::object &PyEngineScript::getDevice(const std::string &deviceName)
 }
 
 void PyEngineScript::setDevice(const std::string &deviceName, boost::python::object data)
-{	this->getDevice(deviceName) = data;	}
+{	
+	//std::cout << this->_time << std::endl;
+	this->getDevice(deviceName) = data;	
+}
 
 void PyEngineScript::setPythonJSONServer(PythonJSONServer *pServer)
 {

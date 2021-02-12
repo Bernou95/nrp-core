@@ -1,0 +1,284 @@
+[2021-02-02 13:29:10.080] [info] Loaded model bicep_curl from file basicModel.osim
+[2021-02-02 13:29:10.081] [info] 'biceps': Parameter update for the damped-model: minimum_activation was 0.01 but is now 0.01
+[2021-02-02 13:29:46.154] [info] Loaded model bicep_curl from file basicModel.osim
+[2021-02-02 13:29:46.154] [info] 'biceps': Parameter update for the damped-model: minimum_activation was 0.01 but is now 0.01
+[2021-02-02 13:29:52.289] [info] Loaded model bicep_curl from file basicModel.osim
+[2021-02-02 13:29:52.289] [info] 'biceps': Parameter update for the damped-model: minimum_activation was 0.01 but is now 0.01
+[2021-02-02 14:11:32.423] [info] Loaded model bicep_curl from file basicModel.osim
+[2021-02-02 14:11:32.423] [info] 'biceps': Parameter update for the damped-model: minimum_activation was 0.01 but is now 0.01
+[2021-02-02 14:11:45.555] [info] Loaded model bicep_curl from file basicModel.osim
+[2021-02-02 14:11:45.555] [info] 'biceps': Parameter update for the damped-model: minimum_activation was 0.01 but is now 0.01
+[2021-02-02 16:33:35.063] [info] Loaded model bicep_curl from file basicModel.osim
+[2021-02-02 16:33:35.063] [info] 'biceps': Parameter update for the damped-model: minimum_activation was 0.01 but is now 0.01
+[2021-02-02 16:33:35.065] [info] 'biceps': Parameter update for the damped-model: minimum_activation was 0.01 but is now 0.01
+[2021-02-02 16:33:48.176] [info] Loaded model bicep_curl from file basicModel.osim
+[2021-02-02 16:33:48.177] [info] 'biceps': Parameter update for the damped-model: minimum_activation was 0.01 but is now 0.01
+[2021-02-02 16:33:48.177] [info] 'biceps': Parameter update for the damped-model: minimum_activation was 0.01 but is now 0.01
+[2021-02-02 17:20:20.692] [info] Loaded model bicep_curl from file basicModel.osim
+[2021-02-02 17:20:20.693] [info] 'biceps': Parameter update for the damped-model: minimum_activation was 0.01 but is now 0.01
+[2021-02-02 17:20:20.694] [info] 'biceps': Parameter update for the damped-model: minimum_activation was 0.01 but is now 0.01
+[2021-02-02 17:22:16.674] [info] Loaded model bicep_curl from file basicModel.osim
+[2021-02-02 17:22:16.674] [info] 'biceps': Parameter update for the damped-model: minimum_activation was 0.01 but is now 0.01
+[2021-02-02 17:22:16.675] [info] 'biceps': Parameter update for the damped-model: minimum_activation was 0.01 but is now 0.01
+[2021-02-02 17:43:54.508] [info] Loaded model Rajagopal_2015 from file calibrated_Rajagopal_2015.osim
+[2021-02-02 17:43:54.508] [warning] Couldn't find file 'r_pelvis.vtp'.
+[2021-02-02 17:43:54.508] [warning] Couldn't find file 'l_pelvis.vtp'.
+[2021-02-02 17:43:54.508] [warning] Couldn't find file 'sacrum.vtp'.
+[2021-02-02 17:43:54.508] [warning] Couldn't find file 'femur_r.vtp'.
+[2021-02-02 17:43:54.509] [warning] Couldn't find file 'tibia_r.vtp'.
+[2021-02-02 17:43:54.509] [warning] Couldn't find file 'r_fibula.vtp'.
+[2021-02-02 17:43:54.509] [warning] Couldn't find file 'r_patella.vtp'.
+[2021-02-02 17:43:54.509] [warning] Couldn't find file 'r_talus.vtp'.
+[2021-02-02 17:43:54.509] [warning] Couldn't find file 'r_foot.vtp'.
+[2021-02-02 17:43:54.509] [warning] Couldn't find file 'r_bofoot.vtp'.
+[2021-02-02 17:43:54.509] [warning] Couldn't find file 'femur_l.vtp'.
+[2021-02-02 17:43:54.509] [warning] Couldn't find file 'tibia_l.vtp'.
+[2021-02-02 17:43:54.509] [warning] Couldn't find file 'l_fibula.vtp'.
+[2021-02-02 17:43:54.509] [warning] Couldn't find file 'l_patella.vtp'.
+[2021-02-02 17:43:54.509] [warning] Couldn't find file 'l_talus.vtp'.
+[2021-02-02 17:43:54.509] [warning] Couldn't find file 'l_foot.vtp'.
+[2021-02-02 17:43:54.509] [warning] Couldn't find file 'l_bofoot.vtp'.
+[2021-02-02 17:43:54.509] [warning] Couldn't find file 'hat_spine.vtp'.
+[2021-02-02 17:43:54.509] [warning] Couldn't find file 'hat_jaw.vtp'.
+[2021-02-02 17:43:54.509] [warning] Couldn't find file 'hat_skull.vtp'.
+[2021-02-02 17:43:54.509] [warning] Couldn't find file 'hat_ribs_scap.vtp'.
+[2021-02-02 17:43:54.509] [warning] Couldn't find file 'humerus_rv.vtp'.
+[2021-02-02 17:43:54.509] [warning] Couldn't find file 'ulna_rv.vtp'.
+[2021-02-02 17:43:54.509] [warning] Couldn't find file 'radius_rv.vtp'.
+[2021-02-02 17:43:54.509] [warning] Couldn't find file 'pisiform_rvs.vtp'.
+[2021-02-02 17:43:54.509] [warning] Couldn't find file 'lunate_rvs.vtp'.
+[2021-02-02 17:43:54.509] [warning] Couldn't find file 'scaphoid_rvs.vtp'.
+[2021-02-02 17:43:54.509] [warning] Couldn't find file 'triquetrum_rvs.vtp'.
+[2021-02-02 17:43:54.509] [warning] Couldn't find file 'hamate_rvs.vtp'.
+[2021-02-02 17:43:54.509] [warning] Couldn't find file 'capitate_rvs.vtp'.
+[2021-02-02 17:43:54.509] [warning] Couldn't find file 'trapezoid_rvs.vtp'.
+[2021-02-02 17:43:54.509] [warning] Couldn't find file 'trapezium_rvs.vtp'.
+[2021-02-02 17:43:54.509] [warning] Couldn't find file 'metacarpal2_rvs.vtp'.
+[2021-02-02 17:43:54.509] [warning] Couldn't find file 'index_proximal_rvs.vtp'.
+[2021-02-02 17:43:54.509] [warning] Couldn't find file 'index_medial_rvs.vtp'.
+[2021-02-02 17:43:54.509] [warning] Couldn't find file 'index_distal_rvs.vtp'.
+[2021-02-02 17:43:54.509] [warning] Couldn't find file 'metacarpal3_rvs.vtp'.
+[2021-02-02 17:43:54.509] [warning] Couldn't find file 'middle_proximal_rvs.vtp'.
+[2021-02-02 17:43:54.509] [warning] Couldn't find file 'middle_medial_rvs.vtp'.
+[2021-02-02 17:43:54.510] [warning] Couldn't find file 'middle_distal_rvs.vtp'.
+[2021-02-02 17:43:54.510] [warning] Couldn't find file 'metacarpal4_rvs.vtp'.
+[2021-02-02 17:43:54.510] [warning] Couldn't find file 'ring_proximal_rvs.vtp'.
+[2021-02-02 17:43:54.510] [warning] Couldn't find file 'ring_medial_rvs.vtp'.
+[2021-02-02 17:43:54.510] [warning] Couldn't find file 'ring_distal_rvs.vtp'.
+[2021-02-02 17:43:54.510] [warning] Couldn't find file 'metacarpal5_rvs.vtp'.
+[2021-02-02 17:43:54.510] [warning] Couldn't find file 'little_proximal_rvs.vtp'.
+[2021-02-02 17:43:54.510] [warning] Couldn't find file 'little_medial_rvs.vtp'.
+[2021-02-02 17:43:54.510] [warning] Couldn't find file 'little_distal_rvs.vtp'.
+[2021-02-02 17:43:54.510] [warning] Couldn't find file 'metacarpal1_rvs.vtp'.
+[2021-02-02 17:43:54.510] [warning] Couldn't find file 'thumb_proximal_rvs.vtp'.
+[2021-02-02 17:43:54.510] [warning] Couldn't find file 'thumb_distal_rvs.vtp'.
+[2021-02-02 17:43:54.510] [warning] Couldn't find file 'humerus_lv.vtp'.
+[2021-02-02 17:43:54.510] [warning] Couldn't find file 'ulna_lv.vtp'.
+[2021-02-02 17:43:54.510] [warning] Couldn't find file 'radius_lv.vtp'.
+[2021-02-02 17:43:54.510] [warning] Couldn't find file 'pisiform_lvs.vtp'.
+[2021-02-02 17:43:54.510] [warning] Couldn't find file 'lunate_lvs.vtp'.
+[2021-02-02 17:43:54.510] [warning] Couldn't find file 'scaphoid_lvs.vtp'.
+[2021-02-02 17:43:54.510] [warning] Couldn't find file 'triquetrum_lvs.vtp'.
+[2021-02-02 17:43:54.510] [warning] Couldn't find file 'hamate_lvs.vtp'.
+[2021-02-02 17:43:54.510] [warning] Couldn't find file 'capitate_lvs.vtp'.
+[2021-02-02 17:43:54.510] [warning] Couldn't find file 'trapezoid_lvs.vtp'.
+[2021-02-02 17:43:54.510] [warning] Couldn't find file 'trapezium_lvs.vtp'.
+[2021-02-02 17:43:54.510] [warning] Couldn't find file 'metacarpal2_lvs.vtp'.
+[2021-02-02 17:43:54.510] [warning] Couldn't find file 'index_proximal_lvs.vtp'.
+[2021-02-02 17:43:54.510] [warning] Couldn't find file 'index_medial_lvs.vtp'.
+[2021-02-02 17:43:54.510] [warning] Couldn't find file 'index_distal_lvs.vtp'.
+[2021-02-02 17:43:54.510] [warning] Couldn't find file 'metacarpal3_lvs.vtp'.
+[2021-02-02 17:43:54.510] [warning] Couldn't find file 'middle_proximal_lvs.vtp'.
+[2021-02-02 17:43:54.510] [warning] Couldn't find file 'middle_medial_lvs.vtp'.
+[2021-02-02 17:43:54.510] [warning] Couldn't find file 'middle_distal_lvs.vtp'.
+[2021-02-02 17:43:54.510] [warning] Couldn't find file 'metacarpal4_lvs.vtp'.
+[2021-02-02 17:43:54.510] [warning] Couldn't find file 'ring_proximal_lvs.vtp'.
+[2021-02-02 17:43:54.510] [warning] Couldn't find file 'ring_medial_lvs.vtp'.
+[2021-02-02 17:43:54.510] [warning] Couldn't find file 'ring_distal_lvs.vtp'.
+[2021-02-02 17:43:54.510] [warning] Couldn't find file 'metacarpal5_lvs.vtp'.
+[2021-02-02 17:43:54.510] [warning] Couldn't find file 'little_proximal_lvs.vtp'.
+[2021-02-02 17:43:54.510] [warning] Couldn't find file 'little_medial_lvs.vtp'.
+[2021-02-02 17:43:54.510] [warning] Couldn't find file 'little_distal_lvs.vtp'.
+[2021-02-02 17:43:54.510] [warning] Couldn't find file 'metacarpal1_lvs.vtp'.
+[2021-02-02 17:43:54.510] [warning] Couldn't find file 'thumb_proximal_lvs.vtp'.
+[2021-02-02 17:43:54.510] [warning] Couldn't find file 'thumb_distal_lvs.vtp'.
+[2021-02-02 17:43:54.562] [info] Loading orientations as quaternions from 'MT_012005D6_009-001_orientations.sto'...
+[2021-02-02 17:43:54.592] [info] InverseKinematicsSolver found 8 model frames to track.
+[2021-02-02 17:44:28.063] [info] Loaded model Rajagopal_2015 from file calibrated_Rajagopal_2015.osim
+[2021-02-02 17:44:28.063] [warning] Couldn't find file 'r_pelvis.vtp'.
+[2021-02-02 17:44:28.063] [warning] Couldn't find file 'l_pelvis.vtp'.
+[2021-02-02 17:44:28.063] [warning] Couldn't find file 'sacrum.vtp'.
+[2021-02-02 17:44:28.063] [warning] Couldn't find file 'femur_r.vtp'.
+[2021-02-02 17:44:28.063] [warning] Couldn't find file 'tibia_r.vtp'.
+[2021-02-02 17:44:28.064] [warning] Couldn't find file 'r_fibula.vtp'.
+[2021-02-02 17:44:28.064] [warning] Couldn't find file 'r_patella.vtp'.
+[2021-02-02 17:44:28.064] [warning] Couldn't find file 'r_talus.vtp'.
+[2021-02-02 17:44:28.064] [warning] Couldn't find file 'r_foot.vtp'.
+[2021-02-02 17:44:28.064] [warning] Couldn't find file 'r_bofoot.vtp'.
+[2021-02-02 17:44:28.064] [warning] Couldn't find file 'femur_l.vtp'.
+[2021-02-02 17:44:28.064] [warning] Couldn't find file 'tibia_l.vtp'.
+[2021-02-02 17:44:28.064] [warning] Couldn't find file 'l_fibula.vtp'.
+[2021-02-02 17:44:28.064] [warning] Couldn't find file 'l_patella.vtp'.
+[2021-02-02 17:44:28.064] [warning] Couldn't find file 'l_talus.vtp'.
+[2021-02-02 17:44:28.064] [warning] Couldn't find file 'l_foot.vtp'.
+[2021-02-02 17:44:28.064] [warning] Couldn't find file 'l_bofoot.vtp'.
+[2021-02-02 17:44:28.064] [warning] Couldn't find file 'hat_spine.vtp'.
+[2021-02-02 17:44:28.064] [warning] Couldn't find file 'hat_jaw.vtp'.
+[2021-02-02 17:44:28.064] [warning] Couldn't find file 'hat_skull.vtp'.
+[2021-02-02 17:44:28.064] [warning] Couldn't find file 'hat_ribs_scap.vtp'.
+[2021-02-02 17:44:28.064] [warning] Couldn't find file 'humerus_rv.vtp'.
+[2021-02-02 17:44:28.064] [warning] Couldn't find file 'ulna_rv.vtp'.
+[2021-02-02 17:44:28.064] [warning] Couldn't find file 'radius_rv.vtp'.
+[2021-02-02 17:44:28.064] [warning] Couldn't find file 'pisiform_rvs.vtp'.
+[2021-02-02 17:44:28.064] [warning] Couldn't find file 'lunate_rvs.vtp'.
+[2021-02-02 17:44:28.064] [warning] Couldn't find file 'scaphoid_rvs.vtp'.
+[2021-02-02 17:44:28.064] [warning] Couldn't find file 'triquetrum_rvs.vtp'.
+[2021-02-02 17:44:28.064] [warning] Couldn't find file 'hamate_rvs.vtp'.
+[2021-02-02 17:44:28.064] [warning] Couldn't find file 'capitate_rvs.vtp'.
+[2021-02-02 17:44:28.064] [warning] Couldn't find file 'trapezoid_rvs.vtp'.
+[2021-02-02 17:44:28.064] [warning] Couldn't find file 'trapezium_rvs.vtp'.
+[2021-02-02 17:44:28.064] [warning] Couldn't find file 'metacarpal2_rvs.vtp'.
+[2021-02-02 17:44:28.064] [warning] Couldn't find file 'index_proximal_rvs.vtp'.
+[2021-02-02 17:44:28.064] [warning] Couldn't find file 'index_medial_rvs.vtp'.
+[2021-02-02 17:44:28.064] [warning] Couldn't find file 'index_distal_rvs.vtp'.
+[2021-02-02 17:44:28.064] [warning] Couldn't find file 'metacarpal3_rvs.vtp'.
+[2021-02-02 17:44:28.064] [warning] Couldn't find file 'middle_proximal_rvs.vtp'.
+[2021-02-02 17:44:28.064] [warning] Couldn't find file 'middle_medial_rvs.vtp'.
+[2021-02-02 17:44:28.064] [warning] Couldn't find file 'middle_distal_rvs.vtp'.
+[2021-02-02 17:44:28.064] [warning] Couldn't find file 'metacarpal4_rvs.vtp'.
+[2021-02-02 17:44:28.064] [warning] Couldn't find file 'ring_proximal_rvs.vtp'.
+[2021-02-02 17:44:28.064] [warning] Couldn't find file 'ring_medial_rvs.vtp'.
+[2021-02-02 17:44:28.064] [warning] Couldn't find file 'ring_distal_rvs.vtp'.
+[2021-02-02 17:44:28.065] [warning] Couldn't find file 'metacarpal5_rvs.vtp'.
+[2021-02-02 17:44:28.065] [warning] Couldn't find file 'little_proximal_rvs.vtp'.
+[2021-02-02 17:44:28.065] [warning] Couldn't find file 'little_medial_rvs.vtp'.
+[2021-02-02 17:44:28.065] [warning] Couldn't find file 'little_distal_rvs.vtp'.
+[2021-02-02 17:44:28.065] [warning] Couldn't find file 'metacarpal1_rvs.vtp'.
+[2021-02-02 17:44:28.065] [warning] Couldn't find file 'thumb_proximal_rvs.vtp'.
+[2021-02-02 17:44:28.065] [warning] Couldn't find file 'thumb_distal_rvs.vtp'.
+[2021-02-02 17:44:28.065] [warning] Couldn't find file 'humerus_lv.vtp'.
+[2021-02-02 17:44:28.065] [warning] Couldn't find file 'ulna_lv.vtp'.
+[2021-02-02 17:44:28.065] [warning] Couldn't find file 'radius_lv.vtp'.
+[2021-02-02 17:44:28.065] [warning] Couldn't find file 'pisiform_lvs.vtp'.
+[2021-02-02 17:44:28.065] [warning] Couldn't find file 'lunate_lvs.vtp'.
+[2021-02-02 17:44:28.065] [warning] Couldn't find file 'scaphoid_lvs.vtp'.
+[2021-02-02 17:44:28.065] [warning] Couldn't find file 'triquetrum_lvs.vtp'.
+[2021-02-02 17:44:28.065] [warning] Couldn't find file 'hamate_lvs.vtp'.
+[2021-02-02 17:44:28.065] [warning] Couldn't find file 'capitate_lvs.vtp'.
+[2021-02-02 17:44:28.065] [warning] Couldn't find file 'trapezoid_lvs.vtp'.
+[2021-02-02 17:44:28.065] [warning] Couldn't find file 'trapezium_lvs.vtp'.
+[2021-02-02 17:44:28.065] [warning] Couldn't find file 'metacarpal2_lvs.vtp'.
+[2021-02-02 17:44:28.065] [warning] Couldn't find file 'index_proximal_lvs.vtp'.
+[2021-02-02 17:44:28.065] [warning] Couldn't find file 'index_medial_lvs.vtp'.
+[2021-02-02 17:44:28.065] [warning] Couldn't find file 'index_distal_lvs.vtp'.
+[2021-02-02 17:44:28.065] [warning] Couldn't find file 'metacarpal3_lvs.vtp'.
+[2021-02-02 17:44:28.065] [warning] Couldn't find file 'middle_proximal_lvs.vtp'.
+[2021-02-02 17:44:28.065] [warning] Couldn't find file 'middle_medial_lvs.vtp'.
+[2021-02-02 17:44:28.065] [warning] Couldn't find file 'middle_distal_lvs.vtp'.
+[2021-02-02 17:44:28.065] [warning] Couldn't find file 'metacarpal4_lvs.vtp'.
+[2021-02-02 17:44:28.065] [warning] Couldn't find file 'ring_proximal_lvs.vtp'.
+[2021-02-02 17:44:28.065] [warning] Couldn't find file 'ring_medial_lvs.vtp'.
+[2021-02-02 17:44:28.065] [warning] Couldn't find file 'ring_distal_lvs.vtp'.
+[2021-02-02 17:44:28.065] [warning] Couldn't find file 'metacarpal5_lvs.vtp'.
+[2021-02-02 17:44:28.065] [warning] Couldn't find file 'little_proximal_lvs.vtp'.
+[2021-02-02 17:44:28.065] [warning] Couldn't find file 'little_medial_lvs.vtp'.
+[2021-02-02 17:44:28.065] [warning] Couldn't find file 'little_distal_lvs.vtp'.
+[2021-02-02 17:44:28.065] [warning] Couldn't find file 'metacarpal1_lvs.vtp'.
+[2021-02-02 17:44:28.065] [warning] Couldn't find file 'thumb_proximal_lvs.vtp'.
+[2021-02-02 17:44:28.065] [warning] Couldn't find file 'thumb_distal_lvs.vtp'.
+[2021-02-02 17:44:38.038] [info] Loaded model Rajagopal_2015 from file calibrated_Rajagopal_2015.osim
+[2021-02-02 17:44:38.038] [warning] Couldn't find file 'r_pelvis.vtp'.
+[2021-02-02 17:44:38.039] [warning] Couldn't find file 'l_pelvis.vtp'.
+[2021-02-02 17:44:38.039] [warning] Couldn't find file 'sacrum.vtp'.
+[2021-02-02 17:44:38.039] [warning] Couldn't find file 'femur_r.vtp'.
+[2021-02-02 17:44:38.039] [warning] Couldn't find file 'tibia_r.vtp'.
+[2021-02-02 17:44:38.039] [warning] Couldn't find file 'r_fibula.vtp'.
+[2021-02-02 17:44:38.039] [warning] Couldn't find file 'r_patella.vtp'.
+[2021-02-02 17:44:38.039] [warning] Couldn't find file 'r_talus.vtp'.
+[2021-02-02 17:44:38.039] [warning] Couldn't find file 'r_foot.vtp'.
+[2021-02-02 17:44:38.039] [warning] Couldn't find file 'r_bofoot.vtp'.
+[2021-02-02 17:44:38.039] [warning] Couldn't find file 'femur_l.vtp'.
+[2021-02-02 17:44:38.039] [warning] Couldn't find file 'tibia_l.vtp'.
+[2021-02-02 17:44:38.039] [warning] Couldn't find file 'l_fibula.vtp'.
+[2021-02-02 17:44:38.039] [warning] Couldn't find file 'l_patella.vtp'.
+[2021-02-02 17:44:38.039] [warning] Couldn't find file 'l_talus.vtp'.
+[2021-02-02 17:44:38.039] [warning] Couldn't find file 'l_foot.vtp'.
+[2021-02-02 17:44:38.039] [warning] Couldn't find file 'l_bofoot.vtp'.
+[2021-02-02 17:44:38.039] [warning] Couldn't find file 'hat_spine.vtp'.
+[2021-02-02 17:44:38.039] [warning] Couldn't find file 'hat_jaw.vtp'.
+[2021-02-02 17:44:38.039] [warning] Couldn't find file 'hat_skull.vtp'.
+[2021-02-02 17:44:38.039] [warning] Couldn't find file 'hat_ribs_scap.vtp'.
+[2021-02-02 17:44:38.039] [warning] Couldn't find file 'humerus_rv.vtp'.
+[2021-02-02 17:44:38.039] [warning] Couldn't find file 'ulna_rv.vtp'.
+[2021-02-02 17:44:38.039] [warning] Couldn't find file 'radius_rv.vtp'.
+[2021-02-02 17:44:38.040] [warning] Couldn't find file 'pisiform_rvs.vtp'.
+[2021-02-02 17:44:38.040] [warning] Couldn't find file 'lunate_rvs.vtp'.
+[2021-02-02 17:44:38.040] [warning] Couldn't find file 'scaphoid_rvs.vtp'.
+[2021-02-02 17:44:38.040] [warning] Couldn't find file 'triquetrum_rvs.vtp'.
+[2021-02-02 17:44:38.040] [warning] Couldn't find file 'hamate_rvs.vtp'.
+[2021-02-02 17:44:38.040] [warning] Couldn't find file 'capitate_rvs.vtp'.
+[2021-02-02 17:44:38.040] [warning] Couldn't find file 'trapezoid_rvs.vtp'.
+[2021-02-02 17:44:38.040] [warning] Couldn't find file 'trapezium_rvs.vtp'.
+[2021-02-02 17:44:38.040] [warning] Couldn't find file 'metacarpal2_rvs.vtp'.
+[2021-02-02 17:44:38.040] [warning] Couldn't find file 'index_proximal_rvs.vtp'.
+[2021-02-02 17:44:38.040] [warning] Couldn't find file 'index_medial_rvs.vtp'.
+[2021-02-02 17:44:38.040] [warning] Couldn't find file 'index_distal_rvs.vtp'.
+[2021-02-02 17:44:38.040] [warning] Couldn't find file 'metacarpal3_rvs.vtp'.
+[2021-02-02 17:44:38.040] [warning] Couldn't find file 'middle_proximal_rvs.vtp'.
+[2021-02-02 17:44:38.040] [warning] Couldn't find file 'middle_medial_rvs.vtp'.
+[2021-02-02 17:44:38.040] [warning] Couldn't find file 'middle_distal_rvs.vtp'.
+[2021-02-02 17:44:38.040] [warning] Couldn't find file 'metacarpal4_rvs.vtp'.
+[2021-02-02 17:44:38.040] [warning] Couldn't find file 'ring_proximal_rvs.vtp'.
+[2021-02-02 17:44:38.040] [warning] Couldn't find file 'ring_medial_rvs.vtp'.
+[2021-02-02 17:44:38.040] [warning] Couldn't find file 'ring_distal_rvs.vtp'.
+[2021-02-02 17:44:38.040] [warning] Couldn't find file 'metacarpal5_rvs.vtp'.
+[2021-02-02 17:44:38.040] [warning] Couldn't find file 'little_proximal_rvs.vtp'.
+[2021-02-02 17:44:38.040] [warning] Couldn't find file 'little_medial_rvs.vtp'.
+[2021-02-02 17:44:38.040] [warning] Couldn't find file 'little_distal_rvs.vtp'.
+[2021-02-02 17:44:38.040] [warning] Couldn't find file 'metacarpal1_rvs.vtp'.
+[2021-02-02 17:44:38.040] [warning] Couldn't find file 'thumb_proximal_rvs.vtp'.
+[2021-02-02 17:44:38.040] [warning] Couldn't find file 'thumb_distal_rvs.vtp'.
+[2021-02-02 17:44:38.040] [warning] Couldn't find file 'humerus_lv.vtp'.
+[2021-02-02 17:44:38.040] [warning] Couldn't find file 'ulna_lv.vtp'.
+[2021-02-02 17:44:38.040] [warning] Couldn't find file 'radius_lv.vtp'.
+[2021-02-02 17:44:38.040] [warning] Couldn't find file 'pisiform_lvs.vtp'.
+[2021-02-02 17:44:38.040] [warning] Couldn't find file 'lunate_lvs.vtp'.
+[2021-02-02 17:44:38.040] [warning] Couldn't find file 'scaphoid_lvs.vtp'.
+[2021-02-02 17:44:38.040] [warning] Couldn't find file 'triquetrum_lvs.vtp'.
+[2021-02-02 17:44:38.040] [warning] Couldn't find file 'hamate_lvs.vtp'.
+[2021-02-02 17:44:38.040] [warning] Couldn't find file 'capitate_lvs.vtp'.
+[2021-02-02 17:44:38.040] [warning] Couldn't find file 'trapezoid_lvs.vtp'.
+[2021-02-02 17:44:38.040] [warning] Couldn't find file 'trapezium_lvs.vtp'.
+[2021-02-02 17:44:38.040] [warning] Couldn't find file 'metacarpal2_lvs.vtp'.
+[2021-02-02 17:44:38.040] [warning] Couldn't find file 'index_proximal_lvs.vtp'.
+[2021-02-02 17:44:38.040] [warning] Couldn't find file 'index_medial_lvs.vtp'.
+[2021-02-02 17:44:38.040] [warning] Couldn't find file 'index_distal_lvs.vtp'.
+[2021-02-02 17:44:38.040] [warning] Couldn't find file 'metacarpal3_lvs.vtp'.
+[2021-02-02 17:44:38.040] [warning] Couldn't find file 'middle_proximal_lvs.vtp'.
+[2021-02-02 17:44:38.040] [warning] Couldn't find file 'middle_medial_lvs.vtp'.
+[2021-02-02 17:44:38.040] [warning] Couldn't find file 'middle_distal_lvs.vtp'.
+[2021-02-02 17:44:38.040] [warning] Couldn't find file 'metacarpal4_lvs.vtp'.
+[2021-02-02 17:44:38.041] [warning] Couldn't find file 'ring_proximal_lvs.vtp'.
+[2021-02-02 17:44:38.041] [warning] Couldn't find file 'ring_medial_lvs.vtp'.
+[2021-02-02 17:44:38.041] [warning] Couldn't find file 'ring_distal_lvs.vtp'.
+[2021-02-02 17:44:38.041] [warning] Couldn't find file 'metacarpal5_lvs.vtp'.
+[2021-02-02 17:44:38.041] [warning] Couldn't find file 'little_proximal_lvs.vtp'.
+[2021-02-02 17:44:38.041] [warning] Couldn't find file 'little_medial_lvs.vtp'.
+[2021-02-02 17:44:38.041] [warning] Couldn't find file 'little_distal_lvs.vtp'.
+[2021-02-02 17:44:38.041] [warning] Couldn't find file 'metacarpal1_lvs.vtp'.
+[2021-02-02 17:44:38.041] [warning] Couldn't find file 'thumb_proximal_lvs.vtp'.
+[2021-02-02 17:44:38.041] [warning] Couldn't find file 'thumb_distal_lvs.vtp'.
+[2021-02-02 17:44:38.092] [info] Loading orientations as quaternions from 'MT_012005D6_009-001_orientations.sto'...
+[2021-02-02 17:44:38.106] [info] InverseKinematicsSolver found 8 model frames to track.
+[2021-02-02 18:38:15.454] [info] Loaded model Rajagopal_2015 from file calibrated_Rajagopal_2015.osim
+[2021-02-02 18:38:15.505] [info] Loading orientations as quaternions from 'MT_012005D6_009-001_orientations.sto'...
+[2021-02-02 18:38:15.602] [info] InverseKinematicsSolver found 8 model frames to track.
+[2021-02-02 18:38:41.477] [info] Wrote IK with IMU tracking results to: 'ik_MT_012005D6_009-001_orientations.mot'.
+[2021-02-02 19:41:42.595] [info] Loaded model bicep_curl from file basicModel.osim
+[2021-02-02 19:41:42.596] [info] 'biceps': Parameter update for the damped-model: minimum_activation was 0.01 but is now 0.01
+[2021-02-02 19:43:22.699] [info] Loaded model bicep_curl from file basicModel.osim
+[2021-02-02 19:43:22.699] [info] 'biceps': Parameter update for the damped-model: minimum_activation was 0.01 but is now 0.01
+[2021-02-02 19:44:11.341] [info] Loaded model bicep_curl from file basicModel.osim
+[2021-02-02 19:44:11.342] [info] 'biceps': Parameter update for the damped-model: minimum_activation was 0.01 but is now 0.01
+[2021-02-02 19:44:16.037] [info] Loaded model bicep_curl from file basicModel.osim
+[2021-02-02 19:44:16.037] [info] 'biceps': Parameter update for the damped-model: minimum_activation was 0.01 but is now 0.01

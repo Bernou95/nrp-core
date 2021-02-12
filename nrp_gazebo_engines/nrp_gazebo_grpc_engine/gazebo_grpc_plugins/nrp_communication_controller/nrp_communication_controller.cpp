@@ -86,6 +86,7 @@ void NRPCommunicationController::initialize(const json &data, EngineGrpcServer::
 	ConfigStorage confDat(data);
 	GazeboGrpcConfig conf(confDat);
 
+	std::cout <<"From nrp_communication_controller.cpp!!!\n\n";
 	double waitTime = conf.maxWorldLoadTime();
 	if(conf.maxWorldLoadTime() <= 0)
 		waitTime = std::numeric_limits<double>::max();

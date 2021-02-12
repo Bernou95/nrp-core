@@ -29,6 +29,9 @@
 #include "nrp_grpc_engine_protocol/config/engine_grpc_config.h"
 #include "nrp_grpc_engine_protocol/engine_server/engine_grpc_server.h"
 
+#include <iostream>
+using namespace std;
+
 grpc::Status EngineGrpcServer::handleGrpcError(const std::string & contextMessage, const std::string & errorMessage)
 {
     std::cerr << contextMessage << std::endl;
@@ -43,6 +46,7 @@ grpc::Status EngineGrpcServer::handleGrpcError(const std::string & contextMessag
 
 grpc::Status EngineGrpcServer::init(grpc::ServerContext * , const EngineGrpc::InitRequest * request, EngineGrpc::InitReply *)
 {
+    std::cout << "From engine_grpc_server.cpp\n";
     try
     {
         EngineGrpcServer::lock_t lock(this->_deviceLock);

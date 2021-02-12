@@ -40,12 +40,14 @@ SimulationLoop::SimulationLoop(SimulationConfigSharedPtr config, engine_interfac
 }
 
 void SimulationLoop::initLoop()
-{
+{	
+	std::cout << "From simulation_loop.cpp -> initLoop \n";
 	for(const auto &engine : this->_engines)
 	{
 		try
 		{
 			engine->initialize();
+			spdlog::info("Engine Initialization Success!!!");
 		}
 		catch(std::exception &e)
 		{

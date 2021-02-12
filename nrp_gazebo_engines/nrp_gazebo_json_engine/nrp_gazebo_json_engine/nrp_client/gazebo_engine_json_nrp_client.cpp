@@ -35,6 +35,7 @@ GazeboEngineJSONNRPClient::GazeboEngineJSONNRPClient(EngineConfigConst::config_s
 
 void GazeboEngineJSONNRPClient::initialize()
 {
+	
 	try
 	{
 		// Wait for Gazebo to load world

@@ -172,7 +172,7 @@ void SimulationManager::initSimulationLoop(const EngineLauncherManagerConstShare
 	// Create and initialize loop
 	spdlog::info("Initializing simulation loop");
 	this->_loop.reset(new SimulationLoop(this->createSimLoop(engineLauncherManager, processLauncherManager)));
-
+	spdlog::info("Loop reset end!!!");
 	//sleep(10);
 
 	this->_loop->initLoop();
@@ -273,6 +273,7 @@ bool SimulationManager::isSimInitializing()
 
 SimulationLoop SimulationManager::createSimLoop(const EngineLauncherManagerConstSharedPtr &engineManager, const MainProcessLauncherManager::const_shared_ptr &processLauncherManager)
 {
+	std::cout << "From simulation_manager.cpp" << std::endl;
 	SimulationLoop::engine_interfaces_t engines;
 	auto &engineConfigs = this->_simConfig->engineConfigs();
 
