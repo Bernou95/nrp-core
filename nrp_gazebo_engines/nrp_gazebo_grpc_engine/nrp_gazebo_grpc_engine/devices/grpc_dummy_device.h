@@ -27,10 +27,10 @@
 
 
 template<>
-GRPCDevice DeviceSerializerMethods<GRPCDevice>::serialize<DummyDevice>(const DummyDevice &dev);
+GRPCDevice DeviceSerializerMethods<GRPCDevice>::serialize<MyDevice>(const MyDevice &device);
 
 template<>
-DummyDevice DeviceSerializerMethods<GRPCDevice>::deserialize<DummyDevice>(DeviceIdentifier &&devID, deserialization_t data);
+MyDevice DeviceSerializerMethods<GRPCDevice>::deserialize<MyDevice>(DeviceIdentifier &&devID, deserialization_t data);
 
 
 #endif // GRPC_DUMMY_DEVICE_H

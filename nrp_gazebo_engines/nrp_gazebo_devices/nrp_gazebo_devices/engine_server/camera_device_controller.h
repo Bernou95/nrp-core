@@ -34,29 +34,29 @@
 namespace gazebo
 {
 	template<class SERIALIZER>
-	class DummyDeviceController
-	        : public EngineDeviceController<SERIALIZER, DummyDevice>
+	class MyDeviceController
+	    : public EngineDeviceController<SERIALIZER, MyDevice>
 	{
 
 		public:
-			DummyDeviceController(const std::string &devName)
-			    : EngineDeviceController<SERIALIZER, DummyDevice>(DummyDevice::createID(devName, "")),
+			MyDeviceController(const std::string &devName)
+			    : EngineDeviceController<SERIALIZER, MyDevice>(MyDevice::createID(devName, "")),
 			      _data(DeviceIdentifier(*this))
 			{}
 
-			virtual void handleDeviceDataCallback(DummyDevice &&data) override
+			virtual void handleDeviceDataCallback(MyDevice &&data) override
 			{
 				this->_data.setScalar(data.getScalar());
 				this->_data.setArray(data.getArray());
 				this->_data.setVector(data.getVector());
 			}
 
-			virtual const DummyDevice *getDeviceInformationCallback() override
+			virtual const MyDevice *getDeviceInformationCallback() override
 			{
 				return &this->_data;
 			}
 
-			DummyDevice _data;
+			MyDevice _data;
 	};
 
 	template<class SERIALIZER>

@@ -35,9 +35,9 @@ void gazebo::NRPCameraController::Load(gazebo::sensors::SensorPtr sensor, sdf::E
 
 	// Create camera device and register it
 	this->_cameraInterface.reset(new GrpcDeviceControlSerializer<CameraDeviceController>(devName, this->camera, sensor));
-	this->_dummy.reset(new GrpcDeviceControlSerializer<DummyDeviceController>("dummy"));
+	this->_myDevice.reset(new GrpcDeviceControlSerializer<MyDeviceController>("myDevice"));
 	NRPCommunicationController::getInstance().registerDevice(devName, this->_cameraInterface.get());
-	NRPCommunicationController::getInstance().registerDevice("dummy", this->_dummy.get());
+	NRPCommunicationController::getInstance().registerDevice("myDevice", this->_myDevice.get());
 }
 
 void gazebo::NRPCameraController::OnNewFrame(const unsigned char *image, unsigned int width, unsigned int height, unsigned int depth, const std::string &)

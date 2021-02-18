@@ -1,5 +1,5 @@
 from NRPPythonModule import *
-from NRPGazeboDevicesPython import PhysicsJoint, DummyDevice
+from NRPGazeboDevicesPython import PhysicsJoint, MyDevice
 import numpy as np
 
 dummy_scalar = 0.0
@@ -17,13 +17,12 @@ def transceiver_function(lwn, rwn, lpg, rpg, gpg):
     front_right_j = PhysicsJoint("husky::front_right_joint", "gazebo")
 
     global dummy_scalar
-    dummy = DummyDevice('dummy', 'gazebo')
-    dummy.scalar   = dummy_scalar
-    dummy.array[0] = dummy_scalar * 2
-    dummy.array[1] = dummy_scalar * 3
+    myDevice = MyDevice('myDevice', 'gazebo')
+    myDevice.scalar   = dummy_scalar
+    myDevice.array[0] = dummy_scalar * 2
+    myDevice.array[1] = dummy_scalar * 3
     # Not sure how to set it...
-    #dummy.vector = [1, 2, 3, 4, 5]
-
+    #myDevice.vector[0] = 1
     dummy_scalar = dummy_scalar + 0.1
     
     left_voltage = lwn.data['V_m']
@@ -47,5 +46,5 @@ def transceiver_function(lwn, rwn, lpg, rpg, gpg):
     print("Forward velocity: " + str(forward_vel))
     print("Rotational vel:   " + str(rot_vel))
     # return []
-    return [ back_left_j, back_right_j, front_left_j, front_right_j, dummy ]
+    return [ back_left_j, back_right_j, front_left_j, front_right_j, myDevice ]
 

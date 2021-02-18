@@ -26,43 +26,41 @@
 
 // Helper structure, for cleaner code
 
-struct DummyDevicePropSpec
+struct MyDeviceConsts
 {
+    using MyArray  = std::array<float, 2>; // Helper type definition for our array
+    using MyVector = std::vector<int>;     // Helper type definition for our vector
+
     static constexpr FixedString Scalar        = "scalar"; // Property name
     static constexpr float       DefaultScalar = 0.0f;     // Default value
 
-    using DummyArray = std::array<float, 2>;
-
     static constexpr FixedString Array         = "array";
-    // Do not use auto here!
-    static constexpr DummyArray  DefaultArray  = { 0.0f, 0.0f };
+    static constexpr MyArray     DefaultArray  = { 0.0f, 0.0f };
 
     static constexpr FixedString String        = "string";
-    static constexpr auto        DefaultString = "";
-
-    using DummyVector = std::vector<int>;
+    static constexpr FixedString DefaultString = "";
 
     static constexpr FixedString Vector        = "vector"; // No default value here, because it can't be a compile time constant
 
     // Aggregate property names into single structure PropNames
     // This will be passed to PropertyTemplates constructor
 
-    using DummyDevicePropNames = PropNames<Scalar, Array, String, Vector>;
+    using MyDevicePropertyNames = PropNames<Scalar, Array, String, Vector>;
 };
 
 // Actual device class
 // Derives from Device, which in turn derives from PropertyTemplates
 // Also derives from DummyDevicePropSpec for convenience
 
-class DummyDevice
-    : public DummyDevicePropSpec,
+class MyDevice
+    : public MyDeviceConsts,
       // Here we need to pass property names and specify property types
-      public Device<DummyDevice, "DummyDevice", DummyDevicePropSpec::DummyDevicePropNames, float, DummyDevicePropSpec::DummyArray, std::string, DummyDevicePropSpec::DummyVector>
+      public Device<MyDevice, "MyDevice", MyDeviceConsts::MyDevicePropertyNames, float, MyDeviceConsts::MyArray, std::string, MyDeviceConsts::MyVector>
 {
     public:
-        DummyDevice(DeviceIdentifier    &&devId,
-                    property_template_t &&props = property_template_t(DefaultScalar, DefaultArray, DefaultString, DummyVector()))
-            : Device(std::move(devId), std::move(props))
+        MyDevice(DeviceIdentifier    &&deviceId,
+                 property_template_t &&properties = property_template_t(DefaultScalar, DefaultArray, DefaultString, MyVector()))
+            : Device(std::move(devId), std::move(properties))
         {
             // Do nothing
         }
@@ -81,12 +79,12 @@ class DummyDevice
 
         // Getter and setter for "Array" property
 
-        const DummyArray & getArray() const
+        const MyArray & getArray() const
         {
             return getPropertyByName<Array>();
         }
 
-        void setArray(const DummyArray & value)
+        void setArray(const MyArray & value)
         {
             getPropertyByName<Array>() = value;
         }
@@ -105,12 +103,12 @@ class DummyDevice
 
         // Getter and setter for "Vector" property
 
-        const DummyVector & getVector() const
+        const MyVector & getVector() const
         {
             return getPropertyByName<Vector>();
         }
 
-        void setVector(const DummyVector & value)
+        void setVector(const MyVector & value)
         {
             getPropertyByName<Vector>() = value;
         }

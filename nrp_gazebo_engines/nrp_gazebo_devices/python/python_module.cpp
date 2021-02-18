@@ -78,7 +78,7 @@ BOOST_PYTHON_MODULE(GAZEBO_PYTHON_MODULE_NAME)
 
 	python_property_device_class<PhysicsLink>::create();
 
-	python_property_device_class<DummyDevice>::create();
+	python_property_device_class<MyDevice>::create();
 }
 
 

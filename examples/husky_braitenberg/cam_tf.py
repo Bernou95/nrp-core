@@ -62,15 +62,15 @@ def detect_red(camDevice):
 
 
 @SingleTransceiverDevice(keyword='camera', id=DeviceIdentifier('mouse_right_eye::camera', 'gazebo'))
-@SingleTransceiverDevice(keyword='dummy', id=DeviceIdentifier('dummy', 'gazebo'))
+@SingleTransceiverDevice(keyword='myDevice', id=DeviceIdentifier('myDevice', 'gazebo'))
 @TransceiverFunction("nest")
-def transceiver_function(camera, dummy):
+def transceiver_function(camera, myDevice):
     print("Camera Depth: " + str(camera.image_depth))
-    print("Dummy scalar: " + str(dummy.scalar))
-    print("Dummy array: " + str(dummy.array))
+    print("myDevice scalar: " + str(myDevice.scalar))
+    print("myDevice array: " + str(myDevice.array))
     # This one may be tricky... How to register it with boost::python?
     #print("Dummy string: " + str(dummy.string))
-    print("Dummy vector: " + str(dummy.vector))
+    print("myDevice vector: " + str(myDevice.vector))
 
     res = detect_red(camera)
     

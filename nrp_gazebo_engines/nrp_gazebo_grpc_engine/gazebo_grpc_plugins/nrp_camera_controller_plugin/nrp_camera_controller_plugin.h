@@ -40,7 +40,7 @@ namespace gazebo
 
 		private:
 			std::unique_ptr<GrpcDeviceControlSerializer<CameraDeviceController> > _cameraInterface;
-			std::unique_ptr<GrpcDeviceControlSerializer<DummyDeviceController> > _dummy;
+			std::unique_ptr<GrpcDeviceControlSerializer<MyDeviceController> > _myDevice;
 	};
 
 	GZ_REGISTER_SENSOR_PLUGIN(NRPCameraController)

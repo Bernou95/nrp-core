@@ -23,34 +23,45 @@
 #include "nrp_gazebo_grpc_engine/devices/grpc_dummy_device.h"
 
 template<>
-GRPCDevice DeviceSerializerMethods<GRPCDevice>::serialize<DummyDevice>(const DummyDevice &dev)
+GRPCDevice DeviceSerializerMethods<GRPCDevice>::serialize<MyDevice>(const MyDevice &device)
 {
     static const std::string str = "test";
 
-    GRPCDevice msg = serializeID<GRPCDevice>(dev.id());
+    // Copy device ID to the gRPC message
 
-    msg.dev().mutable_dummy()->InitAsDefaultInstance();
+    GRPCDevice grpcMessage = serializeID<GRPCDevice>(device.id());
 
-    msg.dev().mutable_dummy()->set_scalar(dev.getScalar());
+    // Get pointer to the message data
 
-    msg.dev().mutable_dummy()->add_array(dev.getArray()[0]);
-    msg.dev().mutable_dummy()->add_array(dev.getArray()[1]);
+    auto myDevice = grpcMessage.dev().mutable_mydevice();
 
-    msg.dev().mutable_dummy()->set_string(str);
+    myDevice->InitAsDefaultInstance();
 
-    //msg.dev().mutable_dummy()->vector(dev.getVector());
-    *msg.dev().mutable_dummy()->mutable_vector() = {dev.getVector().begin(), dev.getVector().end()};
+    // Copy data from scalar property to the gRPC message
 
-    return msg;
+    myDevice->set_scalar(device.getScalar());
+
+    // Copy data from array property to the gRPC message
+
+    myDevice->add_array(device.getArray()[0]);
+    myDevice->add_array(device.getArray()[1]);
+
+    myDevice->set_string(str);
+
+    // Copy data from vector property to the gRPC message
+
+    *myDevice->mutable_vector() = {device.getVector().begin(), device.getVector().end()};
+
+    return grpcMessage;
 }
 
 template<>
-DummyDevice DeviceSerializerMethods<GRPCDevice>::deserialize<DummyDevice>(DeviceIdentifier &&devID, deserialization_t data)
+MyDevice DeviceSerializerMethods<GRPCDevice>::deserialize<MyDevice>(DeviceIdentifier &&deviceId, deserialization_t data)
 {
-    std::cout << "DESERIALIZE" << std::endl;
-    return DummyDevice(std::move(devID), DummyDevice::property_template_t(data->dummy().scalar(),
-                                                                          DummyDevicePropSpec::DummyArray({data->dummy().array(0), data->dummy().array(1)}),
-                                                                          data->dummy().string(),
-                                                                          DummyDevicePropSpec::DummyVector(data->dummy().vector().begin(),
-	                                                                                                       data->dummy().vector().end())));
+    return MyDevice(std::move(deviceId), MyDevice::property_template_t(data->mydevice().scalar(),
+                                                                       MyDeviceConsts::MyArray({data->mydevice().array(0), 
+                                                                                                data->mydevice().array(1)}),
+                                                                       data->mydevice().string(),
+                                                                       MyDeviceConsts::MyVector(data->mydevice().vector().begin(),
+	                                                                                            data->mydevice().vector().end())));
 }

@@ -112,10 +112,10 @@ message GetDeviceReply
 
     oneof data
     {
-	    GazeboCamera camera = 2;
-		GazeboLink   link   = 3;
-		GazeboJoint  joint  = 4;
-        DummyDevice  dummy  = 5;
+	    GazeboCamera camera   = 2;
+		GazeboLink   link     = 3;
+		GazeboJoint  joint    = 4;
+        MyDevice     myDevice = 5;
     }
 }
 
@@ -161,7 +161,7 @@ message GazeboJoint
     float effort   = 3;
 }
 
-message DummyDevice
+message MyDevice
 {
     float          scalar = 1;
     repeated float array  = 2;
