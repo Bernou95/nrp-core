@@ -19,6 +19,8 @@ and users wishing to create their own engines. Nevertheless, the first two secti
 
 Should you be interested in creating your own engine for an as-of-yet unsupported simulator, we provide a small tutorial \ref tutorial_engine_creation "here".
 
+Tutorial on how to \ref tutorial_device_creation "add and integrate a new device".
+
 
 \section nrp_engines Available engines
 

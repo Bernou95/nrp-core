@@ -1,0 +1,340 @@
+/*! \defgroup tutorial_device_creation Creating a new device
+
+In this tutorial we are going to create a new device type and integrate it into gazebo_grpc_engine.
+
+The new device is going to have 4 properties:
+a scalar float, an array of two floats, a string, and a vector.
+
+\subsection tutorial_device_creation_device Creating new device class
+
+Create new source and header files in `nrp_gazebo_engines/nrp_gazebo_devices/nrp_gazebo_devices` directory.
+
+Add the newly created source file to LIB_SRC_FILES variable in `nrp_gazebo_engines/nrp_gazebo_devices/CMakeLists.txt`.
+
+In the header file, create a new structure called `MyDeviceConsts`, 
+The structure is going to contain property names and their default values.
+While optional, this structure is going to help keep the code clean.
+In the code below we have defined four property names. 
+They were aggregated into a single PropNames structure, which will be neede in the next step.
+
+\code
+struct MyDeviceConsts
+{
+    using MyArray  = std::array<float, 2>; // Helper type definition for our array
+    using MyVector = std::vector<int>;     // Helper type definition for our vector
+
+    static constexpr FixedString Scalar        = "scalar"; // Property name
+    static constexpr float       DefaultScalar = 0.0f;     // Default value
+
+    static constexpr FixedString Array         = "array";
+    static constexpr MyArray     DefaultArray  = { 0.0f, 0.0f };
+
+    static constexpr FixedString String        = "string";
+    static constexpr FixedString DefaultString = "";
+
+    static constexpr FixedString Vector        = "vector"; // No default value here, because it can't be a compile time constant
+
+    // Aggregate property names into single structure PropNames
+    // This will be passed to PropertyTemplates constructor
+
+    using MyDevicePropertyNames = PropNames<Scalar, Array, String, Vector>;
+};
+\endcode
+
+Create a new device class, let's call it MyDevice. All devices should derive from the generic Device class,
+which in turn derives from PropertyTemplates. The device class expects several template arguments:
+- derived class
+- type of the derived class as string
+- PropNames structure containing names of all properties of the new device type (in our case it's `MyDevicePropertyNames`
+defined in the helper structure)
+- types of all properties. Their order must match order of property names
+
+\code
+class MyDevice
+    : public MyDeviceConsts,
+      // Here we need to pass property names and specify property types
+      public Device<MyDevice, "MyDevice", MyDeviceConsts::MyDevicePropertyNames, float, MyDeviceConsts::MyArray, std::string, MyDeviceConsts::MyVector>
+{
+};
+\endcode
+
+Add a constructor to the new class. It should expect a DeviceIdentifier and property_template_t
+objects as arguments. You can specify default values of all properties by passing them
+as the default argument.
+
+\code
+MyDevice(DeviceIdentifier    &&deviceId,
+         property_template_t &&properties = property_template_t(DefaultScalar, DefaultArray, DefaultString, MyVector()))
+    : Device(std::move(devId), std::move(properties))
+{
+    // Do nothing
+}
+\endcode
+
+Add getters and setters for the properties. You should use overloaded 'getPropertyByName<>' function provided
+by PropertyTemplate
+
+\code
+        // Getter and setter for "Scalar" property
+
+        float getScalar() const
+        {
+            return getPropertyByName<Scalar>();
+        }
+
+        void setScalar(float value)
+        {
+            getPropertyByName<Scalar>() = value;
+        }
+
+        // Getter and setter for "Array" property
+
+        const MyArray & getArray() const
+        {
+            return getPropertyByName<Array>();
+        }
+
+        void setArray(const MyArray & value)
+        {
+            getPropertyByName<Array>() = value;
+        }
+
+        // Getter and setter for "String" property
+
+        const std::string & getString() const
+        {
+            return getPropertyByName<String>();
+        }
+
+        void setString(const std::string & value)
+        {
+            getPropertyByName<String>() = value;
+        }
+
+        // Getter and setter for "Vector" property
+
+        const MyVector & getVector() const
+        {
+            return getPropertyByName<Vector>();
+        }
+
+        void setVector(const MyVector & value)
+        {
+            getPropertyByName<Vector>() = value;
+        }
+\endcode
+
+\subsection tutorial_device_creation_client Integrating new device class
+
+The Gazebo gRPC engine is using protobuf to pass device data between client and server.
+To integrate the new device into the engine, the first step is to provide a protobuf message
+definition. Its structure should match the structure of the new device class.
+
+Add a new message to `nrp_engine_protocols/nrp_grpc_engine_protocol/grpc_server/engine_grpc.proto` file.
+Please refer to <a href="https://developers.google.com/protocol-buffers/docs/proto3">proto3 language guide</a> to check available protobuf types.
+
+\code
+message MyDevice
+{
+    float          scalar = 1;
+    repeated float array  = 2;
+    string         string = 3;
+    repeated int64 vector = 4;
+}
+\endcode
+
+Add the newly created message to `DeviceMessage` proto message (in the same file), in the `oneof data` section.
+
+\code
+message DeviceMessage
+{
+    DeviceIdentifier deviceId = 1;
+
+    oneof data
+    {
+	    GazeboCamera camera   = 2;
+		GazeboLink   link     = 3;
+		GazeboJoint  joint    = 4;
+        MyDevice     myDevice = 5; // Added the new message here
+    }
+}
+\endcode
+
+Now, we need a way of translating the C++ code of our device into a protobuf message. To do that,
+we have to write two functions, for serialization and deserialization of our device.
+
+Add new header and source files to `nrp_gazebo_engines/nrp_gazebo_grpc_engine/nrp_gazebo_grpc_engine/devices/`
+
+Declare serialization and deserialization functions in the header file
+
+\code
+template<>
+GRPCDevice DeviceSerializerMethods<GRPCDevice>::serialize<MyDevice>(const MyDevice &device);
+
+template<>
+MyDevice DeviceSerializerMethods<GRPCDevice>::deserialize<MyDevice>(DeviceIdentifier &&devID, deserialization_t data);
+\endcode
+
+Define the functions in the source file
+
+\code
+template<>
+GRPCDevice DeviceSerializerMethods<GRPCDevice>::serialize<MyDevice>(const MyDevice &device)
+{
+    static const std::string str = "test";
+
+    // Copy device ID to the gRPC message
+
+    GRPCDevice grpcMessage = serializeID<GRPCDevice>(device.id());
+
+    // Get pointer to the message data
+
+    auto myDevice = grpcMessage.dev().mutable_mydevice();
+
+    myDevice->InitAsDefaultInstance();
+
+    // Copy data from scalar property to the gRPC message
+
+    myDevice->set_scalar(device.getScalar());
+
+    // Copy data from array property to the gRPC message
+
+    myDevice->add_array(device.getArray()[0]);
+    myDevice->add_array(device.getArray()[1]);
+
+    myDevice->set_string(str);
+
+    // Copy data from vector property to the gRPC message
+
+    *myDevice->mutable_vector() = {device.getVector().begin(), device.getVector().end()};
+
+    return grpcMessage;
+}
+
+template<>
+MyDevice DeviceSerializerMethods<GRPCDevice>::deserialize<MyDevice>(DeviceIdentifier &&deviceId, deserialization_t data)
+{
+    return MyDevice(std::move(deviceId), MyDevice::property_template_t(data->mydevice().scalar(),
+                                                                       MyDeviceConsts::MyArray({data->mydevice().array(0), 
+                                                                                                data->mydevice().array(1)}),
+                                                                       data->mydevice().string(),
+                                                                       MyDeviceConsts::MyVector(data->mydevice().vector().begin(),
+	                                                                                            data->mydevice().vector().end())));
+}
+\endcode
+
+We need to register the new device type in the engine. To do that, add MyDevice as template argument to GazeboEngineGrpcNRPClient class
+
+\code
+class GazeboEngineGrpcNRPClient
+    : public EngineGrpcClient<GazeboEngineGrpcNRPClient, GazeboGrpcConfig, PhysicsCamera, PhysicsJoint, PhysicsLink, MyDevice>
+\endcode
+
+We need a device controller class on the server side. The puropse of this class is
+to handle incoming and outgoing data for the new device type.
+
+Create a controller class associated with the new device type (`MyDeviceController`).
+It should inherit from EngineDeviceController. Add a MyDevice object as a member.
+MyDeviceController needs to implement two methods: handleDeviceDataCallback to receive data
+and getDeviceInformationCallback to send data.
+
+\code
+    template<class SERIALIZER>
+	class MyDeviceController
+	    : public EngineDeviceController<SERIALIZER, MyDevice>
+	{
+
+		public:
+			MyDeviceController(const std::string &devName)
+			    : EngineDeviceController<SERIALIZER, MyDevice>(MyDevice::createID(devName, "")),
+			      _data(DeviceIdentifier(*this))
+			{}
+
+			virtual void handleDeviceDataCallback(MyDevice &&data) override
+			{
+				this->_data.setScalar(data.getScalar());
+				this->_data.setArray(data.getArray());
+				this->_data.setVector(data.getVector());
+			}
+
+			virtual const MyDevice *getDeviceInformationCallback() override
+			{
+				return &this->_data;
+			}
+
+			MyDevice _data;
+	};
+\endcode
+
+Add the device controller as a member to your gazebo plugin class:
+
+\code
+std::unique_ptr<GrpcDeviceControlSerializer<MyDeviceController> > _myDevice;
+\endcode
+
+Register the controller in the NRPCommunicationController from the Load function of the plugin.
+
+\code
+this->_myDevice.reset(new GrpcDeviceControlSerializer<MyDeviceController>("myDevice"));
+NRPCommunicationController::getInstance().registerDevice("myDevice", this->_myDevice.get());
+\endcode
+
+Make the device accessible to transceiver functions by registering it in `nrp_gazebo_engines/nrp_gazebo_devices/python/python_module.cpp`.
+You can use the `create` method provided by python_property_device_class, which registers all
+device properties in the corresponding python class
+
+\code
+python_property_device_class<DummyDevice>::create();
+\endcode
+
+\subsection tutorial_device_creation_tf_set Setting device data in transceiver function
+
+Import MyDevice from NRPGazeboDevicesPython module in your gazebo transceiver function
+
+\code
+from NRPGazeboDevicesPython import MyDevice
+\endcode
+
+Create a device object and set the data
+
+\code
+    myDevice = MyDevice('myDevice', 'gazebo')
+    myDevice.scalar   = dummy_scalar
+    myDevice.array[0] = dummy_scalar * 2
+    myDevice.array[1] = dummy_scalar * 3
+    # Not sure how to set it...
+    #myDevice.vector[0] = 1
+    dummy_scalar = dummy_scalar + 0.1
+\endcode
+
+Return the object from your transceiver function:
+
+\code
+return [ back_left_j, back_right_j, front_left_j, front_right_j, myDevice ]
+\endcode
+
+\subsection tutorial_device_creation_tf_access Accessing device data in a transciever function
+
+Import MyDevice from NRPGazeboDevicesPython module in your nest transceiver function file
+
+\code
+import NRPGazeboDevicesPython
+\endcode
+
+Define the device as input device by using the SingleTransceiverDecorator and add it as a parameter to the transceiver function.
+
+\code
+@SingleTransceiverDevice(keyword='myDevice', id=DeviceIdentifier('myDevice', 'gazebo'))
+\endcode
+
+You can access the data now
+
+\code
+    print("myDevice scalar: " + str(myDevice.scalar))
+    print("myDevice array: " + str(myDevice.array))
+    # This one may be tricky... How to register it with boost::python?
+    #print("Dummy string: " + str(dummy.string))
+    print("myDevice vector: " + str(myDevice.vector))
+\endcode
+
+*/

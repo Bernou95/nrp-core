@@ -180,6 +180,7 @@ doxygen_add_docs(doxygen
 	"docs/simulation_config.dox"
 	"docs/todos.dox"
 	"docs/transceiver_functions_and_devices.dox"
+	"docs/tutorials/device_creation.dox"
 	"docs/tutorials/engine_creation.dox"
 	"docs/tutorials/grpc_engine_creation.dox"
 	"docs/tutorials/json_engine_creation.dox"
