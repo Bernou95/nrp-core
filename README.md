@@ -27,7 +27,9 @@
  - Boost-Python: Easier Python handling
  - GTest: Testing Suite
  - spdlog: Logging functions
- - Cython3: Required by Nest
+ - Cython3: Required by Nestu
+ 
+ - OpenSim: For Opensim engine (You can run the shell "OpensimInstall.sh" to install it as a python module")
 
 ## Installation
 
@@ -115,7 +117,7 @@ documentation can be found in a new `doxygen` folder
  - Starts gazebo and loads plugins to communicate with the CLE
 
 ##### Nest
- - In subdirectory nrp_nest_device_interface
+ - In subdirectory nrp_gazebo_engines
  - Uses an EngineJSONServer
  - Takes a python file as input to define the initialize function (Start nest, define devices, ...)
  - Has single device types:
@@ -124,12 +126,18 @@ documentation can be found in a new `doxygen` folder
  - Start NRPNestExecutable as a child process
 
 ##### Python
- - In subdirectory nrp_python_device_interface
+ - In subdirectory nrp_nest_json_engine
  - Uses an EngineJSONServer
  - Takes a python file as input to define the initialize, runStep, and shutdown functions
  - Has single device types:
 	 - PythonObjectDeviceInterface: Should be able to interface with many Python datatypes. Uses Python-side JSON converter
  - Starts NRPPythonExecutable as a child process
+ 
+ ##### OpenSim
+ - In subdirectory nrp_opensim_engines
+ - Uses an EngineJSONServer
+ - Takes a python file as input to define the initialize, runStep, and shutdown functions
+ - Starts NRPOpensimExecutable as a child process
 
 ##### Additional Engines
 Additional engines can be defined in a similar manner. 
