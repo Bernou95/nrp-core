@@ -27,10 +27,11 @@
 #include "nrp_general_library/utils/python_interpreter_state.h"
 
 #include "nrp_opensim_json_engine/config/opensim_config.h"
-#include "nrp_opensim_json_engine/engine_server/opensim_engine_json_device_controller.h"
+#include "nrp_opensim_json_engine/devices/opensim_engine_json_device_controller.h"
 
-#include <boost/python.hpp>
 #include <iostream>
+#include <boost/python.hpp>
+
 class PyEngineScript;
 
 class OpensimJSONServer
@@ -46,7 +47,7 @@ class OpensimJSONServer
 		 * \return Returns true once the initialize function has been run once
 		 */
 		bool initRunFlag() const;
-
+		std::string getWorldFile();
 		/*!
 		 * \brief Has a shutdown command been received?
 		 * \return Returns true if a shutdown command has been received
@@ -64,15 +65,13 @@ class OpensimJSONServer
 		 */
 		static PyEngineScript *registerScript(const boost::python::object &pythonScript);
 
-		std::string getWorldFile();
 	private:
-		std::string worldFileName = "basicModel.osim";
 		/*!
 		 * \brief Ptr to current OpensimJSONServer.
 		 * When registerScript() is called, it will use this ptr to determine the class where the pythonScript will be stored
 		 */
 		static OpensimJSONServer *_registrationPyServer;
-
+		std::string _worldFileName = "None";
 		/*!
 		 * \brief Init Flag. Set to true once the server has executed the initialize function
 		 */
@@ -121,4 +120,4 @@ class OpensimJSONServer
 
 };
 
-#endif // OPENSIM_JSON_SERVER_H
+#endif // OPENSIM

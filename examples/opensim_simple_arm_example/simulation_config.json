@@ -5,19 +5,16 @@
 	"EngineConfigs": 
 	[
 		{
-			"EngineType": "opensim_grpc",
-			"EngineName": "opensim",
-			"OpensimWorldFileName": "basicModel.osim"
-		}
-		{
-			"EngineType": "python_json",
-			"EngineName": "python_1",
-			"PythonFileName": "engine_1.py"
+			"EngineType": "opensim_json",
+			"EngineName": "servo",
+			"OpensimRunPy": "servo.py",
+			"OpensimFileName": "arm26_ground_offset.osim"
 		},
 		{
-			"EngineType": "python_json",
-			"EngineName": "python_2",
-			"PythonFileName": "engine_2.py"
+			"EngineType": "opensim_json",
+			"EngineName": "client",
+			"OpensimRunPy": "client.py",
+			"OpensimFileName": "None"
 		}
 	],
 	"TransceiverFunctions":

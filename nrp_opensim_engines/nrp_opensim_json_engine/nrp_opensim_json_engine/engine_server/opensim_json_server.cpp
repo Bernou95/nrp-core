@@ -20,14 +20,14 @@
 // Agreement No. 945539 (Human Brain Project SGA3).
 //
 
-#include "nrp_opensim_json_engine/engine_server/opensim_json_server.h"
-
 #include "nrp_general_library/utils/python_error_handler.h"
 #include "nrp_general_library/utils/python_interpreter_state.h"
 
 #include "nrp_opensim_json_engine/config/cmake_constants.h"
-#include "nrp_opensim_json_engine/engine_server/opensim_engine_json_device_controller.h"
+#include "nrp_opensim_json_engine/devices/opensim_engine_json_device_controller.h"
 #include "nrp_opensim_json_engine/python/py_engine_script.h"
+
+#include "nrp_opensim_json_engine/engine_server/opensim_json_server.h"
 
 #include <fstream>
 
@@ -51,7 +51,9 @@ bool OpensimJSONServer::initRunFlag() const
 {
 	return this->_initRunFlag;
 }
-
+std::string OpensimJSONServer::getWorldFile(){
+	return this->_worldFileName;
+}
 bool OpensimJSONServer::shutdownFlag() const
 {
 	return this->_shutdownFlag;
@@ -91,18 +93,30 @@ nlohmann::json OpensimJSONServer::initialize(const nlohmann::json &data, EngineJ
 	const OpensimConfig config(data.at(OpensimConfig::ConfigType.m_data));
 
 	// Read python script file if present
-	const std::filesystem::path fileName = config.pythonFileName();
-
-	if(fileName.empty())
-	{
+	const std::filesystem::path fileName = config.opensimRunPy();
+	if(fileName.empty()){
 		const auto errMsg = "No python filename given. Aborting...";
 		NRPLogger::SPDErrLogDefault(errMsg);
 		return this->formatInitErrorMessage(errMsg);
 	}
-
-	if(!std::filesystem::exists(fileName))
-	{
+	if(!std::filesystem::exists(fileName)){
 		const auto errMsg = "Could not find init file " + std::string(fileName);
+		NRPLogger::SPDErrLogDefault(errMsg);
+		return this->formatInitErrorMessage(errMsg);
+	}
+
+	// Read python script file if present
+	this->_worldFileName = config.opensimFileName();
+	//std::cout << config.opensimFileName() << std::endl;
+	const std::filesystem::path opensimFileName = config.opensimFileName();
+	if(opensimFileName.empty()){
+		const auto errMsg = "No Opensimfilename given. Aborting...";
+		NRPLogger::SPDErrLogDefault(errMsg);
+		return this->formatInitErrorMessage(errMsg);
+	}
+
+	if(!std::filesystem::exists(opensimFileName) && this->_worldFileName != "None"){
+		const auto errMsg = "Could not find init file " + std::string(opensimFileName);
 		NRPLogger::SPDErrLogDefault(errMsg);
 		return this->formatInitErrorMessage(errMsg);
 	}
@@ -147,7 +161,6 @@ nlohmann::json OpensimJSONServer::initialize(const nlohmann::json &data, EngineJ
 
 	}
 
-	this->worldFileName = config.opensimFileName();
 	// Init has run once
 	this->_initRunFlag = true;
 
@@ -197,10 +210,6 @@ PyEngineScript *OpensimJSONServer::registerScript(const boost::python::object &p
 	OpensimJSONServer::_registrationPyServer = nullptr;
 
 	return &script;
-}
-
-std::string OpensimJSONServer::getWorldFile(){
-	return this->worldFileName;
 }
 
 nlohmann::json OpensimJSONServer::formatInitErrorMessage(const std::string &errMsg)

@@ -20,7 +20,7 @@
 // Agreement No. 945539 (Human Brain Project SGA3).
 //
 
-#include "nrp_opensim_json_engine/engine_server/opensim_engine_json_device_controller.h"
+#include "nrp_opensim_json_engine/devices/opensim_engine_json_device_controller.h"
 
 #include <iostream>
 

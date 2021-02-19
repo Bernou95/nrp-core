@@ -24,11 +24,13 @@
 
 #include "nrp_general_library/device_interface/devices/pyobject_device.h"
 #include "nrp_general_library/utils/ptr_templates.h"
+
+
 #include "nrp_opensim_json_engine/engine_server/opensim_json_server.h"
 
 #include <boost/python.hpp>
 #include <map>
-
+#include <iostream>
 /*!
  * \brief C++ class to interface with user-defined Python script class
  */
@@ -51,6 +53,7 @@ class PyEngineScript
 		 */
 		inline SimulationTime runLoop(SimulationTime timestep)
 		{
+			//std::cout << " Aloha !!! --- hhh\n";
 			this->runLoopFcn(timestep);
 			this->_time += timestep;
 
@@ -66,6 +69,7 @@ class PyEngineScript
 		 * \brief Get simulation time of this engine
 		 */
 		SimulationTime simTime() const;
+		std::string worldFile() const;
 
 		/*!
 		 * \brief Register device
@@ -88,8 +92,8 @@ class PyEngineScript
 		void setDevice(const std::string &deviceName, boost::python::object data);
 
 		/*!
-		 * \brief Save ptr to OpensimJSONServer instance that owns this script
-		 * \param pServer Pointer to OpensimJSONServer
+		 * \brief Save ptr to PythonJSONServer instance that owns this script
+		 * \param pServer Pointer to PythonJSONServer
 		 */
 		void setOpensimJSONServer(OpensimJSONServer *pServer);
 
@@ -105,9 +109,9 @@ class PyEngineScript
 		 * \brief Engine Time
 		 */
 		SimulationTime _time = SimulationTime::zero();
-
+		std::string _worldFileName = "None";
 		/*!
-		 * \brief Ptr to OpensimJSONServer instance that owns this script
+		 * \brief Ptr to PythonJSONServer instance that owns this script
 		 */
 		OpensimJSONServer *_pServer = nullptr;
 

@@ -1,0 +1,87 @@
+[2021-02-18 00:30:06.470] [info] Loaded model arm26 from file arm26_ground_offset.osim
+[2021-02-18 00:30:06.473] [error] Error while executing loop step: Traceback (most recent call last):
+  File "client.py", line 31, in runLoop
+    self.imuIK.run(True);
+  File "/usr/local/lib/python3.8/dist-packages/opensim-4.2_2021_02_10_d1304141c-py3.8.egg/opensim/tools.py", line 10579, in run
+    return _tools.IMUInverseKinematicsTool_run(self, *args)
+RuntimeError: std::exception in 'bool OpenSim::IMUInverseKinematicsTool::run(bool)': Error inferring extension for file ''.
+Invalid Argument. 
+	Thrown at FileAdapter.cpp:30 in findExtension().
+
+[2021-02-18 00:37:15.727] [info] Loaded model arm26 from file arm26_ground_offset.osim
+[2021-02-18 02:22:29.618] [info] Loaded model arm26 from file arm26_ground_offset.osim
+[2021-02-18 02:25:40.196] [info] Loaded model arm26 from file ./arm26_ground_offset.osim
+[2021-02-19 05:03:47.474] [info] Loaded model arm26 from file arm26_ground_offset.osim
+[2021-02-19 05:04:44.803] [info] Loaded model arm26 from file arm26_ground_offset.osim
+[2021-02-19 05:04:55.769] [info] Loaded model arm26 from file arm26_ground_offset.osim
+[2021-02-19 05:05:07.289] [info] Loaded model arm26 from file arm26_ground_offset.osim
+[2021-02-19 05:05:07.297] [error] Traceback (most recent call last):
+  File "client.py", line 39, in initialize
+    self.reset()
+  File "client.py", line 69, in reset
+    self.reset_manager()
+  File "client.py", line 61, in reset_manager
+    self.manager = osim.Manager(self.model)
+NameError: name 'osim' is not defined
+
+[2021-02-19 05:06:50.642] [info] Loaded model arm26 from file arm26_ground_offset.osim
+[2021-02-19 05:06:50.645] [error] Traceback (most recent call last):
+  File "client.py", line 36, in initialize
+    self.brain = osim.PrescribedController()
+NameError: name 'osim' is not defined
+
+[2021-02-19 05:07:28.388] [info] Loaded model arm26 from file arm26_ground_offset.osim
+[2021-02-19 05:07:28.406] [error] Traceback (most recent call last):
+  File "client.py", line 40, in initialize
+    self.reset()
+  File "client.py", line 70, in reset
+    self.reset_manager()
+  File "client.py", line 63, in reset_manager
+    self.manager.setIntegratorAccuracy(self.integrator_accuracy)
+  File "/usr/local/lib/python3.8/dist-packages/opensim-4.2_2021_02_10_d1304141c-py3.8.egg/opensim/simulation.py", line 37711, in setIntegratorAccuracy
+    return _simulation.Manager_setIntegratorAccuracy(self, accuracy)
+TypeError: in method 'Manager_setIntegratorAccuracy', argument 2 of type 'double'
+
+[2021-02-19 05:10:17.643] [info] Loaded model arm26 from file arm26_ground_offset.osim
+[2021-02-19 05:10:34.663] [info] Loaded model arm26 from file arm26_ground_offset.osim
+[2021-02-19 05:10:34.673] [error] Error while executing loop step: Traceback (most recent call last):
+  File "client.py", line 48, in runLoop
+    self.actuate([0.0, 0.0, 0.0, 0.5, 0.0, 0.0])
+  File "client.py", line 83, in actuate
+    if np.any(np.isnan(action)):
+NameError: name 'np' is not defined
+
+[2021-02-19 05:11:06.000] [info] Loaded model arm26 from file arm26_ground_offset.osim
+[2021-02-19 05:11:06.020] [error] Error while executing loop step: Traceback (most recent call last):
+  File "client.py", line 48, in runLoop
+    self.actuate([0.0, 0.0, 0.0, 0.5, 0.0, 0.0])
+  File "client.py", line 87, in actuate
+    self.model.getControllerSet().get(0))
+  File "/usr/local/lib/python3.8/dist-packages/opensim-4.2_2021_02_10_d1304141c-py3.8.egg/opensim/simulation.py", line 25379, in get
+    return _simulation.SetControllers_get(self, *args)
+RuntimeError: std::exception in 'OpenSim::Controller & OpenSim::Set< OpenSim::Controller,OpenSim::ModelComponent >::get(int) const': ArrayPtrs.get: Array index out of bounds.
+
+[2021-02-19 05:12:57.080] [info] Loaded model arm26 from file arm26_ground_offset.osim
+[2021-02-19 05:12:57.083] [error] Traceback (most recent call last):
+  File "client.py", line 38, in initialize
+    for j in range(self.muscleSet.getSize()):
+AttributeError: 'Script' object has no attribute 'muscleSet'
+
+[2021-02-19 05:13:47.050] [info] Loaded model arm26 from file arm26_ground_offset.osim
+[2021-02-19 05:13:47.053] [error] Traceback (most recent call last):
+  File "client.py", line 39, in initialize
+    func = opensim.Constant(1.0)
+NameError: name 'opensim' is not defined
+
+[2021-02-19 05:14:02.027] [info] Loaded model arm26 from file arm26_ground_offset.osim
+[2021-02-19 05:14:17.918] [info] Loaded model arm26 from file arm26_ground_offset.osim
+[2021-02-19 05:15:06.072] [info] Loaded model arm26 from file arm26_ground_offset.osim
+[2021-02-19 05:17:07.060] [info] Loaded model arm26 from file ./arm26_ground_offset.osim
+[2021-02-19 05:17:45.318] [info] Loaded model arm26 from file ./arm26_ground_offset.osim
+[2021-02-19 05:20:49.659] [info] Loaded model arm26 from file arm26_ground_offset.osim
+[2021-02-19 05:22:23.017] [info] Loaded model arm26 from file arm26_ground_offset.osim
+[2021-02-19 05:26:03.021] [info] Loaded model arm26 from file arm26_ground_offset.osim
+[2021-02-19 05:26:35.886] [info] Loaded model arm26 from file arm26_ground_offset.osim
+[2021-02-19 05:28:35.674] [info] Loaded model arm26 from file arm26_ground_offset.osim
+[2021-02-19 05:39:11.837] [info] Loaded model arm26 from file arm26_ground_offset.osim
+[2021-02-19 08:17:27.224] [info] Loaded model arm26 from file arm26_ground_offset.osim

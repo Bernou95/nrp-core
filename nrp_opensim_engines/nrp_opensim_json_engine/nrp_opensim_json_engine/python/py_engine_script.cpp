@@ -20,11 +20,10 @@
 // Agreement No. 945539 (Human Brain Project SGA3).
 //
 
-#include "nrp_opensim_json_engine/python/py_engine_script.h"
-
 #include "nrp_general_library/utils/nrp_exceptions.h"
-#include "nrp_opensim_json_engine/engine_server/opensim_engine_json_device_controller.h"
-#include <iostream>
+
+#include "nrp_opensim_json_engine/python/py_engine_script.h"
+#include "nrp_opensim_json_engine/devices/opensim_engine_json_device_controller.h"
 
 PyEngineScript::~PyEngineScript()
 {
@@ -39,6 +38,10 @@ void PyEngineScript::shutdown()
 
 SimulationTime PyEngineScript::simTime() const
 {	return this->_time;	}
+std::string PyEngineScript::worldFile() const{
+	return this->_worldFileName;
+}
+
 
 void PyEngineScript::registerDevice(std::string deviceName)
 {
@@ -62,7 +65,6 @@ void PyEngineScript::registerDevice(std::string deviceName)
 boost::python::object &PyEngineScript::getDevice(const std::string &deviceName)
 {
 	auto devIt = this->_nameDeviceMap.find(deviceName);
-
 	if(devIt == this->_nameDeviceMap.end())
 		throw NRPException::logCreate("Could not find device with name \"" + deviceName + "\"");
 
@@ -70,12 +72,11 @@ boost::python::object &PyEngineScript::getDevice(const std::string &deviceName)
 }
 
 void PyEngineScript::setDevice(const std::string &deviceName, boost::python::object data)
-{	
-	//std::cout << this->_time << std::endl;
-	this->getDevice(deviceName) = data;	
-}
+{	this->getDevice(deviceName) = data;	}
 
 void PyEngineScript::setOpensimJSONServer(OpensimJSONServer *pServer)
 {
 	this->_pServer = pServer;
+	this->_worldFileName = pServer->getWorldFile();
+	std::cout << "From PyEngineScript :--> " << pServer->getWorldFile() << std::endl;
 }

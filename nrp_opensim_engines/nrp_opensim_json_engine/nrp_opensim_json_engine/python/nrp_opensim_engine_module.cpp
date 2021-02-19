@@ -23,6 +23,7 @@
 #include <boost/python.hpp>
 
 #include "nrp_general_library/config/cmake_constants.h"
+
 #include "nrp_opensim_json_engine/config/cmake_constants.h"
 #include "nrp_opensim_json_engine/engine_server/opensim_json_server.h"
 #include "nrp_opensim_json_engine/python/py_engine_script.h"
@@ -32,7 +33,7 @@
 namespace python = boost::python;
 
 /*!
- * \brief Calls PythonJSONServer::registerScript() without returning a value
+ * \brief Calls OpensimJSONServer::registerScript() without returning a value
  */
 void PyServerRegistration(python::object script)
 {	OpensimJSONServer::registerScript(script);	}
@@ -59,7 +60,7 @@ BOOST_PYTHON_MODULE(NRP_PYTHON_ENGINE_MODULE)
 
 	// Import General NRP Python Module
 	python::import(PYTHON_MODULE_NAME_STR);
-
+	python::import("opensim");
 	python::class_<SimulationTime>("SimulationTime")
 		.def("count", &SimulationTime::count)
 	;
@@ -70,6 +71,7 @@ BOOST_PYTHON_MODULE(NRP_PYTHON_ENGINE_MODULE)
 	        .def("runLoop", python::pure_virtual(&PyEngineScriptWrapper::runLoop))
 	        .def("shutdown", &PyEngineScriptWrapper::shutdown, &PyEngineScriptWrapper::defaultShutdown)
 	        .add_property("_time", &PyEngineScript::simTime)
+	        .add_property("_world", &PyEngineScript::worldFile)
 	        .def("_registerDevice", &PyEngineScript::registerDevice)
 	        .def("_getDevice", &PyEngineScript::getDevice, python::return_value_policy<python::copy_non_const_reference>())
 	        .def("_setDevice", &PyEngineScript::setDevice);

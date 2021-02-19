@@ -25,39 +25,31 @@
 #include "nrp_general_library/config/cmake_constants.h"
 
 OpensimConfig::OpensimConfig(EngineConfigConst::config_storage_t &config)
-    : OpensimConfig(config.Data)
-{
+    : OpensimConfig(config.Data){
 	config.Config = this;
 }
 
 OpensimConfig::OpensimConfig(const nlohmann::json &data)
-    : EngineJSONConfig(data,
-                       OpensimConfig::DefPythonFileName.data())
-{}
+	: EngineJSONConfig(data,
+		OpensimConfig::DefOpensimRunPy.data(),
+		OpensimConfig::DefOpensimFileName.data()){}
 
-std::string &OpensimConfig::pythonFileName()
-{
-	return this->getPropertyByName<OpensimConfig::PythonFileName, std::string>();
+std::string &OpensimConfig::opensimRunPy(){
+	return this->getPropertyByName<OpensimConfig::OpensimRunPy, std::string>();
+}
+const std::string &OpensimConfig::opensimRunPy() const{
+	return this->getPropertyByName<OpensimConfig::OpensimRunPy, std::string>();
 }
 
-const std::string &OpensimConfig::pythonFileName() const
-{
-	return this->getPropertyByName<OpensimConfig::PythonFileName, std::string>();
+std::string &OpensimConfig::opensimFileName(){
+	return this->getPropertyByName<OpensimConfig::OpensimFileName, std::string>();
 }
-
-
-std::string &OpensimConfig::opensimFileName()
-{
+const std::string &OpensimConfig::opensimFileName() const{
 	return this->getPropertyByName<OpensimConfig::OpensimFileName, std::string>();
 }
 
-const std::string &OpensimConfig::opensimFileName() const
-{
-	return this->getPropertyByName<OpensimConfig::OpensimFileName, std::string>();
-}
 
-EngineConfigConst::string_vector_t OpensimConfig::allEngineProcStartParams() const
-{
+EngineConfigConst::string_vector_t OpensimConfig::allEngineProcStartParams() const{
 	EngineConfigConst::string_vector_t startParams = this->EngineJSONConfig::allEngineProcStartParams();
 
 	// Add JSON Server address (will be used by plugin)
