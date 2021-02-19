@@ -282,6 +282,7 @@
 [2021-02-02 19:44:11.342] [info] 'biceps': Parameter update for the damped-model: minimum_activation was 0.01 but is now 0.01
 [2021-02-02 19:44:16.037] [info] Loaded model bicep_curl from file basicModel.osim
 [2021-02-02 19:44:16.037] [info] 'biceps': Parameter update for the damped-model: minimum_activation was 0.01 but is now 0.01
+<<<<<<< HEAD
 [2021-02-17 22:43:32.785] [info] Loaded model bicep_curl from file basicModel.osim
 [2021-02-17 22:43:32.820] [info] Loading orientations as quaternions from 'MT_012005D6_009-001_orientations.sto'...
 [2021-02-17 22:43:32.834] [error] InverseKinematicsSolver: Orientation data does not correspond to any model frames.
@@ -2545,3 +2546,5 @@ Invalid Argument.
 [2021-02-18 00:13:37.663] [warning] Couldn't find file 'arm_r_5distph.vtp'.
 [2021-02-18 00:13:37.663] [info] ControllerSet 'Controllers' was renamed and is being reset to 'controllerset'.
 [2021-02-18 00:13:37.663] [info] ComponentSet 'MiscComponents' was renamed and is being reset to 'componentset'.
+=======
+>>>>>>> 7afeb301645a7fff5737e91503d85bf60c221f37

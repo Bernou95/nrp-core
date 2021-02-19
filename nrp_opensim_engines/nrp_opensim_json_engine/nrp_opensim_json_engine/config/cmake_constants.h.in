@@ -19,8 +19,13 @@
  * Agreement No. 945539 (Human Brain Project SGA3).
  */
 
+<<<<<<< HEAD
 #ifndef NRP_OPENSIM_CMAKE_CONSTANTS_H
 #define NRP_OPENSIM_CMAKE_CONSTANTS_H
+=======
+#ifndef NRP_PYTHON_CMAKE_CONSTANTS_H
+#define NRP_PYTHON_CMAKE_CONSTANTS_H
+>>>>>>> 7afeb301645a7fff5737e91503d85bf60c221f37
 
 /*!
  * \file nrp_python_constants.h
@@ -36,16 +41,30 @@
 /*!
  * \brief Name of python module
  */
+<<<<<<< HEAD
 #define NRP_PYTHON_ENGINE_MODULE @PYTHON_MODULE_NAME@
+=======
+#define NRP_PYTHON_ENGINE_MODULE @OPENSIM_MODULE_NAME@
+>>>>>>> 7afeb301645a7fff5737e91503d85bf60c221f37
 
 /*!
  * \brief Name of python module (as string)
  */
+<<<<<<< HEAD
 #define NRP_PYTHON_ENGINE_MODULE_STR "@PYTHON_MODULE_NAME@"
+=======
+#define NRP_PYTHON_ENGINE_MODULE_STR "@OPENSIM_MODULE_NAME@"
+>>>>>>> 7afeb301645a7fff5737e91503d85bf60c221f37
 
 /*!
  * \brief Name of NRP Python server Executable
  */
+<<<<<<< HEAD
 #define NRP_OPENSIM_EXECUTABLE_PATH "@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_BINDIR@/@NRP_PYTHON_EXECUTABLE@"
 
 #endif // NRP_OPENSIM_CMAKE_CONSTANTS_H
+=======
+#define NRP_PYTHON_EXECUTABLE_PATH "@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_BINDIR@/@NRP_OPENSIM_EXECUTABLE@"
+
+#endif // NRP_PYTHON_CMAKE_CONSTANTS_H
+>>>>>>> 7afeb301645a7fff5737e91503d85bf60c221f37

@@ -27,11 +27,18 @@
 #include "nrp_general_library/utils/python_interpreter_state.h"
 
 #include "nrp_opensim_json_engine/config/opensim_config.h"
+<<<<<<< HEAD
 #include "nrp_opensim_json_engine/devices/opensim_engine_json_device_controller.h"
 
 #include <iostream>
 #include <boost/python.hpp>
 
+=======
+#include "nrp_opensim_json_engine/engine_server/opensim_engine_json_device_controller.h"
+
+#include <boost/python.hpp>
+#include <iostream>
+>>>>>>> 7afeb301645a7fff5737e91503d85bf60c221f37
 class PyEngineScript;
 
 class OpensimJSONServer
@@ -47,7 +54,11 @@ class OpensimJSONServer
 		 * \return Returns true once the initialize function has been run once
 		 */
 		bool initRunFlag() const;
+<<<<<<< HEAD
 		std::string getWorldFile();
+=======
+
+>>>>>>> 7afeb301645a7fff5737e91503d85bf60c221f37
 		/*!
 		 * \brief Has a shutdown command been received?
 		 * \return Returns true if a shutdown command has been received
@@ -65,13 +76,23 @@ class OpensimJSONServer
 		 */
 		static PyEngineScript *registerScript(const boost::python::object &pythonScript);
 
+<<<<<<< HEAD
 	private:
+=======
+		std::string getWorldFile();
+	private:
+		std::string worldFileName = "basicModel.osim";
+>>>>>>> 7afeb301645a7fff5737e91503d85bf60c221f37
 		/*!
 		 * \brief Ptr to current OpensimJSONServer.
 		 * When registerScript() is called, it will use this ptr to determine the class where the pythonScript will be stored
 		 */
 		static OpensimJSONServer *_registrationPyServer;
+<<<<<<< HEAD
 		std::string _worldFileName = "None";
+=======
+
+>>>>>>> 7afeb301645a7fff5737e91503d85bf60c221f37
 		/*!
 		 * \brief Init Flag. Set to true once the server has executed the initialize function
 		 */
@@ -120,4 +141,8 @@ class OpensimJSONServer
 
 };
 
+<<<<<<< HEAD
 #endif // OPENSIM
+=======
+#endif // OPENSIM_JSON_SERVER_H
+>>>>>>> 7afeb301645a7fff5737e91503d85bf60c221f37

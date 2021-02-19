@@ -20,15 +20,26 @@
 // Agreement No. 945539 (Human Brain Project SGA3).
 //
 
+<<<<<<< HEAD
+=======
+#include "nrp_opensim_json_engine/engine_server/opensim_json_server.h"
+
+>>>>>>> 7afeb301645a7fff5737e91503d85bf60c221f37
 #include "nrp_general_library/utils/python_error_handler.h"
 #include "nrp_general_library/utils/python_interpreter_state.h"
 
 #include "nrp_opensim_json_engine/config/cmake_constants.h"
+<<<<<<< HEAD
 #include "nrp_opensim_json_engine/devices/opensim_engine_json_device_controller.h"
 #include "nrp_opensim_json_engine/python/py_engine_script.h"
 
 #include "nrp_opensim_json_engine/engine_server/opensim_json_server.h"
 
+=======
+#include "nrp_opensim_json_engine/engine_server/opensim_engine_json_device_controller.h"
+#include "nrp_opensim_json_engine/python/py_engine_script.h"
+
+>>>>>>> 7afeb301645a7fff5737e91503d85bf60c221f37
 #include <fstream>
 
 namespace python = boost::python;
@@ -51,9 +62,13 @@ bool OpensimJSONServer::initRunFlag() const
 {
 	return this->_initRunFlag;
 }
+<<<<<<< HEAD
 std::string OpensimJSONServer::getWorldFile(){
 	return this->_worldFileName;
 }
+=======
+
+>>>>>>> 7afeb301645a7fff5737e91503d85bf60c221f37
 bool OpensimJSONServer::shutdownFlag() const
 {
 	return this->_shutdownFlag;
@@ -93,6 +108,7 @@ nlohmann::json OpensimJSONServer::initialize(const nlohmann::json &data, EngineJ
 	const OpensimConfig config(data.at(OpensimConfig::ConfigType.m_data));
 
 	// Read python script file if present
+<<<<<<< HEAD
 	const std::filesystem::path fileName = config.opensimRunPy();
 	if(fileName.empty()){
 		const auto errMsg = "No python filename given. Aborting...";
@@ -111,12 +127,25 @@ nlohmann::json OpensimJSONServer::initialize(const nlohmann::json &data, EngineJ
 	const std::filesystem::path opensimFileName = config.opensimFileName();
 	if(opensimFileName.empty()){
 		const auto errMsg = "No Opensimfilename given. Aborting...";
+=======
+	const std::filesystem::path fileName = config.pythonFileName();
+
+	if(fileName.empty())
+	{
+		const auto errMsg = "No python filename given. Aborting...";
+>>>>>>> 7afeb301645a7fff5737e91503d85bf60c221f37
 		NRPLogger::SPDErrLogDefault(errMsg);
 		return this->formatInitErrorMessage(errMsg);
 	}
 
+<<<<<<< HEAD
 	if(!std::filesystem::exists(opensimFileName) && this->_worldFileName != "None"){
 		const auto errMsg = "Could not find init file " + std::string(opensimFileName);
+=======
+	if(!std::filesystem::exists(fileName))
+	{
+		const auto errMsg = "Could not find init file " + std::string(fileName);
+>>>>>>> 7afeb301645a7fff5737e91503d85bf60c221f37
 		NRPLogger::SPDErrLogDefault(errMsg);
 		return this->formatInitErrorMessage(errMsg);
 	}
@@ -161,6 +190,10 @@ nlohmann::json OpensimJSONServer::initialize(const nlohmann::json &data, EngineJ
 
 	}
 
+<<<<<<< HEAD
+=======
+	this->worldFileName = config.opensimFileName();
+>>>>>>> 7afeb301645a7fff5737e91503d85bf60c221f37
 	// Init has run once
 	this->_initRunFlag = true;
 
@@ -212,6 +245,13 @@ PyEngineScript *OpensimJSONServer::registerScript(const boost::python::object &p
 	return &script;
 }
 
+<<<<<<< HEAD
+=======
+std::string OpensimJSONServer::getWorldFile(){
+	return this->worldFileName;
+}
+
+>>>>>>> 7afeb301645a7fff5737e91503d85bf60c221f37
 nlohmann::json OpensimJSONServer::formatInitErrorMessage(const std::string &errMsg)
 {
 	return nlohmann::json({{OpensimConfig::InitFileExecStatus, 0}, {OpensimConfig::InitFileErrorMsg, errMsg}});

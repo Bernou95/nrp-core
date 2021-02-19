@@ -38,10 +38,16 @@ OpensimEngineJSONNRPClient::~OpensimEngineJSONNRPClient()
 
 void OpensimEngineJSONNRPClient::initialize()
 {
+<<<<<<< HEAD
 	const auto &theConfig = this->engineConfig();
 	nlohmann::json resp = this->sendInitCommand(nlohmann::json({{OpensimConfig::ConfigType.m_data, theConfig->writeConfig()}}));
 	//if(!resp.at(OpensimConfig::InitFileExecStatus.data()).get<bool>())
 	if(resp.at(OpensimConfig::InitFileExecStatus.data())==0)
+=======
+	const auto &opensimConfig = this->engineConfig();
+	nlohmann::json resp = this->sendInitCommand(nlohmann::json({{OpensimConfig::ConfigType.m_data, opensimConfig->writeConfig()}}));
+	if(resp.at(OpensimConfig::InitFileExecStatus.data())!=0)
+>>>>>>> 7afeb301645a7fff5737e91503d85bf60c221f37
 	{
 		// Write the error message
 		this->_initErrMsg = resp.at(OpensimConfig::InitFileErrorMsg.data());
