@@ -133,7 +133,7 @@ documentation can be found in a new `doxygen` folder
 	 - PythonObjectDeviceInterface: Should be able to interface with many Python datatypes. Uses Python-side JSON converter
  - Starts NRPPythonExecutable as a child process
  
- ##### OpenSim
+##### OpenSim
  - In subdirectory nrp_opensim_engines
  - Uses an EngineJSONServer
  - Takes a python file as input to define the initialize, runStep, and shutdown functions
