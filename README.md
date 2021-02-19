@@ -27,7 +27,7 @@
  - Boost-Python: Easier Python handling
  - GTest: Testing Suite
  - spdlog: Logging functions
- - Cython3: Required by Nestu
+ - Cython3: Required by Nest
  
  - OpenSim: For Opensim engine (You can run the shell "OpensimInstall.sh" to install it as a python module")
 
