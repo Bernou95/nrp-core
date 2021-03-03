@@ -119,9 +119,9 @@ add_subdirectory(nrp_engine_protocols/nrp_grpc_engine_protocol)
 ##########################################
 ## NRP Engines
 
-## Opensim gRPC Engine
-add_subdirectory(nrp_opensim_engines/nrp_opensim_json_engine)
-#add_subdirectory(nrp_opensim_engines/nrp_opensim_grpc_engine)
+## JSON Engines (OpenSim, Gazebo)
+add_subdirectory(nrp_simulation_json_engines/nrp_opensim_json_engine)
+add_subdirectory(nrp_simulation_json_engines/nrp_new_gazebo_engine)
 
 ## Gazebo devices
 add_subdirectory(nrp_gazebo_engines/nrp_gazebo_devices)
@@ -139,14 +139,13 @@ add_subdirectory(nrp_gazebo_engines/nrp_gazebo_grpc_engine)
 add_subdirectory(nrp_nest_json_engine)
 add_subdirectory(nrp_nest_server_engine)
 
+## Python Engine
+add_subdirectory(nrp_python_json_engine)
+
 
 ##########################################
 ## NRP Simulation
-<<<<<<< HEAD
-set(NRP_SIMULATION_DEFAULT_ENGINE_LAUNCHERS "NRPGazeboGrpcEngine.so;NRPNestJSONEngine.so;NRPOpensimJSONEngine.so;NRPPythonJSONEngine.so"
-=======
-set(NRP_SIMULATION_DEFAULT_ENGINE_LAUNCHERS "NRPGazeboGrpcEngine.so;NRPNestJSONEngine.so;NRPOpensimJSONEngine.so"
->>>>>>> 7afeb301645a7fff5737e91503d85bf60c221f37
+set(NRP_SIMULATION_DEFAULT_ENGINE_LAUNCHERS "NRPGazeboGrpcEngine.so;NRPNestJSONEngine.so;NRPOpensimJSONEngine.so;NRPNewGazeboEngine.so;NRPPythonJSONEngine.so"
 	CACHE STRING "Default engines which will always be available in the NRP server")
 add_subdirectory(nrp_simulation)
 

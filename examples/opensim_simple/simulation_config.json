@@ -7,24 +7,14 @@
 		{
 			"EngineType": "opensim_json",
 			"EngineName": "servo",
-<<<<<<< HEAD
 			"OpensimRunPy": "servo.py",
 			"OpensimFileName": "None"
-=======
-			"PythonFileName": "servo.py",
-			"OpensimFileName": "basicModel.osim"
->>>>>>> 7afeb301645a7fff5737e91503d85bf60c221f37
 		},
 		{
 			"EngineType": "opensim_json",
 			"EngineName": "client",
-<<<<<<< HEAD
 			"OpensimRunPy": "client.py",
 			"OpensimFileName": "arm26.osim"
-=======
-			"PythonFileName": "client.py",
-			"OpensimFileName": "basicModel.osim"
->>>>>>> 7afeb301645a7fff5737e91503d85bf60c221f37
 		}
 	],
 	"TransceiverFunctions":

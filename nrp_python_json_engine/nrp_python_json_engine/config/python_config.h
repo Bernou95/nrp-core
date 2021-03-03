@@ -27,23 +27,19 @@
 
 #include "nrp_python_json_engine/config/cmake_constants.h"
 
-struct OpensimConfigConst
+struct PythonConfigConst
 {
 	/*!
 	 * \brief PythonConfig Type
 	 */
-	static constexpr FixedString ConfigType = "OpensimConfig";
+	static constexpr FixedString ConfigType = "PythonConfig";
 
 	/*!
 	 * \brief Python File (contains the python engine script)
 	 */
 	static constexpr FixedString PythonFileName = "PythonFileName";
 	static constexpr std::string_view DefPythonFileName = "";
-	/*!
-	 * \brief Opensim File (contains the opensim engine script)
-	 */
-	static constexpr FixedString OpensimFileName = "OpensimFileName";
-	static constexpr std::string_view DefOpensimFileName = "";
+
 	/*!
 	 * \brief After the server executes the init file, this status flag will either be 1 for success or 0 for fail. If the execution fails, a JSON message with more details will be passed as well (under InitFileErrorMsg).
 	 */
@@ -54,13 +50,13 @@ struct OpensimConfigConst
 	 */
 	static constexpr std::string_view InitFileErrorMsg = "Message";
 
-	using PPropNames = PropNames<PythonFileName, OpensimFileName>;
+	using PPropNames = PropNames<PythonFileName>;
 };
 
-class OpensimConfig
-        : public EngineJSONConfig<OpensimConfig, OpensimConfigConst::PPropNames, std::string, std::string>,
-          public PtrTemplates<OpensimConfig>,
-          public OpensimConfigConst
+class PythonConfig
+        : public EngineJSONConfig<PythonConfig, PythonConfigConst::PPropNames, std::string>,
+          public PtrTemplates<PythonConfig>,
+          public PythonConfigConst
 {
 	public:
 		// Default engine values. Copies from EngineConfigConst
@@ -70,20 +66,17 @@ class OpensimConfig
 		static constexpr std::string_view DefEngineProcCmd = NRP_PYTHON_EXECUTABLE_PATH;
 		//static const string_vector_t DefEngineProcStartParams;
 
-		OpensimConfig(EngineConfigConst::config_storage_t &config);
-		OpensimConfig(const nlohmann::json &data);
+		PythonConfig(EngineConfigConst::config_storage_t &config);
+		PythonConfig(const nlohmann::json &data);
 
 		const std::string &pythonFileName() const;
 		std::string &pythonFileName();
-
-		const std::string &opensimFileName() const;
-		std::string &opensimFileName();
 
 		//string_vector_t allEngineProcEnvParams() const override;
 		string_vector_t allEngineProcStartParams() const override;
 };
 
-using OpensimConfigSharedPtr = OpensimConfig::shared_ptr;
-using OpensimConfigConstSharedPtr = OpensimConfig::const_shared_ptr;
+using PythonConfigSharedPtr = PythonConfig::shared_ptr;
+using PythonConfigConstSharedPtr = PythonConfig::const_shared_ptr;
 
 #endif // PYTHON_CONFIG_H

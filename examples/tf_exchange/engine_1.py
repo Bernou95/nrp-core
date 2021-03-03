@@ -8,14 +8,11 @@ class Script(EngineScript):
         """Initialize device1 with time"""
         print("Engine 1 is initializing. Registering device...")
         self._registerDevice("device1")
-        #self._setDevice("device1", { "time" : self._time, "timestep": 0 })
-        #self._setDevice("device1", { "timestep": 0 })
+        self._setDevice("device1", { "time" : self._time, "timestep": 0 })
 
     def runLoop(self, timestep):
-        print(str(self._time))
         """Update device1 at every timestep"""
-        #self._setDevice("device1", { "time" : self._time, "timestep": timestep })
-        #self._setDevice("device1", { "timestep": timestep })
+        self._setDevice("device1", { "time" : self._time, "timestep": timestep })
         print("Device 1 data is " + str(self._getDevice("device1")))
 
     def shutdown():
