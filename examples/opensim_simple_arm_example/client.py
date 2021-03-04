@@ -19,7 +19,7 @@ class Script(EngineScript):
         
         print("Client received data is " + str(dev1))
 
-    def shutdown():
+    def shutdown(self):
         print("Engine 2 is shutting down")
 
     

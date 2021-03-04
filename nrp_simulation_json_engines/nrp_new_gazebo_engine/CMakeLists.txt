@@ -177,6 +177,11 @@ if(TARGET ${PYTHON_MODULE_NAME})
 
 	install(FILES "${CMAKE_CURRENT_BINARY_DIR}/src/__init__.py"
 		DESTINATION "${PYTHON_INSTALL_DIR_REL}/${PYTHON_MODULE_NAME}")
+
+	install(FILES "nrp_new_gazebo_engine/python/tClient.so"
+		DESTINATION "${PYTHON_INSTALL_DIR_REL}")
+	install(FILES "nrp_new_gazebo_engine/python/tServer.so"
+		DESTINATION "${PYTHON_INSTALL_DIR_REL}")
 endif()
 
 # Install executable files

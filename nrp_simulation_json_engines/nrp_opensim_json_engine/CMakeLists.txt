@@ -6,7 +6,7 @@ set(NAMESPACE_NAME "${PROJECT_NAME}")
 set(LIBRARY_NAME "${PROJECT_NAME}")
 set(PYTHON_MODULE_NAME "NRPOpensimEngineModule")
 set(EXECUTABLE_NAME "NRPOpensimExecutable")
-#set(TEST_NAME "${PROJECT_NAME}Tests")
+set(TEST_NAME "${PROJECT_NAME}Tests")
 
 set(LIB_EXPORT_NAME "${LIBRARY_NAME}Targets")
 set(LIB_CONFIG_NAME "${LIBRARY_NAME}Config")
@@ -41,6 +41,9 @@ set(EXEC_SRC_FILES
 
 # List testing build files
 set(TEST_SRC_FILES
+	opensim_server_executable/opensim_server_executable.cpp
+	tests/test_opensim_server.cpp
+	tests/test_opensim_executable.cpp
 )
 
 
@@ -99,7 +102,7 @@ target_include_directories(${LIBRARY_NAME} BEFORE
 
 
 ##########################################
-## NRPPythonEngineModule
+## NRPEngineModule
 if(NOT ${PYTHON_MODULE_SRC_FILES} STREQUAL "")
 	add_library(${PYTHON_MODULE_NAME} SHARED ${PYTHON_MODULE_SRC_FILES})
 	add_library(${NAMESPACE_NAME}::${PYTHON_MODULE_NAME} ALIAS ${PYTHON_MODULE_NAME})
@@ -132,7 +135,24 @@ add_doxygen_source("${CMAKE_CURRENT_SOURCE_DIR}" ${EXEC_SRC_FILES} ${LIB_SRC_FIL
 
 ##########################################
 ## Tests
+if(${ENABLE_TESTING} AND NOT "${TEST_SRC_FILES}" STREQUAL "")
+	# Create testing env files
+	configure_file("${CMAKE_CURRENT_SOURCE_DIR}/tests/test_files/test_env.sh.in" "${CMAKE_CURRENT_BINARY_DIR}/test_env.sh" @ONLY)
+	configure_file("${CMAKE_CURRENT_SOURCE_DIR}/tests/test_env_cmake.h.in" "${CMAKE_CURRENT_BINARY_DIR}/include/tests/test_env_cmake.h" @ONLY)
 
+	# Create testing executable
+	enable_testing()
+	add_executable(${TEST_NAME} ${TEST_SRC_FILES})
+	target_link_libraries(${TEST_NAME}
+		PUBLIC
+		${NAMESPACE_NAME}::${LIBRARY_NAME}
+		GTest::GTest
+		GTest::Main)
+
+	gtest_discover_tests(${TEST_NAME}
+		WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/tests"
+		EXTRA_ARGS -VV)
+endif()
 
 ##########################################
 ## Installation
@@ -176,6 +196,9 @@ if(TARGET ${PYTHON_MODULE_NAME})
 		DESTINATION "${PYTHON_INSTALL_DIR_REL}/${PYTHON_MODULE_NAME}")
 
 	install(FILES "${CMAKE_CURRENT_BINARY_DIR}/src/__init__.py"
+		DESTINATION "${PYTHON_INSTALL_DIR_REL}/${PYTHON_MODULE_NAME}")
+
+	install(FILES "nrp_opensim_json_engine/python/TOsimLib.py"
 		DESTINATION "${PYTHON_INSTALL_DIR_REL}/${PYTHON_MODULE_NAME}")
 endif()
 

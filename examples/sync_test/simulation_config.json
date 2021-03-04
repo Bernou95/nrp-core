@@ -1,0 +1,40 @@
+{
+	"SimulationName": "tf_exchange",
+	"SimulationDescription": "Launch two python engines. Engine1 will offer the current time as a device. tf_1 will request said device and send it to Engine2. Engine2 will receive the time and display it",
+	"SimulationTimeout": 10,
+	"EngineConfigs": 
+	[
+		{
+			"EngineType": "new_gazebo",
+			"EngineName": "servo_gz",
+			"NewGazeboRunPy": "servo_gz.py",
+			"ServerAddress": "localhost:1234",
+			"NewGazeboFileName": "empty_world.sdf"
+		},
+		{
+			"EngineType": "opensim_json",
+			"EngineName": "servo_os",
+			"OpensimRunPy": "servo_os.py",
+			"ServerAddress": "localhost:2345",
+			"OpensimFileName": "arm26_ground_offset.osim"
+		},
+		{
+			"EngineType": "python_json",
+			"EngineName": "servo_py",
+			"ServerAddress": "localhost:3456",
+			"PythonFileName": "servo_py.py"
+		},
+		{
+			"EngineType": "python_json",
+			"EngineName": "client",
+			"PythonFileName": "client_py.py"
+		}
+	],
+	"TransceiverFunctions":
+	[
+		{
+			"Name": "tf_1",
+			"FileName": "tf_1.py"
+		}
+	]
+}

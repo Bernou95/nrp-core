@@ -22,6 +22,7 @@ class Script(EngineScript):
 
         self._registerDevice("rec_device2")
         self._setDevice("rec_device2", { "time": 0 })
+        self.count = 0
         self.time.sleep(1)
 
     def runLoop(self, timestep):
@@ -30,11 +31,12 @@ class Script(EngineScript):
         #print(self.modelFileName)
         #res = self.t_os.system("gz topic --echo %s &" % self.topicName)
         #print(res)
-        self._setDevice("device1", { "cmd" : 1, "time": 1 })
+        self._setDevice("device1", { "cmd" : self.count, "time": 1 })
+        self.count = self.count + 1
         dev2 = self._getDevice("rec_device2")
         print("Servo received data is " + str(dev2))
         #print("Servo data is " + str(self._getDevice("device1")))
 
-    def shutdown():
-        self.t_os = self.importlib.import_module('killall gzserver')
+    def shutdown(self):
+        self.t_os.system('killall gzserver')
         print("Engine 1 is shutting down")

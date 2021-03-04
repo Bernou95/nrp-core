@@ -22,8 +22,16 @@
 #ifndef TEST_ENV_CMAKE_H
 #define TEST_ENV_CMAKE_H
 
-#define TEST_SIMPLE_PYTHON_FILE_NAME "@CMAKE_CURRENT_SOURCE_DIR@/tests/test_files/python_simple.py"
-#define TEST_PYTHON_DEVICE_FILE_NAME "@CMAKE_CURRENT_SOURCE_DIR@/tests/test_files/python_device_test.py"
-#define TEST_PYTHON_INIT_ERROR_FILE_NAME  "@CMAKE_CURRENT_SOURCE_DIR@/tests/test_files/test_init_error.py"
+
+#define TEST_OPENSIM_MODEL_NAME "@CMAKE_CURRENT_SOURCE_DIR@/tests/test_files/arm26_ground_offset.osim"
+
+
+#define TEST_OPENSIM_INIT_ERROR_FILE_NAME "@CMAKE_CURRENT_SOURCE_DIR@/tests/test_files/test_init_error.py"
+
+#define TEST_SIMPLE_OPENSIM_FILE_NAME "@CMAKE_CURRENT_SOURCE_DIR@/tests/test_files/opensim_simple.py"
+
+#define TEST_OPENSIM_EXE_FILE_NAME "@CMAKE_CURRENT_SOURCE_DIR@/tests/test_files/opensim_device_test.py"
+
+#define TEST_OPENSIM_RUN_LOOP_FILE "@CMAKE_CURRENT_SOURCE_DIR@/tests/test_files/opensim_exe_test.py"
 
 #endif // TEST_ENV_CMAKE_H

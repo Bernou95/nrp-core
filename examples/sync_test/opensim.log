@@ -1,0 +1,38 @@
+[2021-03-15 06:40:51.902] [info] Loaded model arm26 from file arm26_ground_offset.osim
+[2021-03-15 06:40:51.925] [error] Traceback (most recent call last):
+  File "servo_os.py", line 18, in initialize
+    self.time.sleep(1)
+AttributeError: 'Script' object has no attribute 'time'
+
+[2021-03-15 06:41:22.718] [info] Loaded model arm26 from file arm26_ground_offset.osim
+[2021-03-15 06:41:22.728] [error] Traceback (most recent call last):
+  File "servo_os.py", line 18, in initialize
+    self.time.sleep(1)
+AttributeError: 'Script' object has no attribute 'time'
+
+[2021-03-15 06:41:46.604] [info] Loaded model arm26 from file arm26_ground_offset.osim
+[2021-03-15 06:43:07.652] [info] Loaded model arm26 from file arm26_ground_offset.osim
+[2021-03-15 06:43:58.175] [info] Loaded model arm26 from file arm26_ground_offset.osim
+[2021-03-15 06:45:15.794] [info] Loaded model arm26 from file arm26_ground_offset.osim
+[2021-03-15 06:45:52.335] [info] Loaded model arm26 from file arm26_ground_offset.osim
+[2021-03-15 06:47:27.678] [info] Loaded model arm26 from file arm26_ground_offset.osim
+[2021-03-15 06:48:16.207] [info] Loaded model arm26 from file arm26_ground_offset.osim
+[2021-03-15 06:49:14.893] [info] Loaded model arm26 from file arm26_ground_offset.osim
+[2021-03-15 06:51:02.580] [info] Loaded model arm26 from file arm26_ground_offset.osim
+[2021-03-15 06:51:42.028] [info] Loaded model arm26 from file arm26_ground_offset.osim
+[2021-03-15 06:52:46.888] [info] Loaded model arm26 from file arm26_ground_offset.osim
+[2021-03-15 06:53:15.316] [info] Loaded model arm26 from file arm26_ground_offset.osim
+[2021-03-15 06:56:39.050] [info] Loaded model arm26 from file arm26_ground_offset.osim
+[2021-03-15 06:57:52.301] [info] Loaded model arm26 from file arm26_ground_offset.osim
+[2021-03-15 06:59:27.909] [info] Loaded model arm26 from file arm26_ground_offset.osim
+[2021-03-15 06:59:59.739] [info] Loaded model arm26 from file arm26_ground_offset.osim
+[2021-03-15 07:00:25.271] [info] Loaded model arm26 from file arm26_ground_offset.osim
+[2021-03-15 07:02:13.001] [info] Loaded model arm26 from file arm26_ground_offset.osim
+[2021-03-15 07:04:21.947] [info] Loaded model arm26 from file arm26_ground_offset.osim
+[2021-03-15 07:04:46.094] [info] Loaded model arm26 from file arm26_ground_offset.osim
+[2021-03-15 07:05:00.802] [info] Loaded model arm26 from file arm26_ground_offset.osim
+[2021-03-15 07:05:43.331] [info] Loaded model arm26 from file arm26_ground_offset.osim
+[2021-03-15 07:06:30.216] [info] Loaded model arm26 from file arm26_ground_offset.osim
+[2021-03-15 07:07:48.085] [info] Loaded model arm26 from file arm26_ground_offset.osim
+[2021-03-15 07:08:08.756] [info] Loaded model arm26 from file arm26_ground_offset.osim
+[2021-03-15 07:08:22.894] [info] Loaded model arm26 from file arm26_ground_offset.osim

@@ -86,3 +86,31 @@ NameError: name 'opensim' is not defined
 [2021-02-19 05:39:11.837] [info] Loaded model arm26 from file arm26_ground_offset.osim
 [2021-02-19 08:17:27.224] [info] Loaded model arm26 from file arm26_ground_offset.osim
 [2021-02-19 11:51:15.110] [info] Loaded model arm26 from file arm26_ground_offset.osim
+[2021-03-10 15:17:38.446] [info] Loaded model arm26 from file arm26_ground_offset.osim
+[2021-03-10 16:21:23.015] [info] Loaded model arm26 from file arm26_ground_offset.osim
+[2021-03-10 16:22:32.556] [info] Loaded model arm26 from file arm26_ground_offset.osim
+[2021-03-10 17:12:25.380] [info] Loaded model arm26 from file arm26_ground_offset.osim
+[2021-03-11 16:01:07.374] [info] Loaded model arm26 from file arm26_ground_offset.osim
+[2021-03-11 16:01:07.569] [error] Error while executing loop step: Traceback (most recent call last):
+  File "servo.py", line 40, in runLoop
+    self.tOS.run_step()
+TypeError: run_step() missing 1 required positional argument: 'action'
+
+[2021-03-11 16:01:38.049] [info] Loaded model arm26 from file arm26_ground_offset.osim
+[2021-03-15 04:54:17.578] [info] Loaded model arm26 from file arm26_ground_offset.osim
+[2021-03-15 04:57:40.622] [info] Loaded model arm26 from file arm26_ground_offset.osim
+[2021-03-15 04:59:11.373] [info] Loaded model arm26 from file arm26_ground_offset.osim
+[2021-03-15 04:59:44.416] [info] Loaded model arm26 from file arm26_ground_offset.osim
+[2021-03-15 05:00:02.954] [info] Loaded model arm26 from file arm26_ground_offset.osim
+[2021-03-15 05:00:03.157] [error] Error while executing loop step: Traceback (most recent call last):
+  File "servo.py", line 43, in runLoop
+    print(self.tt[1])
+TypeError: 'SimulationTime' object is not subscriptable
+
+[2021-03-15 05:00:16.775] [info] Loaded model arm26 from file arm26_ground_offset.osim
+[2021-03-15 05:00:16.977] [error] Error while executing loop step: Traceback (most recent call last):
+  File "servo.py", line 43, in runLoop
+    print(self.tt.sec)
+AttributeError: 'SimulationTime' object has no attribute 'sec'
+
+[2021-03-15 05:00:56.026] [info] Loaded model arm26 from file arm26_ground_offset.osim

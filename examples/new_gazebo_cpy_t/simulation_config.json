@@ -1,0 +1,14 @@
+{
+	"SimulationName": "tf_exchange",
+	"SimulationDescription": "Launch two python engines. Engine1 will offer the current time as a device. tf_1 will request said device and send it to Engine2. Engine2 will receive the time and display it",
+	"SimulationTimeout": 10,
+	"EngineConfigs": 
+	[
+		{
+			"EngineType": "new_gazebo",
+			"EngineName": "servo",
+			"NewGazeboRunPy": "servo.py",
+			"NewGazeboFileName": "camera_check.sdf"
+		}
+	]
+}

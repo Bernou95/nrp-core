@@ -39,7 +39,7 @@ void OpensimEngineJSONDeviceController<PyObjectDevice>::handleDeviceDataCallback
 const PyObjectDevice *OpensimEngineJSONDeviceController<PyObjectDevice>::getDeviceInformationCallback()
 {	
 	std::string tStr = py::extract<std::string>(py::str(this->_deviceData.data()))();
-	std::cout << "1 --> "<< tStr << std::endl;
+	//std::cout << "1 --> "<< tStr << std::endl;
 	return &(this->_deviceData);
 }
 
