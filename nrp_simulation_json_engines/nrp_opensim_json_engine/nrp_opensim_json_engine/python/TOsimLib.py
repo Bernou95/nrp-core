@@ -19,10 +19,11 @@ class TOpenSim(object):
 	maxforces = []
 	curforces = []
 	"""docstring for t"""
-	def __init__(self, modelName):		
+	def __init__(self, modelName, isVisualizer):		
 		super(TOpenSim, self).__init__()
 		self.model = osim.Model(modelName)
 		self.model.initSystem()
+		self.model.setUseVisualizer(isVisualizer)
 		self.brain = osim.PrescribedController()
 		self.muscleSet = self.model.getMuscles()
 		for j in range(self.muscleSet.getSize()):
@@ -42,9 +43,6 @@ class TOpenSim(object):
 
 	def testPrint(self):
 		print("Hello, I am TOpenSim")
-
-	def setVisualizer(self, status):
-		self.model.setUseVisualizer(status)
 
 	def run_step(self, action):
 		self.actuate(action)

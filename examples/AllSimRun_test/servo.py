@@ -4,33 +4,12 @@ from NRPOpensimEngineModule import TOpenSim
 
 @RegisterEngine()
 class Script(EngineScript):
-    '''
-    import opensim as osim
-    stepsize = 0.001
-
-    model = None
-    state = None
-    state0 = None
-    joints = []
-    bodies = []
-    brain = None
-    verbose = False
-    istep = 0
-
-    state_desc_istep = None
-    prev_state_desc = None
-    state_desc = None
-    integrator_accuracy = 5e-5
-
-    maxforces = []
-    curforces = []
-    '''
     def initialize(self):
         """Initialize device1 with time"""
         print("Servo Engine is initializing. Registering device...")
         self.modelFileName = self._world
 
-        self.tOS = TOpenSim(self.modelFileName)
+        self.tOS = TOpenSim(self.modelFileName, False)
 
         self._registerDevice("device1")
         self._setDevice("device1", { "cmd" : 0, "time": 0 })

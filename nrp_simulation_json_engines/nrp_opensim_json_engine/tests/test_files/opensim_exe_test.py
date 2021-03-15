@@ -31,7 +31,7 @@ class Script(EngineScript):
         """Initialize device1 with time"""
         print("Servo Engine is initializing. Registering device...")
         self.modelFileName = self._world
-        self.tOS = self.TOpenSim(self.modelFileName)
+        self.tOS = self.TOpenSim(self.modelFileName, False)
         self._registerDevice("device1")
         self._setDevice("device1", {"time":0, "time_1":0})
 

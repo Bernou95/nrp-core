@@ -5,6 +5,9 @@ project(NRProject VERSION ${NRP_VERSION})
 
 set (CMAKE_CXX_STANDARD 20)
 
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fpic")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpic")
+
 set (CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set (CMAKE_INTERPROCEDURAL_OPTIMIZATION OFF)
 #string(APPEND CMAKE_SHARED_LINKER_FLAGS " -Wl,--no-undefined")
@@ -121,7 +124,6 @@ add_subdirectory(nrp_engine_protocols/nrp_grpc_engine_protocol)
 
 ## JSON Engines (OpenSim, Gazebo)
 add_subdirectory(nrp_simulation_json_engines/nrp_opensim_json_engine)
-add_subdirectory(nrp_simulation_json_engines/nrp_new_gazebo_engine)
 
 ## Gazebo devices
 add_subdirectory(nrp_gazebo_engines/nrp_gazebo_devices)
@@ -145,7 +147,7 @@ add_subdirectory(nrp_python_json_engine)
 
 ##########################################
 ## NRP Simulation
-set(NRP_SIMULATION_DEFAULT_ENGINE_LAUNCHERS "NRPGazeboGrpcEngine.so;NRPNestJSONEngine.so;NRPOpensimJSONEngine.so;NRPNewGazeboEngine.so;NRPPythonJSONEngine.so"
+set(NRP_SIMULATION_DEFAULT_ENGINE_LAUNCHERS "NRPGazeboGrpcEngine.so;NRPNestJSONEngine.so;NRPOpensimJSONEngine.so;NRPPythonJSONEngine.so"
 	CACHE STRING "Default engines which will always be available in the NRP server")
 add_subdirectory(nrp_simulation)
 
