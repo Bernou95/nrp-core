@@ -122,9 +122,6 @@ add_subdirectory(nrp_engine_protocols/nrp_grpc_engine_protocol)
 ##########################################
 ## NRP Engines
 
-## JSON Engines (OpenSim, Gazebo)
-add_subdirectory(nrp_simulation_json_engines/nrp_opensim_json_engine)
-
 ## Gazebo devices
 add_subdirectory(nrp_gazebo_engines/nrp_gazebo_devices)
 
@@ -133,9 +130,6 @@ add_subdirectory(nrp_gazebo_engines/nrp_gazebo_json_engine)
 
 ## Gazebo gRPC Engine
 add_subdirectory(nrp_gazebo_engines/nrp_gazebo_grpc_engine)
-
-## Gazebo MPI Engine
-#add_subdirectory(nrp_gazebo_mpi_engine)
 
 ## Nest Engine
 add_subdirectory(nrp_nest_json_engine)
@@ -147,18 +141,9 @@ add_subdirectory(nrp_python_json_engine)
 
 ##########################################
 ## NRP Simulation
-set(NRP_SIMULATION_DEFAULT_ENGINE_LAUNCHERS "NRPGazeboGrpcEngine.so;NRPNestJSONEngine.so;NRPOpensimJSONEngine.so;NRPPythonJSONEngine.so"
-	CACHE STRING "Default engines which will always be available in the NRP server")
+set(NRP_SIMULATION_DEFAULT_ENGINE_LAUNCHERS "NRPGazeboGrpcEngine.so;NRPNestJSONEngine.so"
+	CACHE STRING "Default engines which will always be available in the NRP simulation")
 add_subdirectory(nrp_simulation)
-
-##########################################
-## NRP Server
-#add_subdirectory(nrp_server)
-
-##########################################
-## NRP Client
-#add_subdirectory(nrp_client)
-
 
 ##########################################
 ## Doxygen
@@ -184,7 +169,6 @@ doxygen_add_docs(doxygen
 	"docs/installation.dox"
 	"docs/main_page.dox"
 	"docs/simulation_config.dox"
-	"docs/todos.dox"
 	"docs/transceiver_functions_and_devices.dox"
 	"docs/tutorials/engine_creation.dox"
 	"docs/tutorials/grpc_engine_creation.dox"

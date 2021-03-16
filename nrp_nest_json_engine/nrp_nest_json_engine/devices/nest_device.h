@@ -1,6 +1,6 @@
 /* * NRP Core - Backend infrastructure to synchronize simulations
  *
- * Copyright 2020 Michael Zechmair
+ * Copyright 2020-2021 NRP Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,9 +22,9 @@
 #ifndef NEST_DEVICE_H
 #define NEST_DEVICE_H
 
-#include "nrp_general_library/device_interface/devices/pyobject_device.h"
-#include "nrp_general_library/utils/serializers/json_property_serializer.h"
-#include "nrp_general_library/utils/serializers/python_dict_property_serializer.h"
+#include "nrp_python_device/devices/pyobject_device.h"
+#include "nrp_general_library/property_template/serializers/json_property_serializer.h"
+#include "nrp_general_library/property_template/serializers/python_dict_property_serializer.h"
 #include "nrp_nest_json_engine/config/cmake_constants.h"
 
 #include <boost/python.hpp>
@@ -36,10 +36,10 @@ class NestDevice
         : public Device<NestDevice, "NestDevice", PropNames<"data">, PyObjectDeviceConst::PyObjData>
 {
 		static PyObjectDeviceConst::PyObjData defaultPyObject(const boost::python::object &data = boost::python::dict())
-		{	return PyObjectDeviceConst::PyObjData(data, boost::python::import(NRP_NEST_PYTHON_MODULE_STR).attr("__dict__")["NumpyEncoder"]);	}
+		{ return PyObjectDeviceConst::PyObjData(data, boost::python::import(NRP_NEST_PYTHON_MODULE_STR).attr("__dict__")["NumpyEncoder"]); }
 
 	public:
-		NestDevice(DeviceIdentifier &&devID, const boost::python::object &data = boost::python::dict());
+		NestDevice(DeviceIdentifier &&devID, const boost::python::object &data = boost::python::list());
 		NestDevice(DeviceIdentifier &&devID, property_template_t &&props);
 
 		template<class DESERIALIZE_T>

@@ -1,6 +1,6 @@
 """Python Engine 1. Will get current engine time and make it accessible as a device"""
-from NRPOpensimEngineModule import EngineScript,RegisterEngine
-from NRPOpensimEngineModule import TOpenSim
+from NRPPythonEngineModule import EngineScript,RegisterEngine
+from NRPPythonEngineModule import TOpenSim
 
 @RegisterEngine()
 class Script(EngineScript):
@@ -8,9 +8,7 @@ class Script(EngineScript):
     def initialize(self):
         """Initialize device1 with time"""
         print("Servo Engine is initializing. Registering device...")
-        self.modelFileName = self._world
-
-        self.tOS = TOpenSim(self.modelFileName, False)
+        self.tOS = TOpenSim("rajagopal/rajagopal_2015.osim", False)
 
         self._registerDevice("device_os_2")
         self._setDevice("device_os_2", { "count" : 0, "time": 0 })
@@ -20,7 +18,8 @@ class Script(EngineScript):
 
     def runLoop(self, timestep):
         """Update device1 at every timestep"""
-        self.tOS.run_step([0.0, 0.0, 0.0, 0.5, 0.0, 0.0])
+        action = []
+        self.tOS.run_step(action)
         self._setDevice("device_os_2", {"count":self.count, "time":self.tOS.state.getTime()})
         self.count = self.count + 1
 

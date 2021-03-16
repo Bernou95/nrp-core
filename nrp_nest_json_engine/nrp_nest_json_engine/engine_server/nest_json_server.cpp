@@ -1,7 +1,7 @@
 //
 // NRP Core - Backend infrastructure to synchronize simulations
 //
-// Copyright 2020 Michael Zechmair
+// Copyright 2020-2021 NRP Team
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,6 +28,8 @@
 #include "nrp_nest_json_engine/config/cmake_constants.h"
 #include "nrp_nest_json_engine/engine_server/nest_engine_device_controller.h"
 #include "nrp_nest_json_engine/python/create_device_class.h"
+
+#include "nrp_nest_json_engine/config/nest_config.h"
 
 #include <fstream>
 
@@ -88,30 +90,12 @@ SimulationTime NestJSONServer::runLoopStep(SimulationTime timeStep)
 
 	try
 	{
-		// Convert SimulationTime to milliseconds
-		// NEST uses floating points for time variables, we have to convert our time step to a double
-
-		const double timeStepMsDouble = fromSimulationTime<float, std::milli>(timeStep);
-
-		// NEST Resolution is in milliseconds
-
-		const auto resolutionMs = python::extract<double>(this->_pyNest["GetKernelStatus"]("resolution"));
-
-		// Round the time step to account for NEST resolution
-
-		const auto numSteps = std::round(timeStepMsDouble / resolutionMs);
-
-		if(numSteps == 0)
-		{
-			throw NRPException::logCreate("Nest time step too small, step (ms): " + std::to_string(timeStepMsDouble) + ", resolution (ms): " + std::to_string(resolutionMs));
-		}
-
-		const double runTimeMsRounded = std::round(timeStepMsDouble / resolutionMs) * resolutionMs;
-
-		this->_pyNest["Run"](runTimeMsRounded);
+		const double runTimeMsRounded = getRoundedRunTimeMs(timeStep, python::extract<double>(this->_pyNest["GetKernelStatus"]("resolution")));
+        // Commented out in the context of https://hbpneurorobotics.atlassian.net/browse/NRRPLT-8209
+		// this->_pyNest["Run"](runTimeMsRounded);
+        this->_pyNest["Simulate"](runTimeMsRounded);
 
 		// The time field of dictionary returned from GetKernelStatus contains time in milliseconds
-		
 		return toSimulationTime<float, std::milli>(python::extract<float>(this->_pyNest["GetKernelStatus"]("time")));
 	}
 	catch(python::error_already_set &)
@@ -135,9 +119,6 @@ nlohmann::json NestJSONServer::initialize(const nlohmann::json &data, EngineJSON
 
 		this->_pyGlobals["nest"] = nestModule;
 		this->_pyGlobals[NRP_NEST_PYTHON_MODULE_STR] = nrpNestModule;
-
-		// Set Nest to silent
-		nestModule.attr("set_verbosity")(0);
 	}
 	catch(python::error_already_set &)
 	{
@@ -147,14 +128,11 @@ nlohmann::json NestJSONServer::initialize(const nlohmann::json &data, EngineJSON
 		return this->formatInitErrorMessage(msg);
 	}
 
-	// Read received configuration
-	const NestConfig config(data.at(NestConfig::ConfigType.m_data));
-
 	// Empty device mapping
 	this->_devMap.clear();
 
 	// Read init file if present
-	const auto &initFileName = config.nestInitFileName();
+	const std::string &initFileName = data.at("NestInitFileName");
 	if(!initFileName.empty())
 	{
 		std::fstream initFile(initFileName, std::ios_base::in);
@@ -199,7 +177,7 @@ nlohmann::json NestJSONServer::initialize(const nlohmann::json &data, EngineJSON
 			python::object devNodes = this->_devMap[devKey];
 
 			auto devController = std::shared_ptr<NestEngineJSONDeviceController<NestDevice> >(new
-			            NestEngineJSONDeviceController<NestDevice>(DeviceIdentifier(devName, config.engineName(), NestDevice::TypeName.data()),
+			            NestEngineJSONDeviceController<NestDevice>(DeviceIdentifier(devName, data.at("EngineName"), NestDevice::TypeName.data()),
 												 devNodes, this->_pyNest));
 
 			this->_deviceControllerPtrs.push_back(devController);
@@ -207,8 +185,9 @@ nlohmann::json NestJSONServer::initialize(const nlohmann::json &data, EngineJSON
 		}
 
 		// Prepare Nest for execution
-		this->_pyNest["Prepare"]();
-		this->_nestPreparedFlag = true;
+        // Commented out in the context of https://hbpneurorobotics.atlassian.net/browse/NRRPLT-8209
+		// this->_pyNest["Prepare"]();
+		// this->_nestPreparedFlag = true;
 	}
 	catch(python::error_already_set &)
 	{
@@ -222,7 +201,7 @@ nlohmann::json NestJSONServer::initialize(const nlohmann::json &data, EngineJSON
 	this->_initRunFlag = true;
 
 	// Return success and parsed devmap
-	return nlohmann::json({{NestConfig::InitFileExecStatus, true}, {NestConfig::InitFileParseDevMap, jsonDevMap}});
+	return nlohmann::json({{NestConfigConst::InitFileExecStatus, true}, {NestConfigConst::InitFileParseDevMap, jsonDevMap}});
 }
 
 nlohmann::json NestJSONServer::shutdown(const nlohmann::json &)
@@ -246,7 +225,7 @@ nlohmann::json NestJSONServer::shutdown(const nlohmann::json &)
 
 nlohmann::json NestJSONServer::formatInitErrorMessage(const std::string &errMsg)
 {
-	return nlohmann::json({{NestConfig::InitFileExecStatus, 0}, {NestConfig::InitFileErrorMsg, errMsg}});
+	return nlohmann::json({{NestConfigConst::InitFileExecStatus, 0}, {NestConfigConst::InitFileErrorMsg, errMsg}});
 }
 
 nlohmann::json NestJSONServer::getDeviceData(const nlohmann::json &reqData)

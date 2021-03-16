@@ -15,5 +15,5 @@ class Script(EngineScript):
         self._setDevice("device1", { "time" : self._time.count(), "timestep": timestep.count() })
         print("Device 1 data is " + str(self._getDevice("device1")))
 
-    def shutdown(self):
+    def shutdown():
         print("Engine 1 is shutting down")

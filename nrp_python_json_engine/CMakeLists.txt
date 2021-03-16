@@ -44,6 +44,9 @@ set(TEST_SRC_FILES
 	python_server_executable/python_server_executable.cpp
 	tests/test_python_executable.cpp
 	tests/test_python_server.cpp
+
+	tests/test_osim/test_opensim_server.cpp
+	tests/test_osim/test_opensim_executable.cpp
 )
 
 
@@ -137,6 +140,10 @@ add_doxygen_source("${CMAKE_CURRENT_SOURCE_DIR}" ${EXEC_SRC_FILES} ${LIB_SRC_FIL
 ## Tests
 if(${ENABLE_TESTING} AND NOT "${TEST_SRC_FILES}" STREQUAL "")
 	# Create testing env files
+	configure_file("${CMAKE_CURRENT_SOURCE_DIR}/tests/test_osim/test_files/test_osim_env.sh.in" "${CMAKE_CURRENT_BINARY_DIR}/test_osim/test_osim_env.sh" @ONLY)
+	configure_file("${CMAKE_CURRENT_SOURCE_DIR}/tests/test_osim/test_files/arm26_ground_offset.osim" "${CMAKE_CURRENT_BINARY_DIR}/test_osim/arm26_ground_offset.osim" COPYONLY)
+	file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_osim/test_files/Geometry" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/test_osim/")
+
 	configure_file("${CMAKE_CURRENT_SOURCE_DIR}/tests/test_files/test_env.sh.in" "${CMAKE_CURRENT_BINARY_DIR}/test_env.sh" @ONLY)
 	configure_file("${CMAKE_CURRENT_SOURCE_DIR}/tests/test_env_cmake.h.in" "${CMAKE_CURRENT_BINARY_DIR}/include/tests/test_env_cmake.h" @ONLY)
 
@@ -197,6 +204,9 @@ if(TARGET ${PYTHON_MODULE_NAME})
 		DESTINATION "${PYTHON_INSTALL_DIR_REL}/${PYTHON_MODULE_NAME}")
 
 	install(FILES "${CMAKE_CURRENT_BINARY_DIR}/src/__init__.py"
+		DESTINATION "${PYTHON_INSTALL_DIR_REL}/${PYTHON_MODULE_NAME}")
+
+	install(FILES "nrp_python_json_engine/python/TOsimLib.py"
 		DESTINATION "${PYTHON_INSTALL_DIR_REL}/${PYTHON_MODULE_NAME}")
 endif()
 

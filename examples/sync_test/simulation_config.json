@@ -5,18 +5,16 @@
 	"EngineConfigs": 
 	[
 		{
-			"EngineType": "opensim_json",
+			"EngineType": "python_json",
 			"EngineName": "servo_os_1",
-			"OpensimRunPy": "servo_os_1.py",
-			"ServerAddress": "localhost:1234",
-			"OpensimFileName": "arm26/arm26_ground_offset.osim"
+			"PythonFileName": "servo_os_1.py",
+			"ServerAddress": "localhost:1234"
 		},
 		{
-			"EngineType": "opensim_json",
+			"EngineType": "python_json",
 			"EngineName": "servo_os_2",
-			"OpensimRunPy": "servo_os_2.py",
-			"ServerAddress": "localhost:2345",
-			"OpensimFileName": "rajagopal/rajagopal_2015.osim"
+			"PythonFileName": "servo_os_2.py",
+			"ServerAddress": "localhost:2345"
 		},
 		{
 			"EngineType": "python_json",

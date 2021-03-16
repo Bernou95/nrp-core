@@ -1,6 +1,6 @@
 /* * NRP Core - Backend infrastructure to synchronize simulations
  *
- * Copyright 2020 Michael Zechmair
+ * Copyright 2020-2021 NRP Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -111,6 +111,18 @@ class Device
 		{
 			return PropertySerializer<std::remove_cvref_t<DESERIALIZER_T>, DEVICE>::template readProperties(std::forward<DESERIALIZER_T>(data),
 			                                                                                                std::forward<PROPERTIES_T>(props)...);
+		}
+
+		virtual DeviceInterfaceConstSharedPtr moveToSharedPtr() const override final
+		{
+			return this->moveToSharedPtrHelper();
+		}
+
+	private:
+		
+		typename PtrTemplates<DEVICE>::const_shared_ptr moveToSharedPtrHelper() const
+		{	
+			return typename PtrTemplates<DEVICE>::const_shared_ptr(new DEVICE(std::move(static_cast<const DEVICE&>(*this))));
 		}
 };
 

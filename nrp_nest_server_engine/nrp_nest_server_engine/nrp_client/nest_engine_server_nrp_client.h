@@ -1,6 +1,6 @@
 /* * NRP Core - Backend infrastructure to synchronize simulations
  *
- * Copyright 2020 Michael Zechmair
+ * Copyright 2020-2021 NRP Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,12 +22,11 @@
 #ifndef NEST_ENGINE_SERVER_NRP_CLIENT_H
 #define NEST_ENGINE_SERVER_NRP_CLIENT_H
 
-#include "nrp_general_library/engine_interfaces/engine_interface.h"
+#include "nrp_nest_server_engine/config/nest_server_config.h"
+#include "nrp_general_library/engine_interfaces/engine_client_interface.h"
 #include "nrp_general_library/plugin_system/plugin.h"
 
 #include "nrp_nest_server_engine/devices/nest_server_device.h"
-
-#include "nrp_nest_server_engine/config/nest_server_config.h"
 
 #include <future>
 #include <unistd.h>
@@ -36,35 +35,20 @@
  * \brief NRP - Nest Communicator on the NRP side. Converts DeviceInterface classes from/to JSON objects
  */
 class NestEngineServerNRPClient
-        : public Engine<NestEngineServerNRPClient, NestServerConfig>
+        : public EngineClient<NestEngineServerNRPClient, NestServerConfigConst::EngineSchema>
 {
-		struct CompNestDevs
-		{
-			bool operator()(const NestServerDevice::shared_ptr &lhs, const NestServerDevice::shared_ptr &rhs) const
-			{	return lhs->id().Name.compare(rhs->id().Name) < 0;	}
-		};
-
-		struct nest_devices_t : public std::set<NestServerDevice::shared_ptr, CompNestDevs>
-		{
-			iterator find(const std::string &name)
-			{
-				for(auto nestDevIt = this->begin(); nestDevIt != this->end(); ++nestDevIt)
-				{
-					if(nestDevIt->get()->id().Name == name)
-						return nestDevIt;
-				}
-
-				return this->end();
-			}
-		};
-
 		/*!
 		 * \brief Number of seconds to wait for Nest to exit cleanly after first SIGTERM signal. Afterwards, send a SIGKILL
 		 */
 		static constexpr size_t _killWait = 10;
 
+        /*!
+         * \brief NestEngineServerNRPClient will look for an unbound port as default. This is the port number at which to start the search
+         */
+        static constexpr uint16_t PortSearchStart = 5000;
+
 	public:
-		NestEngineServerNRPClient(EngineConfigConst::config_storage_t &config, ProcessLauncherInterface::unique_ptr &&launcher);
+		NestEngineServerNRPClient(nlohmann::json &config, ProcessLauncherInterface::unique_ptr &&launcher);
 		virtual ~NestEngineServerNRPClient() override;
 
 		virtual void initialize() override;
@@ -75,24 +59,64 @@ class NestEngineServerNRPClient
 		virtual void runLoopStep(SimulationTime timeStep) override;
 		virtual void waitForStepCompletion(float timeOut) override;
 
-		virtual void handleInputDevices(const device_inputs_t &inputDevices) override;
+		virtual void sendDevicesToEngine(const devices_ptr_t &devicesArray) override;
+
+        virtual const std::vector<std::string> engineProcStartParams() const override;
+
+        virtual const std::vector<std::string> engineProcEnvParams() const override;
+
+		using population_mapping_t = std::map<std::string, std::string>;
 
 	protected:
-		virtual device_outputs_set_t requestOutputDeviceCallback(const device_identifiers_t &deviceIdentifiers) override;
+		virtual devices_set_t getDevicesFromEngine(const device_identifiers_set_t &deviceIdentifiers) override;
 
 	private:
+
+		/*!
+		 * \brief Future used during asynchronous execution of the runStep function
+		 */
 		std::future<bool> _runStepThread;
-		nest_devices_t _nestDevs;
+
+		/*!
+		 * \brief Contains populations returned by server after loading the brain file
+		 *
+		 * The structure contains (population_name, [IDs]) pairs, which are returned
+		 * by the NEST server during initialization. The mapping may be used to access
+		 * populations of neurons by their name, rather than by specifying their IDs.
+		 *
+		 * The list of IDs is stored as string, formatted as JSON array.
+		 */
+		population_mapping_t _populations;
+
+		/*!
+		 * \brief NEST simulation resolution cached at engine initialization
+		 */
+		float _simulationResolution = 0.0f;
+
+		/*!
+		 * \brief Address of NEST server
+		 */
+		std::string _serverAddress;
 
 		bool runStepFcn(SimulationTime timestep);
+
+		/*!
+		 * \brief Returns NEST server address
+		 *
+		 * \return Address of NEST server
+		 */
 		std::string serverAddress() const;
 
-		boost::python::object _parseFcn;
-
-		std::tuple<std::string, std::string> parseName(const std::string &devName) const;
+		/*!
+		 * \brief Returns a JSON array of device IDs mapped to specified device name
+		 *
+		 * \param deviceName Name of the device
+		 * \return Reference to JSON array of device IDs, as string
+		 */
+		const std::string & getDeviceIdList(const std::string & deviceName) const;
 };
 
-using NestEngineServerNRPClientLauncher = NestEngineServerNRPClient::EngineLauncher<NestServerConfig::DefEngineType>;
+using NestEngineServerNRPClientLauncher = NestEngineServerNRPClient::EngineLauncher<NestServerConfigConst::EngineType>;
 
 
 CREATE_NRP_ENGINE_LAUNCHER(NestEngineServerNRPClientLauncher);

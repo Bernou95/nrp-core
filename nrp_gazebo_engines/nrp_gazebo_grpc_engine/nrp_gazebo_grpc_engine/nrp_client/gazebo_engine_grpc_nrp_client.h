@@ -1,6 +1,6 @@
 /* * NRP Core - Backend infrastructure to synchronize simulations
  *
- * Copyright 2020 Michael Zechmair
+ * Copyright 2020-2021 NRP Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@
 #define GAZEBO_ENGINE_GRPC_NRP_CLIENT_H
 
 #include "nrp_grpc_engine_protocol/engine_client/engine_grpc_client.h"
-#include "nrp_general_library/engine_interfaces/engine_interface.h"
+#include "nrp_general_library/engine_interfaces/engine_client_interface.h"
 #include "nrp_general_library/plugin_system/plugin.h"
 
 #include "nrp_gazebo_grpc_engine/devices/grpc_physics_camera.h"
@@ -39,18 +39,22 @@
  *  \brief NRP - Gazebo Communicator on the NRP side. Converts DeviceInterface classes from/to JSON objects
  */
 class GazeboEngineGrpcNRPClient
-        : public EngineGrpcClient<GazeboEngineGrpcNRPClient, GazeboGrpcConfig, PhysicsCamera, PhysicsJoint, PhysicsLink>
+: public EngineGrpcClient<GazeboEngineGrpcNRPClient, GazeboGrpcConfigConst::EngineSchema, PhysicsCamera, PhysicsJoint, PhysicsLink>
 {
 	public:
-		GazeboEngineGrpcNRPClient(EngineConfigConst::config_storage_t &config, ProcessLauncherInterface::unique_ptr &&launcher);
+		GazeboEngineGrpcNRPClient(nlohmann::json &config, ProcessLauncherInterface::unique_ptr &&launcher);
 		virtual ~GazeboEngineGrpcNRPClient() override = default;
 
 		virtual void initialize() override;
 
 		virtual void shutdown() override;
+
+        virtual const std::vector<std::string> engineProcStartParams() const override;
+
+        virtual const std::vector<std::string> engineProcEnvParams() const override;
 };
 
-using GazeboEngineGrpcLauncher = GazeboEngineGrpcNRPClient::EngineLauncher<GazeboGrpcConfig::DefEngineType>;
+using GazeboEngineGrpcLauncher = GazeboEngineGrpcNRPClient::EngineLauncher<GazeboGrpcConfigConst::EngineType>;
 
 CREATE_NRP_ENGINE_LAUNCHER(GazeboEngineGrpcLauncher);
 

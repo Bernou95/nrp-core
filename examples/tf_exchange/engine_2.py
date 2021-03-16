@@ -7,7 +7,6 @@ class Script(EngineScript):
     def initialize(self):
         """Initialize device1 with empty time"""
         print("Engine 2 is initializing. Registering device...")
-        #self.tt = SimulationTime()
         self._registerDevice("rec_device1")
         self._setDevice("rec_device1", { "time" : self._time.count(), "timestep": 0 })
 
@@ -16,5 +15,5 @@ class Script(EngineScript):
         dev1 = self._getDevice("rec_device1")
         print("Engine 2 received data is " + str(dev1))
 
-    def shutdown(self):
+    def shutdown():
         print("Engine 2 is shutting down")

@@ -5,17 +5,16 @@
 	"EngineConfigs": 
 	[
 		{
-			"EngineType": "gazebo_json",
+			"EngineType": "gazebo_grpc",
 			"EngineName": "gazebo",
 			"ServerAddress": "localhost:1234",
 			"GazeboWorldFile": "empty_world.sdf"
 		},
 		{
-			"EngineType": "opensim_json",
+			"EngineType": "python_json",
 			"EngineName": "servo",
-			"OpensimRunPy": "servo.py",
-			"ServerAddress": "localhost:2345",
-			"OpensimFileName": "arm26/arm26_ground_offset.osim"
+			"PythonFileName": "servo.py",
+			"ServerAddress": "localhost:2345"
 		},
 		{
 			"EngineType": "python_json",

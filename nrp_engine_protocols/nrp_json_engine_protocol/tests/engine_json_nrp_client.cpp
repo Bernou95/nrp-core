@@ -1,7 +1,7 @@
 //
 // NRP Core - Backend infrastructure to synchronize simulations
 //
-// Copyright 2020 Michael Zechmair
+// Copyright 2020-2021 NRP Team
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -34,16 +34,10 @@
 
 using namespace testing;
 
-class TestEngineJSONConfig
-        : public EngineJSONConfig<TestEngineJSONConfig, PropNames<> >
+struct TestEngineJSONConfigConst
 {
-	public:
-		static constexpr FixedString ConfigType = "TestEngineConfig";
-
-
-		TestEngineJSONConfig(EngineConfigConst::config_storage_t &config)
-		    : EngineJSONConfig(config)
-		{}
+    static constexpr FixedString EngineType = "test_engine";
+    static constexpr FixedString EngineSchema = "https://neurorobotics.net/engines/engine_comm_protocols.json#/engine_json";
 };
 
 class TestEngineJSONServer
@@ -88,7 +82,7 @@ class TestEngineJSONServer
 };
 
 class TestEngineJSONNRPClient
-        : public EngineJSONNRPClient<TestEngineJSONNRPClient, TestEngineJSONConfig, TestJSONDevice1, TestJSONDevice2, TestJSONDeviceThrow>
+: public EngineJSONNRPClient<TestEngineJSONNRPClient, TestEngineJSONConfigConst::EngineSchema, TestJSONDevice1, TestJSONDevice2, TestJSONDeviceThrow>
 {
 	public:
 	template<class ...T>
@@ -148,15 +142,17 @@ TEST(EngineJSONNRPClientTest, ServerCalls)
 	auto dev2Ctrl = TestJSONDevice2Controller(DeviceIdentifier(dev2.id()));
 	server.registerDevice(dev2.name(), &dev2Ctrl);
 
-	// Check timeout if no server is running
-	SimulationConfig::config_storage_t config;
+	nlohmann::json config;
+	config["EngineName"] = engineName;
+	config["EngineType"] = "test_engine_json";
+
+    // Check timeout if no server is running
 	TestEngineJSONNRPClient fakeClient("localhost:" + std::to_string(server.serverPort()), config, ProcessLauncherInterface::unique_ptr(new ProcessLauncherBasic()));
 	ASSERT_THROW(fakeClient.initialize(), NRPExceptionNonRecoverable);
 
 	// Start server, test init
 	server.startServerAsync();
 	TestEngineJSONNRPClient client("localhost:" + std::to_string(server.serverPort()), config, ProcessLauncherInterface::unique_ptr(new ProcessLauncherBasic()));
-	client.engineName() = engineName;
 	ASSERT_NO_THROW(client.initialize());
 
 	ASSERT_NO_THROW(client.runLoopStep(floatToSimulationTime(10)));
@@ -165,8 +161,8 @@ TEST(EngineJSONNRPClientTest, ServerCalls)
 	ASSERT_EQ(client.getEngineTime(), server.curTime);
 
 	// Test device retrieval
-	TestEngineJSONNRPClient::device_identifiers_t devIDs({dev1.id(), dev2.id(), devThrow.id()});
-	auto devices = client.requestOutputDevices(devIDs);
+	TestEngineJSONNRPClient::device_identifiers_set_t devIDs({dev1.id(), dev2.id(), devThrow.id()});
+	auto devices = client.updateDevicesFromEngine(devIDs);
 
 	// Only two devices (dev1, dev2) should be retrieved, as they are associated with the correct EngineName
 	ASSERT_EQ(devices.size(), 2);
@@ -200,11 +196,11 @@ TEST(EngineJSONNRPClientTest, ServerCalls)
 	dev2.data() = -1;
 
 	// Test device sending
-	TestEngineJSONNRPClient::device_inputs_t inputs;
+	TestEngineJSONNRPClient::devices_ptr_t inputs;
 	inputs.push_back(&inputDev1);
 	inputs.push_back(&inputDev2);
 	inputs.push_back(&inputDevThrow);
-	ASSERT_NO_THROW(client.handleInputDevices(inputs));
+	ASSERT_NO_THROW(client.sendDevicesToEngine(inputs));
 
 	ASSERT_EQ(inputDev1.data(), dev1Ctrl.data().data());
 	ASSERT_EQ(inputDev2.data(), dev2Ctrl.data().data());

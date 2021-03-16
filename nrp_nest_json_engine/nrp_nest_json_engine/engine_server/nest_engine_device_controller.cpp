@@ -1,7 +1,7 @@
 //
 // NRP Core - Backend infrastructure to synchronize simulations
 //
-// Copyright 2020 Michael Zechmair
+// Copyright 2020-2021 NRP Team
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -63,8 +63,8 @@ void NestEngineJSONDeviceController<NestDevice>::setNestID(boost::python::dict n
 	this->_nodeCollection = nodeCollection;
 }
 
-boost::python::dict NestEngineJSONDeviceController<NestDevice>::getStatusFromNest()
+boost::python::list NestEngineJSONDeviceController<NestDevice>::getStatusFromNest()
 {	return getStatusFromNest(this->_nest, this->_nodeCollection);	}
 
-boost::python::dict NestEngineJSONDeviceController<NestDevice>::getStatusFromNest(boost::python::dict &nest, const boost::python::object &nodeCollection)
-{	return boost::python::dict(nest["GetStatus"](nodeCollection)[0]);	}
+boost::python::list NestEngineJSONDeviceController<NestDevice>::getStatusFromNest(boost::python::dict &nest, const boost::python::object &nodeCollection)
+{	return boost::python::list(nest["GetStatus"](nodeCollection));	}

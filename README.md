@@ -10,7 +10,7 @@
     wget https://packages.osrfoundation.org/gazebo.key -O - | sudo apt-key add -
     
     sudo apt update
-    sudo apt install cmake libpistache-dev g++-10 libboost-python-dev libboost-filesystem-dev libcurl4-openssl-dev nlohmann-json3-dev libzip-dev libgazebo11-dev gazebo11 gazebo11-plugin-base cython3 python3-numpy
+    sudo apt install cmake libpistache-dev g++-10 libboost-python-dev libboost-filesystem-dev libcurl4-openssl-dev nlohmann-json3-dev libzip-dev libgazebo11-dev gazebo11 gazebo11-plugin-base cython3 python3-numpy libgrpc++-dev protobuf-compiler-grpc libprotobuf-dev doxygen libgsl-dev libopencv-dev python3-opencv python3-flask python3-flask-cors python3-restrictedpython uwsgi-core uwsgi-plugin-python3
     
     # Fix deprecated type in OGRE (std::allocator<void>::const_pointer has been deprecated with glibc-10). Until the upstream libs are updated, use this workaround. It changes nothing, the types are the same
     sudo sed -i "s/typename std::allocator<void>::const_pointer/const void*/g" /usr/include/OGRE/OgreMemorySTLAllocator.h
@@ -28,8 +28,6 @@
  - GTest: Testing Suite
  - spdlog: Logging functions
  - Cython3: Required by Nest
- 
- - OpenSim: For Opensim engine (You can run the shell "OpensimInstall.sh" to install it as a python module")
 
 ## Installation
 
@@ -40,7 +38,7 @@
  5. `export C=/usr/bin/gcc-10; export CXX=/usr/bin/g++-10`
  6. `cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local/nrp`
  7. `sudo mkdir -p /usr/local/nrp`
- 8. `sudo chown <USER> /usr/local/nrp`
+ 8. `sudo chown $USER /usr/local/nrp`
  9. `make -j8`
      Note that the installation process might take some time, as it downloads and compiles Nest as well. Also, Ubuntu has an outdated version of nlohman_json. CMake will download a newer version, which takes time as well
  10. `make install`
@@ -71,7 +69,7 @@ documentation can be found in a new `doxygen` folder
 	 - EngineServer: Server running in a separate process to facilitate communication between Engine and CLE
 	 - EngineDeviceController: Server side device controller. Handles the sending and receiving of devices. Each device requires a controller
 	 - NRPClient: CLE-side client that communicates with a single EngineServer
-	 - DeviceConversionMechanism: Mechanism to convert a device to/from a communication data type. Currently, it converts devices to/from a JSON structure which can then be exchanged between the EngineServer and NRPClient
+	 - DeviceConversionMechanism: Mechanism to convert a device to/from a communication data type. Currently, it converts devices to/from a JSON structure which can then be exchanged between the EngineServer and NRPClient [TODO: deprecated]
  - Device: Data Type used for communication between Engine and CLE. Can be anything, from single integer value, over string, to a mixture of differently-typed arrays
 	 - DeviceIdentifier: Unique Identifier for device data. 
 	Contains 3 strings:
@@ -90,7 +88,7 @@ documentation can be found in a new `doxygen` folder
  - PluginSystem: Load additional engines on startup by supplying their .so library
  - ProcessLaunchers: Different options can be supplied to launch processes. This is important when switching from a local machine to an HPC cluster with managed ressources, or when integrating MPI
 
-### Current Engine Interface: EngineJSON
+### Current Engine Interface: EngineJSON [OUTDATED]
 
  - EngineJSONServer: Server-side engine. 
    Supports the following communication functions:
@@ -100,7 +98,7 @@ documentation can be found in a new `doxygen` folder
 	 - getDeviceData: Receives an array of DeviceIdentifiers in JSON format from the NRPClient. Will retrieve the requested devices via the EngineDeviceController and send them back
 	 - setDeviceData: Receives an array of Devicedata in JSON format from NRPClient. Will set data in the engine and perform any functions stored inside the corresponding EngineDeviceController
  - EngineJSONNRPClient: CLE-side communicator that sends/receives data to/from the corresponding EngineJSONServer
- - JSONDeviceConversionMechanism:
+ - JSONDeviceConversionMechanism: [TODO: deprecated]
 	 - A type of DeviceConversionMechanism. Will de-/serialize devices from/to JSON format
 
 ### Current Engines:
@@ -117,7 +115,7 @@ documentation can be found in a new `doxygen` folder
  - Starts gazebo and loads plugins to communicate with the CLE
 
 ##### Nest
- - In subdirectory nrp_gazebo_engines
+ - In subdirectory nrp_nest_device_interface
  - Uses an EngineJSONServer
  - Takes a python file as input to define the initialize function (Start nest, define devices, ...)
  - Has single device types:
@@ -126,18 +124,12 @@ documentation can be found in a new `doxygen` folder
  - Start NRPNestExecutable as a child process
 
 ##### Python
- - In subdirectory nrp_nest_json_engine
+ - In subdirectory nrp_python_device_interface
  - Uses an EngineJSONServer
  - Takes a python file as input to define the initialize, runStep, and shutdown functions
  - Has single device types:
 	 - PythonObjectDeviceInterface: Should be able to interface with many Python datatypes. Uses Python-side JSON converter
  - Starts NRPPythonExecutable as a child process
- 
-##### OpenSim
- - In subdirectory nrp_opensim_engines
- - Uses an EngineJSONServer
- - Takes a python file as input to define the initialize, runStep, and shutdown functions
- - Starts NRPOpensimExecutable as a child process
 
 ##### Additional Engines
 Additional engines can be defined in a similar manner. 

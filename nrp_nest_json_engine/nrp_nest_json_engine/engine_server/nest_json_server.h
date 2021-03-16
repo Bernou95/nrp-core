@@ -1,6 +1,6 @@
 /* * NRP Core - Backend infrastructure to synchronize simulations
  *
- * Copyright 2020 Michael Zechmair
+ * Copyright 2020-2021 NRP Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +25,6 @@
 #include "nrp_json_engine_protocol/engine_server/engine_json_server.h"
 #include "nrp_general_library/utils/python_interpreter_state.h"
 #include "nrp_nest_json_engine/engine_server/nest_engine_device_controller.h"
-
-#include "nrp_nest_json_engine/config/nest_config.h"
 
 #include "nrp_nest_json_engine/devices/nest_device.h"
 
