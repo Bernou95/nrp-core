@@ -21,6 +21,8 @@
 
 """Init File. Imports nest and sets up a poisson generator, neuron, and voltmeter"""
 
-fdsafff
+#from NRPNestPythonModule import CreateDevice
+import NRPPythonEngineModule
+print("Success !!!")
 
 
