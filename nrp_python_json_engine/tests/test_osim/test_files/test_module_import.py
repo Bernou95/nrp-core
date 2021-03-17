@@ -24,7 +24,7 @@
 from NRPPythonEngineModule import EngineScript,RegisterEngine
 from TOsimLib import *
 import os
-#from NRPOpensimEngineModule import TOpenSim
+
 print ("Success Init")
 print (os.getcwd())
 
