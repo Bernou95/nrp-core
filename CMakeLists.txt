@@ -5,6 +5,9 @@ project(NRProject VERSION ${NRP_VERSION})
 
 set (CMAKE_CXX_STANDARD 20)
 
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fpic")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpic")
+
 set (CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set (CMAKE_INTERPROCEDURAL_OPTIMIZATION OFF)
 #string(APPEND CMAKE_SHARED_LINKER_FLAGS " -Wl,--no-undefined")
@@ -115,47 +118,22 @@ add_subdirectory(nrp_engine_protocols/nrp_json_engine_protocol)
 ## GRPC Communication Protocol
 add_subdirectory(nrp_engine_protocols/nrp_grpc_engine_protocol)
 
-##########################################
-## ENABLE_SIMULATOR Flags
-## 
-## These flags allow to disable the compilation of those parts of nrp-core that depends on or install a specific simulator (eg. gazebo, nest)
-##
-## The expected behavior for each of these flags is as follows:
-## - the CLE is always built regardless of any of the flags values.
-## - if a flag is set to OFF:
-##   - the related simulator won't be assumed to be installed in the system, ie. make won't fail if it isn't. 
-##     Also it won't be installed along the compilation process if this possibility is available (as in the case of nest)
-##   - The engines connected with this simulator won't be built (nor client nor server components)
-##   - tests that would fail if the related simulator is not available won't be built
-## - if the flag is set to CLIENT: Same as above but:
-##   - the engine clients connected to this simulator will be built. This means that they should not depend on or link to any specific simulator
-##   - the engine server side components might or might not be built, depending on if the related simulator is required at compilation time
-## - if the flag is set to FULL the simulator is assumed to be installed or it will be installed from source if this option is available. All targets connected with this simulator will be built
-##
-## This flag system allows to configure the resulting nrp-core depending on which simulators are available on the system, both for avoiding potential denpendency conflicts
-## between simulators and enforcing modularity, opening the possibility of having specific engine servers running on a different machine or inside containers.
-
-set(ENABLE_NEST FULL)
-set(ENABLE_GAZEBO FULL)
 
 ##########################################
 ## NRP Engines
 
-## Gazebo targets
-if(NOT ENABLE_GAZEBO STREQUAL OFF)
-	add_subdirectory(nrp_gazebo_engines/nrp_gazebo_devices)
-	add_subdirectory(nrp_gazebo_engines/nrp_gazebo_json_engine)
-	add_subdirectory(nrp_gazebo_engines/nrp_gazebo_grpc_engine)
-else()
-	message(STATUS "Gazebo engines will not be built")
-endif()
+## Gazebo devices
+add_subdirectory(nrp_gazebo_engines/nrp_gazebo_devices)
 
-## Nest Engines
-if(NOT ENABLE_NEST STREQUAL OFF)
-	add_subdirectory(nrp_nest_engines)
-else()
-	message(STATUS "Nest engines will not be built")
-endif()
+## Gazebo JSON Engine
+add_subdirectory(nrp_gazebo_engines/nrp_gazebo_json_engine)
+
+## Gazebo gRPC Engine
+add_subdirectory(nrp_gazebo_engines/nrp_gazebo_grpc_engine)
+
+## Nest Engine
+add_subdirectory(nrp_nest_json_engine)
+add_subdirectory(nrp_nest_server_engine)
 
 ## Python Engine
 add_subdirectory(nrp_python_json_engine)
@@ -163,7 +141,7 @@ add_subdirectory(nrp_python_json_engine)
 
 ##########################################
 ## NRP Simulation
-set(NRP_SIMULATION_DEFAULT_ENGINE_LAUNCHERS "NRPGazeboGrpcEngine.so;NRPNestJSONEngine.so"
+set(NRP_SIMULATION_DEFAULT_ENGINE_LAUNCHERS "NRPGazeboGrpcEngine.so;NRPNestJSONEngine.so;NRPPythonJSONEngine.so"
 	CACHE STRING "Default engines which will always be available in the NRP simulation")
 add_subdirectory(nrp_simulation)
 
