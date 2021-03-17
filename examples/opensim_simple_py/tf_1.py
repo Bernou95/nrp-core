@@ -1,6 +1,6 @@
 from NRPPythonModule import *
-import opensim
-@SingleTransceiverDevice(keyword='device1', id=DeviceIdentifier('device1', 'servo'))
+
+@FromEngineDevice(keyword='device1', id=DeviceIdentifier('device1', 'servo'))
 @TransceiverFunction("client")
 def transceiver_function(device1):
     rec_device1 = PythonDevice("rec_device1", "client")

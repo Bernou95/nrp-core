@@ -4,6 +4,12 @@ sudo apt-get --yes install git cmake cmake-curses-gui \
                            liblapack-dev swig python-dev \
                            openjdk-8-jdk
 export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+
+
+cd $HOME/Documents
+mkdir OpenSim
+cd OpenSim
+OPENSIM_CURR_PATH=$PWD
 git clone https://github.com/opensim-org/opensim-core.git
 mkdir opensim_dependencies_build
 cd opensim_dependencies_build
@@ -30,3 +36,5 @@ make -j8 install
 cd ../opensim_install/lib/python3.8/site-packages
 sudo python3 setup.py install
 
+echo 'export PATH='$OPENSIM_CURR_PATH'/opensim_install/lib/cmake:$PATH' >> $HOME/.bashrc
+echo 'export LD_LIBRARY_PATH='$OPENSIM_CURR_PATH'/opensim_install/lib:$LD_LIBRARY_PATH' >> $HOME/.bashrc

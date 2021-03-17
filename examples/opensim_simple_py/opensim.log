@@ -109,3 +109,6 @@ AttributeError: 'NoneType' object has no attribute 'setValue'
 
 [2021-03-17 00:21:20.481] [info] Loaded model Rajagopal_2015 from file rajagopal/rajagopal_2015.osim
 [2021-03-17 00:22:04.188] [info] Loaded model arm26 from file arm26/arm26_ground_offset.osim
+[2021-03-17 12:16:47.347] [info] Loaded model arm26 from file arm26/arm26_ground_offset.osim
+[2021-03-17 12:17:49.064] [info] Loaded model arm26 from file arm26/arm26_ground_offset.osim
+[2021-03-17 13:44:57.929] [info] Loaded model arm26 from file arm26/arm26_ground_offset.osim

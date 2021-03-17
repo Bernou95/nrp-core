@@ -23,10 +23,11 @@
 		},
 		{
 			"EngineType": "nest_json",
-			"EngineName": "nest"
+			"EngineName": "nest",
+			"NestInitFileName": "nest_simple.py"
 		}
 	],
-	"TransceiverFunctions":
+	"TransceiverFunctionConfigs":
 	[
 		{
 			"Name": "tf_1",

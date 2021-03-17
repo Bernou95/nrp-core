@@ -28,7 +28,7 @@
 			"PythonFileName": "client_py.py"
 		}
 	],
-	"TransceiverFunctions":
+	"TransceiverFunctionConfigs":
 	[
 		{
 			"Name": "tf_1",

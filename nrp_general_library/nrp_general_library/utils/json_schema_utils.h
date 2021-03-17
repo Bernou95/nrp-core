@@ -52,7 +52,6 @@ namespace json_utils {
         std::fstream s(schema_path.c_str());
         if (!s.good())
             throw std::invalid_argument("could not open " + uri.url() + " for schema loading\n");
-
         try {
             s >> schema;
         } catch (std::exception &e) {

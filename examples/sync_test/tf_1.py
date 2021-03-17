@@ -2,9 +2,9 @@ from NRPPythonModule import *
 import opensim
 
 #'''
-@SingleTransceiverDevice(keyword='device_os_1', id=DeviceIdentifier('device_os_1', 'servo_os_1'))
-@SingleTransceiverDevice(keyword='device_os_2', id=DeviceIdentifier('device_os_2', 'servo_os_2'))
-@SingleTransceiverDevice(keyword='device_py', id=DeviceIdentifier('device_py', 'servo_py'))
+@FromEngineDevice(keyword='device_os_1', id=DeviceIdentifier('device_os_1', 'servo_os_1'))
+@FromEngineDevice(keyword='device_os_2', id=DeviceIdentifier('device_os_2', 'servo_os_2'))
+@FromEngineDevice(keyword='device_py', id=DeviceIdentifier('device_py', 'servo_py'))
 @TransceiverFunction("client")
 def transceiver_function(device_os_1, device_os_2, device_py):
     rec_os_1 = PythonDevice("rec_os_1", "client")
