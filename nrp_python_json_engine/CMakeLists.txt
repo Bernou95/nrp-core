@@ -144,6 +144,7 @@ if(${ENABLE_TESTING} AND NOT "${TEST_SRC_FILES}" STREQUAL "")
 	configure_file("${CMAKE_CURRENT_SOURCE_DIR}/tests/test_osim/test_files/arm26_ground_offset.osim" "${CMAKE_CURRENT_BINARY_DIR}/test_osim/arm26_ground_offset.osim" COPYONLY)
 	file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_osim/test_files/Geometry" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/test_osim/")
 
+	# Create testing env files
 	configure_file("${CMAKE_CURRENT_SOURCE_DIR}/tests/test_files/test_env.sh.in" "${CMAKE_CURRENT_BINARY_DIR}/test_env.sh" @ONLY)
 	configure_file("${CMAKE_CURRENT_SOURCE_DIR}/tests/test_env_cmake.h.in" "${CMAKE_CURRENT_BINARY_DIR}/include/tests/test_env_cmake.h" @ONLY)
 

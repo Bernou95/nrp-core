@@ -36,5 +36,4 @@ make -j8 install
 cd ../opensim_install/lib/python3.8/site-packages
 sudo python3 setup.py install
 
-echo 'export PATH='$OPENSIM_CURR_PATH'/opensim_install/lib/cmake:$PATH' >> $HOME/.bashrc
 echo 'export LD_LIBRARY_PATH='$OPENSIM_CURR_PATH'/opensim_install/lib:$LD_LIBRARY_PATH' >> $HOME/.bashrc
