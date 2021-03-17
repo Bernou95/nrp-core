@@ -11,10 +11,7 @@ sudo mkdir -p /usr/local/nrp/share/doc/nest
 export C=/usr/bin/gcc-10; export CXX=/usr/bin/g++-10
 cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local/nrp
 
-
-
 sudo make -j8
-
 sudo make install
 
 sudo chmod -R 777  /usr/local/nrp/lib/config_schemas
