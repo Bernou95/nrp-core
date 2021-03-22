@@ -6,21 +6,21 @@
 	[
 		{
 			"EngineType": "python_json",
-			"EngineName": "servo_os_1",
-			"PythonFileName": "servo_os_1.py",
+			"EngineName": "server_os_1",
+			"PythonFileName": "server_os_1.py",
 			"ServerAddress": "localhost:1234"
 		},
 		{
 			"EngineType": "python_json",
-			"EngineName": "servo_os_2",
-			"PythonFileName": "servo_os_2.py",
+			"EngineName": "server_os_2",
+			"PythonFileName": "server_os_2.py",
 			"ServerAddress": "localhost:2345"
 		},
 		{
 			"EngineType": "python_json",
-			"EngineName": "servo_py",
-			"ServerAddress": "localhost:3456",
-			"PythonFileName": "servo_py.py"
+			"EngineName": "server_py",
+			"PythonFileName": "server_py.py",
+			"ServerAddress": "localhost:3456"
 		},
 		{
 			"EngineType": "python_json",

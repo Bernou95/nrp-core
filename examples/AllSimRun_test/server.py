@@ -18,6 +18,7 @@ class Script(EngineScript):
         self.tOS.run_step(action)
         self._setDevice("device1", { "cmd" : 1, "time": self.tOS.state.getTime() })
         print("Servo data is " + str(self._getDevice("device1")))
+        print("--------------------------------------------------")
 
     def shutdown(self):
         print("Engine 1 is shutting down")

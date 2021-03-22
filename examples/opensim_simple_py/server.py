@@ -4,7 +4,6 @@ from NRPPythonEngineModule import TOpenSim
 
 @RegisterEngine()
 class Script(EngineScript):
-    import opensim as osim
     def initialize(self):
         """Initialize device1 with time"""
         print("Servo Engine is initializing. Registering device...")
@@ -28,9 +27,10 @@ class Script(EngineScript):
         self.tOS.run_step(action)
 
         self._setDevice("device1", { "cmd" : 1, "time": self.tOS.state.getTime() })
-        self.tt = self._time
-        print(self.tt.count())
+        #self.tt = self._time
+        #print(self.tt.count())
         print("Servo data is " + str(self._getDevice("device1")))
+        print("-------------------------------------------")
 
     def shutdown(self):
         print("Engine 1 is shutting down")

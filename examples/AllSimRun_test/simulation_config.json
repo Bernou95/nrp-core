@@ -12,8 +12,8 @@
 		},
 		{
 			"EngineType": "python_json",
-			"EngineName": "servo",
-			"PythonFileName": "servo.py",
+			"EngineName": "server",
+			"PythonFileName": "server.py",
 			"ServerAddress": "localhost:2345"
 		},
 		{

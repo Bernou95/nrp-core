@@ -8,6 +8,7 @@ class TOpenSim(object):
 	joints = []
 	bodies = []
 	brain = None
+	manager = None
 	verbose = False
 	istep = 0
 
@@ -22,7 +23,7 @@ class TOpenSim(object):
 	def __init__(self, modelName, isVisualizer):		
 		super(TOpenSim, self).__init__()
 		self.model = osim.Model(modelName)
-		self.model.initSystem()
+		self.state = self.model.initSystem()
 		self.model.setUseVisualizer(isVisualizer)
 		self.brain = osim.PrescribedController()
 		self.muscleSet = self.model.getMuscles()

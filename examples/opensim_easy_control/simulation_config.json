@@ -18,8 +18,12 @@
 	"TransceiverFunctionConfigs":
 	[
 		{
-			"Name": "tf_1",
-			"FileName": "tf_1.py"
+			"Name": "rec_joints",
+			"FileName": "rec_joints.py"
+		},
+		{
+			"Name": "send_cmd",
+			"FileName": "send_cmd.py"
 		}
 	]
 }
