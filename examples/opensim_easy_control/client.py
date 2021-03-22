@@ -21,11 +21,11 @@ class Script(EngineScript):
         joints = self._getDevice("joint_data")
 
         if joints.get("elbow") > 2.0:
-            self.action = [0.0, 0.0, 0.0, 0.2, 0.0, 0.0]
+            self.action = [0.0, 0.2, 0.2, 0.2, 0.0, 0.0]
         elif joints.get("elbow") > 1.0:
-            self.action = [0.0, 0.0, 0.0, 0.4, 0.0, 0.0]
+            self.action = [0.0, 0.0, 0.4, 0.4, 0.4, 0.0]
         else:
-            self.action = [0.0, 0.0, 0.0, 0.6, 0.0, 0.0]
+            self.action = [0.0, 0.0, 0.0, 0.6, 0.6, 0.6]
         #print(joints, self.action)
         self._setDevice("action", { "act_list": self.action})
 
