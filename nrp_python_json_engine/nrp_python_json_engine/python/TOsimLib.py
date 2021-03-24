@@ -23,7 +23,7 @@ class TOpenSim(object):
 	maxforces = []
 	curforces = []
 	"""docstring for t"""
-	def __init__(self, modelName, isVisualizer):		
+	def __init__(self, modelName, isVisualizer):
 		super(TOpenSim, self).__init__()
 		self.model = osim.Model(modelName)
 		self.state = self.model.initSystem()
@@ -53,17 +53,27 @@ class TOpenSim(object):
 
 	def run_step(self, action):
 		self.actuate(action)
-		self.integrate()
+		self.integrate(numIterations=10)
 
-	def integrate(self):
+	def reset(self):
+		self.state = self.model.initializeState()
+		self.state.setTime(0)
+		self.istep = 0
+
+		self.reset_manager()
+
+	# Run simulation step by step
+	# "numIterations" defines the number of mini time step on one loop
+	def integrate(self, numIterations):
 		# Define the new endtime of the simulation
-		self.istep = self.istep + 1
+		self.istep = self.istep + numIterations
 		# Integrate till the new endtime
 		try:
 			self.state = self.manager.integrate(self.stepsize * self.istep)
 		except Exception as e:
 			print (e)
 
+	# Set the value of controller
 	def actuate(self, action):
 		# TODO: Check if actions within [0,1]
 		self.last_action = action
@@ -76,39 +86,41 @@ class TOpenSim(object):
 			func = osim.Constant.safeDownCast(functionSet.get(j))
 			func.setValue(float(action[j]))
 
-
-	def reset_manager(self):
-		self.manager = osim.Manager(self.model)
-		self.manager.setIntegratorAccuracy(self.integrator_accuracy)
-		self.manager.initialize(self.state)
-
-	def reset(self):
-		self.state = self.model.initializeState()
-		self.state.setTime(0)
-		self.istep = 0
-
-		self.reset_manager()
-
-
+	#Obtain devices' name, which can also be found in the model file "*.osim"
 	def getNameSet(self, deviceType):
 		tSet = None
 		if deviceType == "Joint":
 			tSet = self.jointSet
 		elif deviceType == "Force":
 			tSet = self.forceSet
+		else:
+			print("DeviceType is error")
+			print("In this function, it only supports Joint and Force")
+			return []
 		nameList = []
 		for i in range(tSet.getSize()):
 			nameList.append(tSet.get(i).getName())
 
 		return nameList
-
+	#Obtain the value of one device by the device name
 	def getDeviceValue(self, deviceName, deviceType):
 		tSet = None
 		if deviceType == "Joint":
 			tSet = self.jointSet
 		elif deviceType == "Force":
 			tSet = self.forceSet
+		else:
+			print("DeviceType is error")
+			print("In this function, it only supports Joint and Force")
+			return []
 		
 		theDevice = tSet.get(deviceName).getCoordinate()
 
 		return theDevice.getValue(self.state)
+
+	def reset_manager(self):
+		self.manager = osim.Manager(self.model)
+		self.manager.setIntegratorAccuracy(self.integrator_accuracy)
+		self.manager.initialize(self.state)
+
+

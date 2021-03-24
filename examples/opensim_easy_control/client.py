@@ -29,24 +29,25 @@ class Script(EngineScript):
         #'''
         joints = self._getDevice("joint_data")
         elbow_joint = joints.get("elbow")
-
+        #print(elbow_joint)
         # Easy state machine
-        '''
+        #'''
         if elbow_joint > 2.0:
             self.action = [0.0, 0.2, 0.2, 0.2, 0.0, 0.0]
         elif elbow_joint > 1.0:
             self.action = [0.0, 0.0, 0.4, 0.4, 0.4, 0.0]
         else:
             self.action = [0.0, 0.0, 0.0, 0.6, 0.6, 0.6]
-        '''
-        # Easy PID controller
         #'''
+        # Easy PID controller
+        '''
+        print(elbow_joint)
         if self.count % 4 == 0:
             err = 2.0 - elbow_joint
             self.u = self.pid_ctrl(err)
         self.count = self.count + 1
         self.action = [0.5-self.u, 0.0, 0.0, 0.5+self.u, 0.0, 0.0]
-        #'''
+        '''
         self._setDevice("action", { "act_list": self.action})
 
     def shutdown(self):
