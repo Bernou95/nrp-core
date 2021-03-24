@@ -19,13 +19,8 @@ class Script(EngineScript):
         self._setDevice("control_cmd", { "act_list" : self.action})
 
     def runLoop(self, timestep):
-
-        jointSet = self.tOS.model.getJointSet();
-        shoulder = jointSet.get(1).getCoordinate()
-        elbow = jointSet.get(2).getCoordinate()
-
-        s_val = shoulder.getValue(self.tOS.state)
-        e_val = elbow.getValue(self.tOS.state)
+        s_val = self.tOS.getDeviceValue("r_shoulder", deviceType="Joint")
+        e_val = self.tOS.getDeviceValue("r_elbow", deviceType="Joint")
         self._setDevice("joints", {"shoulder": s_val, "elbow": e_val})
         self._setDevice("infos", {"time": self.tOS.state.getTime()})
 
@@ -36,13 +31,9 @@ class Script(EngineScript):
         # To show components in the model changed by action
         # 1: To show components in a list
         #ctrl_list = self.tOS.model.getControlsTable()
-        '''
         # 2: To show components one by one
-        ctrlSet = self.tOS.model.getForceSet()
-        for j in range(ctrlSet.getSize()):
-            print('|', ctrlSet.get(j).getName(), end=' ')
-        print('|--> Action size: ', ctrlSet.getSize())
-        '''
+        #print(self.tOS.getNameSet("Force"))
+
     def shutdown(self):
         print("Engine 1 is shutting down")
 

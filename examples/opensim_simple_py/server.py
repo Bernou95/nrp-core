@@ -20,10 +20,10 @@ class Script(EngineScript):
 
     def runLoop(self, timestep):
         """Update device1 at every timestep"""
-        #action = []
+        #action = [0.0] * 99
         #action = [0.1, 0.1, 0.1, 0.5, 0.1, 0.5, 0.1, 0.1, 0.1] #leg 39
         action = [0.0, 0.0, 0.0, 0.5, 0.0, 0.0]                #arm 26
-        
+
         self.tOS.run_step(action)
 
         self._setDevice("device1", { "cmd" : 1, "time": self.tOS.state.getTime() })

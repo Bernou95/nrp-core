@@ -20,8 +20,8 @@ class Script(EngineScript):
 
         self.count = 0
         self.u = 0
-        self.kp = 0.33
-        self.ki = 0.000005
+        self.kp = 0.39
+        self.ki = 0.001
         self.kd = 0.99
 
     def runLoop(self, timestep):
@@ -41,12 +41,11 @@ class Script(EngineScript):
         '''
         # Easy PID controller
         #'''
-        if self.count % 5 == 0:
-            print('----------------------------------------------------> ')
+        if self.count % 4 == 0:
             err = 2.0 - elbow_joint
             self.u = self.pid_ctrl(err)
         self.count = self.count + 1
-        self.action = [0.5-self.u, 0.0, 0.0, 0.0, 0.5+self.u, 0.0]
+        self.action = [0.5-self.u, 0.0, 0.0, 0.5+self.u, 0.0, 0.0]
         #'''
         self._setDevice("action", { "act_list": self.action})
 

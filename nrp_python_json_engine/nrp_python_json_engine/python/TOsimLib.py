@@ -17,6 +17,9 @@ class TOpenSim(object):
 	state_desc = None
 	integrator_accuracy = 5e-5
 
+	jointSet = None
+	forceSet = None
+
 	maxforces = []
 	curforces = []
 	"""docstring for t"""
@@ -41,6 +44,9 @@ class TOpenSim(object):
 		self.model.initSystem()
 		# Enable the visualizer
 		self.reset()
+
+		self.jointSet = self.model.getJointSet()
+		self.forceSet = self.model.getForceSet()
 
 	def testPrint(self):
 		print("Hello, I am TOpenSim")
@@ -82,3 +88,27 @@ class TOpenSim(object):
 		self.istep = 0
 
 		self.reset_manager()
+
+
+	def getNameSet(self, deviceType):
+		tSet = None
+		if deviceType == "Joint":
+			tSet = self.jointSet
+		elif deviceType == "Force":
+			tSet = self.forceSet
+		nameList = []
+		for i in range(tSet.getSize()):
+			nameList.append(tSet.get(i).getName())
+
+		return nameList
+
+	def getDeviceValue(self, deviceName, deviceType):
+		tSet = None
+		if deviceType == "Joint":
+			tSet = self.jointSet
+		elif deviceType == "Force":
+			tSet = self.forceSet
+		
+		theDevice = tSet.get(deviceName).getCoordinate()
+
+		return theDevice.getValue(self.state)
