@@ -15,7 +15,7 @@ class Script(EngineScript):
     def runLoop(self, timestep):
         """Update device1 at every timestep"""
         action = [0.0, 0.0, 0.0, 0.5, 0.0, 0.0]
-        self.tOS.run_step(action)
+        self.tOS.run_step(action, timestep.count())
         self._setDevice("device1", { "cmd" : 1, "time": self.tOS.state.getTime() })
         print("Servo data is " + str(self._getDevice("device1")))
         print("--------------------------------------------------")

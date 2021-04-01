@@ -44,7 +44,7 @@ class Script(EngineScript):
         # Receive control data from TF
         self.action = self._getDevice("control_cmd").get("act_list")
         # Set muscles' force to change joints
-        self.tOS.run_step(self.action)
+        self.tOS.run_step(self.action, timestep.count())
         
         # To show components in the model changed by action
         # 1: To show components in a list

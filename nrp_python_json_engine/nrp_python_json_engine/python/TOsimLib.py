@@ -1,4 +1,5 @@
 import opensim as osim
+import math
 class TOpenSim(object):
 	stepsize = 0.001
 
@@ -51,9 +52,11 @@ class TOpenSim(object):
 	def testPrint(self):
 		print("Hello, I am TOpenSim")
 
-	def run_step(self, action):
+	def run_step(self, action, timeStep_ns):
+		timeStep_s = timeStep_ns/math.pow(10, 9)
+		numIterations = timeStep_s/self.stepsize
 		self.actuate(action)
-		self.integrate(numIterations=10)
+		self.integrate(numIterations=numIterations)
 
 	def reset(self):
 		self.state = self.model.initializeState()
@@ -122,5 +125,4 @@ class TOpenSim(object):
 		self.manager = osim.Manager(self.model)
 		self.manager.setIntegratorAccuracy(self.integrator_accuracy)
 		self.manager.initialize(self.state)
-
 
