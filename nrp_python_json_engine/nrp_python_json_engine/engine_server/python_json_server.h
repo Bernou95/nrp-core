@@ -64,6 +64,8 @@ class PythonJSONServer
 		 */
 		static PyEngineScript *registerScript(const boost::python::object &pythonScript);
 
+		std::string curEngineName;
+
 	private:
 		/*!
 		 * \brief Ptr to current PythonJSONServer.

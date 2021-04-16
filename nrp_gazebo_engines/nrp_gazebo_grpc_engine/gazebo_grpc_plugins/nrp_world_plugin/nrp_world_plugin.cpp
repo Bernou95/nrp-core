@@ -55,7 +55,11 @@ void gazebo::NRPWorldPlugin::Reset()
 SimulationTime gazebo::NRPWorldPlugin::runLoopStep(SimulationTime timeStep)
 {
 	std::scoped_lock lock(this->_lockLoop);
-
+	/* ------------------------------------------ */
+	//std::cout << "Engine Name: " << "gazebo" << " --> ";
+	//std::cout << "CLE Time cost: " << timeStep.count()/pow(10, 9) << " --- ";
+	//std::cout << "GZServer Time cost: " << this->_world->SimTime().Double() << std::endl;
+	/* ------------------------------------------ */
 	//std::cout << "NRPWorldPlugin: Executing loop step\n";
 
 	try

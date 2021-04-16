@@ -1,7 +1,7 @@
 sudo apt-get update
-sudo apt-get --yes install git cmake cmake-curses-gui \
+sudo apt-get --yes install python3 git cmake cmake-curses-gui \
                            freeglut3-dev libxi-dev libxmu-dev \
-                           liblapack-dev swig python-dev \
+                           liblapack-dev swig python3-dev \
                            openjdk-8-jdk
 export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
 

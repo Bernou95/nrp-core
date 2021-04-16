@@ -81,6 +81,7 @@ void SimulationLoop::initLoop()
 
 void SimulationLoop::runLoop(SimulationTime runLoopTime)
 {
+	//std::cout <<"TimeStep -->: " << runLoopTime.count() << std::endl;
 	const auto loopStopTime = this->_simTime + runLoopTime;
 	
 	if(this->_engineQueue.empty())
@@ -91,10 +92,12 @@ void SimulationLoop::runLoop(SimulationTime runLoopTime)
 
 	// Compute all engines which should finish before loopStopTime
 	std::vector<EngineClientInterfaceSharedPtr> processedEngines;
+	int count_t = 0;
 	while(this->_engineQueue.begin()->first < loopStopTime)
 	{
 		// Get the next batch of engines which should finish next
 		// _engineQueue is sorted by completion time of engine last step
+		std::cout << "Test: " << count_t++ << std::endl;
 		const auto nextCompletionTime = this->_engineQueue.begin()->first;
 		do
 		{
@@ -164,7 +167,6 @@ void SimulationLoop::runLoop(SimulationTime runLoopTime)
 		for(auto &engine : processedEngines)
 		{
 			const auto trueRunTime = this->_simTime - engine->getEngineTime() + engine->getEngineTimestep();
-
 			if(trueRunTime >= SimulationTime::zero())
 			{
 				try

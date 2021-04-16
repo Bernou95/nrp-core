@@ -31,6 +31,7 @@
 
 #include <fstream>
 #include <filesystem>
+#include <cmath>
 
 namespace python = boost::python;
 
@@ -65,7 +66,13 @@ SimulationTime PythonJSONServer::runLoopStep(SimulationTime timestep)
 	try
 	{
 		PyEngineScript &script = python::extract<PyEngineScript&>(this->_pyEngineScript);
-		return script.runLoop(timestep);
+		//return script.runLoop(timestep);
+		/* ------------------------------------------ */
+		SimulationTime tTime = script.runLoop(timestep);
+		std::cout << "Engine Name: " << this->curEngineName << " --> ";
+		std::cout << "CLE Time cost: " << tTime.count() << "(NS) ->" << tTime.count()/pow(10, 9) << "(S)\n";
+		return tTime;
+		/* ------------------------------------------ */		
 	}
 	catch(python::error_already_set &)
 	{
@@ -76,6 +83,7 @@ SimulationTime PythonJSONServer::runLoopStep(SimulationTime timestep)
 
 nlohmann::json PythonJSONServer::initialize(const nlohmann::json &data, EngineJSONServer::lock_t&)
 {
+	this->curEngineName = std::string(data.at("EngineName"));
 	PythonGILLock lock(this->_pyGILState, true);
 	try
 	{

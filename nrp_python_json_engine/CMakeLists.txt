@@ -209,6 +209,8 @@ if(TARGET ${PYTHON_MODULE_NAME})
 
 	install(FILES "nrp_python_json_engine/python/TOsimLib.py"
 		DESTINATION "${PYTHON_INSTALL_DIR_REL}/${PYTHON_MODULE_NAME}")
+	#install(FILES "nrp_python_json_engine/python/TMujocoLib.py"
+	#	DESTINATION "${PYTHON_INSTALL_DIR_REL}/${PYTHON_MODULE_NAME}")
 endif()
 
 # Install executable files

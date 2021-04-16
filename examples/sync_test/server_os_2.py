@@ -18,6 +18,7 @@ class Script(EngineScript):
 
     def runLoop(self, timestep):
         """Update device1 at every timestep"""
+        #print(timestep.count())
         action = []
         self.tOS.run_step(action, timestep.count())
         self._setDevice("device_os_2", {"count":self.count, "time":self.tOS.state.getTime()})

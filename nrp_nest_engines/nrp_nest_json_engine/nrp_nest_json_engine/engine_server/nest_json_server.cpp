@@ -30,6 +30,7 @@
 #include "nrp_nest_json_engine/python/create_device_class.h"
 
 #include "nrp_nest_json_engine/config/nest_config.h"
+//#include "nrp_python_json_engine/engine_server/python_engine_json_device_controller.h"
 
 #include <fstream>
 
@@ -96,7 +97,13 @@ SimulationTime NestJSONServer::runLoopStep(SimulationTime timeStep)
         this->_pyNest["Simulate"](runTimeMsRounded);
 
 		// The time field of dictionary returned from GetKernelStatus contains time in milliseconds
-		return toSimulationTime<float, std::milli>(python::extract<float>(this->_pyNest["GetKernelStatus"]("time")));
+		//return toSimulationTime<float, std::milli>(python::extract<float>(this->_pyNest["GetKernelStatus"]("time")));
+		/* ---------------------------------------------------------------- */
+		SimulationTime tTime = toSimulationTime<float, std::milli>(python::extract<float>(this->_pyNest["GetKernelStatus"]("time")));
+		std::cout << "Engine Name: " << this->curEngineName << " --> ";
+		std::cout << "Time cost: " << tTime.count() << "(NS) ->" << tTime.count()/pow(10, 9) << "(S)\n";
+		return tTime;
+		/* ---------------------------------------------------------------- */		
 	}
 	catch(python::error_already_set &)
 	{
@@ -107,6 +114,7 @@ SimulationTime NestJSONServer::runLoopStep(SimulationTime timeStep)
 
 nlohmann::json NestJSONServer::initialize(const nlohmann::json &data, EngineJSONServer::lock_t&)
 {
+	this->curEngineName = data.at("EngineName");
 	PythonGILLock lock(this->_pyGILState, true);
 	try
 	{
@@ -166,15 +174,19 @@ nlohmann::json NestJSONServer::initialize(const nlohmann::json &data, EngineJSON
 		jsonDevMap = nlohmann::json::parse(jsonStr);
 
 		// Register devices
+		
 		this->_devMap = python::dict(this->_pyNRPNest["GetDevMap"]());
 		python::list devMapKeys = this->_devMap.keys();
 		const long numDevices = python::len(devMapKeys);
+
+		//std::cout << "NEST JSON SERVER \n";
 		//const long numDevices = python::len(this->_pyNRPNest["GetDevMap"]());
 		for(long i=0; i < numDevices; ++i)
 		{
 			const python::object &devKey = devMapKeys[i];
 			const std::string devName = python::extract<std::string>(python::str(devKey));
 			python::object devNodes = this->_devMap[devKey];
+			//std::cout << i << " " << devName << std::endl;
 
 			auto devController = std::shared_ptr<NestEngineJSONDeviceController<NestDevice> >(new
 			            NestEngineJSONDeviceController<NestDevice>(DeviceIdentifier(devName, data.at("EngineName"), NestDevice::TypeName.data()),
@@ -184,6 +196,10 @@ nlohmann::json NestJSONServer::initialize(const nlohmann::json &data, EngineJSON
 			this->registerDeviceNoLock(devName, devController.get());
 		}
 
+		//std::string tDeviceName = "check_time";
+		//PtrTemplates<PythonEngineJSONDeviceController<PyObjectDevice>>::shared_ptr
+	    //    newController(new PythonEngineJSONDeviceController<PyObjectDevice>(DeviceIdentifier(tDeviceName, "", { "time": 0 })));
+		//this->registerDeviceNoLock(tDeviceName, newController.get());
 		// Prepare Nest for execution
         // Commented out in the context of https://hbpneurorobotics.atlassian.net/browse/NRRPLT-8209
 		// this->_pyNest["Prepare"]();

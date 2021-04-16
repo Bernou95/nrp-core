@@ -1,0 +1,29 @@
+{
+	"SimulationName": "tf_exchange",
+	"SimulationDescription": "Launch two python engines. Engine1 will offer the current time as a device. tf_1 will request said device and send it to Engine2. Engine2 will receive the time and display it",
+	"SimulationTimeout": 10,
+	"EngineConfigs": 
+	[
+		{
+			"EngineType": "python_json",
+			"EngineName": "server",
+			"PythonFileName": "server.py"
+		},
+		{
+			"EngineType": "python_json",
+			"EngineName": "client",
+			"PythonFileName": "client.py"
+		}
+	],
+	"TransceiverFunctionConfigs":
+	[
+		{
+			"Name": "rec_joints",
+			"FileName": "rec_joints.py"
+		},
+		{
+			"Name": "send_cmd",
+			"FileName": "send_cmd.py"
+		}
+	]
+}

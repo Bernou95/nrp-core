@@ -43,7 +43,7 @@ set(TEST_SRC_FILES
 ## Dependencies
 
 # pistache: REST server library
-find_package(Pistache REQUIRED)
+#find_package(Pistache REQUIRED)
 
 
 ##########################################

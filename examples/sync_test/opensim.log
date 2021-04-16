@@ -1,0 +1,100 @@
+[2021-03-29 11:19:42.753] [info] Loaded model arm26 from file arm26/arm26_ground_offset.osim
+[2021-03-29 11:19:44.187] [info] Loaded model Rajagopal_2015 from file rajagopal/rajagopal_2015.osim
+[2021-04-01 12:11:50.560] [info] Loaded model arm26 from file arm26/arm26_ground_offset.osim
+[2021-04-01 12:11:51.965] [info] Loaded model Rajagopal_2015 from file rajagopal/rajagopal_2015.osim
+[2021-04-01 12:11:54.734] [error] Error while executing loop step: Traceback (most recent call last):
+  File "server_os_2.py", line 22, in runLoop
+    self.tOS.run_step(action)
+TypeError: run_step() missing 1 required positional argument: 'timeStep_ns'
+
+[2021-04-01 12:11:54.734] [error] Error while executing loop step: Traceback (most recent call last):
+  File "server_os_1.py", line 22, in runLoop
+    self.tOS.run_step(action)
+TypeError: run_step() missing 1 required positional argument: 'timeStep_ns'
+
+[2021-04-01 12:12:43.060] [info] Loaded model arm26 from file arm26/arm26_ground_offset.osim
+[2021-04-01 12:12:44.466] [info] Loaded model Rajagopal_2015 from file rajagopal/rajagopal_2015.osim
+[2021-04-01 12:12:47.229] [error] Error while executing loop step: Traceback (most recent call last):
+  File "server_os_2.py", line 22, in runLoop
+    self.tOS.run_step(action)
+TypeError: run_step() missing 1 required positional argument: 'timeStep_ns'
+
+[2021-04-01 12:13:08.415] [info] Loaded model arm26 from file arm26/arm26_ground_offset.osim
+[2021-04-01 12:13:09.869] [info] Loaded model Rajagopal_2015 from file rajagopal/rajagopal_2015.osim
+[2021-04-01 12:17:30.930] [info] Loaded model arm26 from file arm26/arm26_ground_offset.osim
+[2021-04-01 12:17:32.342] [info] Loaded model Rajagopal_2015 from file rajagopal/rajagopal_2015.osim
+[2021-04-01 12:22:01.123] [info] Loaded model arm26 from file arm26/arm26_ground_offset.osim
+[2021-04-01 12:22:02.518] [info] Loaded model Rajagopal_2015 from file rajagopal/rajagopal_2015.osim
+[2021-04-01 12:43:50.036] [info] Loaded model arm26 from file arm26/arm26_ground_offset.osim
+[2021-04-01 12:43:51.427] [info] Loaded model Rajagopal_2015 from file rajagopal/rajagopal_2015.osim
+[2021-04-01 12:46:32.655] [info] Loaded model arm26 from file arm26/arm26_ground_offset.osim
+[2021-04-01 12:46:34.070] [info] Loaded model Rajagopal_2015 from file rajagopal/rajagopal_2015.osim
+[2021-04-07 18:59:47.936] [info] Loaded model arm26 from file arm26/arm26_ground_offset.osim
+[2021-04-07 18:59:49.329] [info] Loaded model Rajagopal_2015 from file rajagopal/rajagopal_2015.osim
+[2021-04-08 12:00:53.458] [info] Loaded model arm26 from file arm26/arm26_ground_offset.osim
+[2021-04-08 12:00:54.866] [info] Loaded model Rajagopal_2015 from file rajagopal/rajagopal_2015.osim
+[2021-04-08 12:01:39.630] [info] Loaded model arm26 from file arm26/arm26_ground_offset.osim
+[2021-04-08 12:01:41.034] [info] Loaded model Rajagopal_2015 from file rajagopal/rajagopal_2015.osim
+[2021-04-08 12:02:25.257] [info] Loaded model arm26 from file arm26/arm26_ground_offset.osim
+[2021-04-08 12:02:26.647] [info] Loaded model Rajagopal_2015 from file rajagopal/rajagopal_2015.osim
+[2021-04-08 12:02:49.471] [info] Loaded model arm26 from file arm26/arm26_ground_offset.osim
+[2021-04-08 12:02:50.868] [info] Loaded model Rajagopal_2015 from file rajagopal/rajagopal_2015.osim
+[2021-04-08 12:03:40.351] [info] Loaded model arm26 from file arm26/arm26_ground_offset.osim
+[2021-04-08 12:03:41.742] [info] Loaded model Rajagopal_2015 from file rajagopal/rajagopal_2015.osim
+[2021-04-08 14:46:13.161] [info] Loaded model arm26 from file arm26/arm26_ground_offset.osim
+[2021-04-08 14:46:14.591] [info] Loaded model Rajagopal_2015 from file rajagopal/rajagopal_2015.osim
+[2021-04-08 14:46:50.761] [info] Loaded model arm26 from file arm26/arm26_ground_offset.osim
+[2021-04-08 14:46:52.189] [info] Loaded model Rajagopal_2015 from file rajagopal/rajagopal_2015.osim
+[2021-04-08 15:09:19.259] [info] Loaded model arm26 from file arm26/arm26_ground_offset.osim
+[2021-04-08 15:09:20.650] [info] Loaded model Rajagopal_2015 from file rajagopal/rajagopal_2015.osim
+[2021-04-08 15:49:06.784] [info] Loaded model arm26 from file arm26/arm26_ground_offset.osim
+[2021-04-08 15:49:08.170] [info] Loaded model Rajagopal_2015 from file rajagopal/rajagopal_2015.osim
+[2021-04-08 15:51:00.152] [info] Loaded model arm26 from file arm26/arm26_ground_offset.osim
+[2021-04-08 15:51:01.539] [info] Loaded model Rajagopal_2015 from file rajagopal/rajagopal_2015.osim
+[2021-04-08 16:00:52.143] [info] Loaded model arm26 from file arm26/arm26_ground_offset.osim
+[2021-04-08 16:00:53.532] [info] Loaded model Rajagopal_2015 from file rajagopal/rajagopal_2015.osim
+[2021-04-09 02:12:27.711] [info] Loaded model arm26 from file arm26/arm26_ground_offset.osim
+[2021-04-09 02:12:29.127] [info] Loaded model Rajagopal_2015 from file rajagopal/rajagopal_2015.osim
+[2021-04-09 02:18:32.884] [info] Loaded model arm26 from file arm26/arm26_ground_offset.osim
+[2021-04-09 02:18:34.273] [info] Loaded model Rajagopal_2015 from file rajagopal/rajagopal_2015.osim
+[2021-04-09 02:29:04.958] [info] Loaded model arm26 from file arm26/arm26_ground_offset.osim
+[2021-04-09 02:29:06.366] [info] Loaded model Rajagopal_2015 from file rajagopal/rajagopal_2015.osim
+[2021-04-09 02:35:17.458] [info] Loaded model arm26 from file arm26/arm26_ground_offset.osim
+[2021-04-09 02:35:18.857] [info] Loaded model Rajagopal_2015 from file rajagopal/rajagopal_2015.osim
+[2021-04-09 02:49:13.012] [info] Loaded model arm26 from file arm26/arm26_ground_offset.osim
+[2021-04-09 02:49:14.403] [info] Loaded model Rajagopal_2015 from file rajagopal/rajagopal_2015.osim
+[2021-04-09 02:56:16.371] [info] Loaded model arm26 from file arm26/arm26_ground_offset.osim
+[2021-04-09 02:56:17.774] [info] Loaded model Rajagopal_2015 from file rajagopal/rajagopal_2015.osim
+[2021-04-09 02:56:45.394] [info] Loaded model arm26 from file arm26/arm26_ground_offset.osim
+[2021-04-09 02:56:46.793] [info] Loaded model Rajagopal_2015 from file rajagopal/rajagopal_2015.osim
+[2021-04-09 02:59:05.146] [info] Loaded model arm26 from file arm26/arm26_ground_offset.osim
+[2021-04-09 02:59:06.555] [info] Loaded model Rajagopal_2015 from file rajagopal/rajagopal_2015.osim
+[2021-04-12 10:47:16.928] [info] Loaded model arm26 from file arm26/arm26_ground_offset.osim
+[2021-04-12 10:47:18.174] [info] Loaded model Rajagopal_2015 from file rajagopal/rajagopal_2015.osim
+[2021-04-12 10:51:10.994] [info] Loaded model arm26 from file arm26/arm26_ground_offset.osim
+[2021-04-12 10:51:12.218] [info] Loaded model Rajagopal_2015 from file rajagopal/rajagopal_2015.osim
+[2021-04-12 16:07:08.879] [info] Loaded model arm26 from file arm26/arm26_ground_offset.osim
+[2021-04-12 16:07:10.089] [info] Loaded model Rajagopal_2015 from file rajagopal/rajagopal_2015.osim
+[2021-04-12 16:10:06.293] [info] Loaded model arm26 from file arm26/arm26_ground_offset.osim
+[2021-04-12 16:10:07.533] [info] Loaded model Rajagopal_2015 from file rajagopal/rajagopal_2015.osim
+[2021-04-16 12:17:11.808] [info] Loaded model arm26 from file arm26/arm26_ground_offset.osim
+[2021-04-16 12:18:17.278] [info] Loaded model arm26 from file arm26/arm26_ground_offset.osim
+[2021-04-16 12:19:33.735] [info] Loaded model arm26 from file arm26/arm26_ground_offset.osim
+[2021-04-16 12:19:57.731] [info] Loaded model arm26 from file arm26/arm26_ground_offset.osim
+[2021-04-16 12:20:32.841] [info] Loaded model arm26 from file arm26/arm26_ground_offset.osim
+[2021-04-16 12:44:01.660] [info] Loaded model arm26 from file arm26/arm26_ground_offset.osim
+[2021-04-16 12:44:02.885] [info] Loaded model Rajagopal_2015 from file rajagopal/rajagopal_2015.osim
+[2021-04-16 12:46:11.203] [info] Loaded model arm26 from file arm26/arm26_ground_offset.osim
+[2021-04-16 12:46:12.424] [info] Loaded model Rajagopal_2015 from file rajagopal/rajagopal_2015.osim
+[2021-04-16 12:55:20.236] [info] Loaded model arm26 from file arm26/arm26_ground_offset.osim
+[2021-04-16 12:55:21.452] [info] Loaded model Rajagopal_2015 from file rajagopal/rajagopal_2015.osim
+[2021-04-16 13:33:46.699] [info] Loaded model arm26 from file arm26/arm26_ground_offset.osim
+[2021-04-16 13:33:47.909] [info] Loaded model Rajagopal_2015 from file rajagopal/rajagopal_2015.osim
+[2021-04-16 13:34:12.365] [info] Loaded model arm26 from file arm26/arm26_ground_offset.osim
+[2021-04-16 13:34:13.574] [info] Loaded model Rajagopal_2015 from file rajagopal/rajagopal_2015.osim
+[2021-04-16 13:37:42.646] [info] Loaded model arm26 from file arm26/arm26_ground_offset.osim
+[2021-04-16 13:37:43.856] [info] Loaded model Rajagopal_2015 from file rajagopal/rajagopal_2015.osim
+[2021-04-16 14:00:11.394] [info] Loaded model arm26 from file arm26/arm26_ground_offset.osim
+[2021-04-16 14:00:12.611] [info] Loaded model Rajagopal_2015 from file rajagopal/rajagopal_2015.osim
+[2021-04-16 14:00:40.660] [info] Loaded model arm26 from file arm26/arm26_ground_offset.osim
+[2021-04-16 14:00:41.881] [info] Loaded model Rajagopal_2015 from file rajagopal/rajagopal_2015.osim

@@ -96,6 +96,8 @@ class NRPCommunicationController
 		static std::string createDeviceName(const gazebo::PluginT<T> &plugin, const std::string &objectName)
 		{	return plugin.GetHandle() + "::" + objectName;	}
 
+		std::string curEngineName;
+
 	private:
 
 		/*!

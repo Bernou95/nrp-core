@@ -129,7 +129,7 @@ if(NOT ${restclient-cpp_FOUND})
 endif()
 
 # pistache: REST server library
-find_package(Pistache REQUIRED)
+#find_package(Pistache REQUIRED)
 
 # nlohmann_json: JSON library
 find_package(nlohmann_json 3.9.0 QUIET)

@@ -195,10 +195,10 @@ bool SimulationManager::runSimulationUntilTimeout(sim_lock_t &simLock)
 		simLock.lock();
 
 		hasTimedOut = hasSimTimedOut(this->_loop->getSimTime(), toSimulationTime<unsigned, std::ratio<1>>(this->_simConfig->at("SimulationTimeout")));
-
 		if(!this->isRunning() || hasTimedOut)
 			break;
-
+		std::cout << "++++++++++++++++++++++++++++++++++\n";
+		std::cout <<"TimeStep: " << this->_simConfig->at("SimulationTimestep") << std::endl;
 		SimulationTime timeStep = toSimulationTime<float, std::ratio<1>>(this->_simConfig->at("SimulationTimestep"));
 
 		this->_loop->runLoop(timeStep);

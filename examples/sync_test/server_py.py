@@ -17,7 +17,7 @@ class Script(EngineScript):
 
     def runLoop(self, timestep):
         """Update device1 at every timestep"""
-        t_Time = self._time.count() / self.math.pow(10, 10)
+        t_Time = self._time.count() / self.math.pow(10, 9)
         self._setDevice("device_py", { "count":self.count, "time":t_Time})
         self.count = self.count + 1
         
