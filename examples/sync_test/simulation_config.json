@@ -1,30 +1,76 @@
 {
 	"SimulationName": "tf_exchange",
 	"SimulationDescription": "Launch two python engines. Engine1 will offer the current time as a device. tf_1 will request said device and send it to Engine2. Engine2 will receive the time and display it",
-	"SimulationTimeout": 10,
+<<<<<<< HEAD
+	"SimulationTimeout": 0.032,
+	"SimulationTimestep":0.001,
+=======
+	"SimulationTimeout": 1,
+	"SimulationTimestep":0.016,
+>>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
 	"EngineConfigs": 
 	[
 		{
+			"EngineType": "gazebo_grpc",
+			"EngineName": "gazebo",
+			"EngineTimestep":0.001,
+<<<<<<< HEAD
+			"ServerAddress": "localhost:1234",
+			"GazeboWorldFile": "empty_world.sdf"
+		},
+		{
+			"EngineType": "nest_json",
+			"EngineName": "nest",
+			"EngineTimestep":0.002,
+			"ServerAddress": "localhost:2345",
+			"NestInitFileName": "nest_simple.py"
+		},
+		{
+			"EngineType": "python_json",
+			"EngineName": "py_1",
+			"EngineTimestep":0.004,
+			"PythonFileName": "server_py_1.py",
+=======
+			"ServerAddress": "localhost:5432",
+			"GazeboWorldFile": "empty_world.sdf"
+		},
+		{
+			"EngineType": "nest_json",
+			"EngineName": "nest",
+			"EngineTimestep":0.002,
+			"ServerAddress": "localhost:4321",
+			"NestInitFileName": "nest_simple.py"
+		},
+		{
 			"EngineType": "python_json",
 			"EngineName": "server_os_1",
+			"EngineTimestep":0.004,
 			"PythonFileName": "server_os_1.py",
 			"ServerAddress": "localhost:1234"
 		},
 		{
 			"EngineType": "python_json",
-			"EngineName": "server_os_2",
-			"PythonFileName": "server_os_2.py",
-			"ServerAddress": "localhost:2345"
-		},
-		{
-			"EngineType": "python_json",
 			"EngineName": "server_py",
+			"EngineTimestep":0.008,
 			"PythonFileName": "server_py.py",
+>>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
 			"ServerAddress": "localhost:3456"
 		},
 		{
 			"EngineType": "python_json",
+			"EngineName": "py_2",
+			"EngineTimestep":0.008,
+			"PythonFileName": "server_py_2.py",
+			"ServerAddress": "localhost:4567"
+		},
+		{
+			"EngineType": "python_json",
 			"EngineName": "client",
+<<<<<<< HEAD
+			"EngineTimestep":0.001,
+=======
+			"EngineTimestep":0.008,
+>>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
 			"PythonFileName": "client_py.py"
 		}
 	],

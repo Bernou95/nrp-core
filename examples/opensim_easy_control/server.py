@@ -7,6 +7,7 @@ from NRPPythonEngineModule import TOpenSim
 
 @RegisterEngine()
 class Script(EngineScript):
+    import math
     def initialize(self):
         """Initialize device1 with time"""
         print("Server Engine is initializing. Registering device...")
@@ -39,6 +40,7 @@ class Script(EngineScript):
         # Send data to TF
         self._setDevice("joints", {"shoulder": s_val, "elbow": e_val})
         self._setDevice("infos", {"time": self.tOS.state.getTime()})
+        
         #print("Time: ", self.tOS.state.getTime())
 
         # Receive control data from TF

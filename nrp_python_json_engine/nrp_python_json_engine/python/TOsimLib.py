@@ -126,3 +126,4 @@ class TOpenSim(object):
 		self.manager.setIntegratorAccuracy(self.integrator_accuracy)
 		self.manager.initialize(self.state)
 
+

@@ -19,4 +19,8 @@
 # Agreement No. 945539 (Human Brain Project SGA3).
 
 from .@PYTHON_MODULE_NAME@ import *
+<<<<<<< HEAD
+=======
 from .TOsimLib import *
+#from .TMujocoLib import *
+>>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763

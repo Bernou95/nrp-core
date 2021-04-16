@@ -326,12 +326,6 @@ class EngineJSONNRPClient
 
 			for(auto curDeviceIterator = devices.begin(); curDeviceIterator != devices.end(); ++curDeviceIterator)
 			{
-				if(curDeviceIterator.value().empty())
-				{
-					// TODO: Print warning that device was requested but not found
-					continue;
-				}
-
 				try
 				{
 					auto deviceID = JSONDeviceSerializerMethods::deserializeID(curDeviceIterator);
@@ -361,6 +355,16 @@ class EngineJSONNRPClient
 		{
             if(DEVICE::TypeName.compare(deviceID.Type) == 0)
             {
+				// Check whether the requested device has new data
+				// A device that has no data will contain two JSON objects with "engine_name" and "type" keys (parts of device ID)
+
+				if(deviceData->size() == 2)
+				{
+					// There's no meaningful data in the device, so create an empty device with device ID only
+
+					return DeviceInterfaceSharedPtr(new DeviceInterface(std::move(deviceID)));
+				}
+
                 DeviceInterfaceSharedPtr newDevice(new DEVICE(JSONDeviceSerializerMethods::template deserialize<DEVICE>(std::move(deviceID), deviceData)));
                 newDevice->setEngineName(this->engineName());
                 return newDevice;
@@ -393,24 +397,6 @@ class EngineJSONNRPClient
 			{	throw NRPException::logCreate("Could not serialize given device of type \"" + device.type() + "\"");	}
 		}
 };
-
-/*! \defgroup JSON Engine Protocol
-
-\section engine_json_config_section Engine Configuration Options
-
-Engines constructed on this protocol have the following additional configuration options available to them:
-
-<table>
-<caption id="json_engine_config_table">JSON Engine Configuration Options</caption>
-<tr><th>Name                       <th>Description                                                                <th>Type                <th>Default
-<tr><td>ServerAddress              <td>REST JSON Server address. Should this address already be in use, continue trying ports higher up   <td>string    <td>"localhost:9002"
-<tr><td>RegistrationServerAddress  <td>NRP Registration server address. Once a JSON engine has bound to a port, it will use this address to
-register itself with the NRP   <td>string        <td>"localhost:9001"
-</table>
-
-
-
- */
 
 
 #endif //ENGINE_JSON_NRP_CLIENT_H

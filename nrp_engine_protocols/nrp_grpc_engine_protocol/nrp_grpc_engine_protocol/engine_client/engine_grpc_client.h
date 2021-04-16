@@ -253,9 +253,7 @@ class EngineGrpcClient
 
             for(int i = 0; i < reply.reply_size(); i++)
             {
-                // Check whether the requested device has new data
-				if(reply.reply(i).has_deviceid())
-					interfaces.insert(this->getSingleDeviceInterfaceFromProto<DEVICES...>(reply.reply(i)));
+				interfaces.insert(this->getSingleDeviceInterfaceFromProto<DEVICES...>(reply.reply(i)));
             }
 
             return interfaces;
@@ -269,6 +267,15 @@ class EngineGrpcClient
                 DeviceIdentifier devId(deviceData.deviceid().devicename(),
 				                       this->engineName(),
                                        deviceData.deviceid().devicetype());
+
+                // Check whether the requested device has new data
+
+                if(deviceData.data_case() == EngineGrpc::DeviceMessage::DataCase::DATA_NOT_SET)
+                {
+                    // There's no meaningful data in the device, so create an empty device with device ID only
+
+                    return DeviceInterfaceSharedPtr(new DeviceInterface(std::move(devId)));
+                }
 
 				return DeviceInterfaceConstSharedPtr(new DEVICE(DeviceSerializerMethods<GRPCDevice>::template deserialize<DEVICE>(std::move(devId), &deviceData)));
             }
@@ -294,10 +301,6 @@ class EngineGrpcClient
             // Add JSON Server address (will be used by EngineGrpcServer)
             std::string address = this->engineConfig().at("ServerAddress");
             startParams.push_back(std::string("--") + EngineGRPCConfigConst::EngineServerAddrArg.data() + "=" + address);
-    
-            // Add JSON registration Server address (will be used by EngineGrpcServer)
-            std::string reg_address = this->engineConfig().at("RegistrationServerAddress");
-            startParams.push_back(std::string("--") + EngineGRPCConfigConst::EngineRegistrationServerAddrArg.data() + "=" + reg_address);
     
             return startParams;
         }
@@ -347,22 +350,6 @@ class EngineGrpcClient
         SimulationTime _engineTime     = SimulationTime::zero();
         SimulationTime _rpcTimeout     = SimulationTime::zero();
 };
-
-/*! \defgroup GRPC Engine Protocol
-
-\section engine_grpc_config_section Engine Configuration Options
-
-Engines constructed on this protocol have the following additional configuration options available to them:
-
-<table>
-<caption id="grpc_engine_config_table">GRPC Engine Configuration Options</caption>
-<tr><th>Name                       <th>Description                                                                <th>Type                <th>Default
-<tr><td>ServerAddress              <td>GRPC Server address. Should this address already be in use, simulation initialization will fail   <td>string    <td>"localhost:9004"
-</table>
-
-
-
- */
 
 
 #endif // ENGINE_GRPC_CLIENT_H

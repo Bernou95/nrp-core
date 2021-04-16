@@ -38,14 +38,10 @@ cxxopts::Options SimulationParams::createStartParamParser()
 	opts.add_options()
 	        (SimulationParams::ParamHelpLong.data(), SimulationParams::ParamHelpDesc.data(),
 	         cxxopts::value<SimulationParams::ParamHelpT>()->default_value("0"))
-	        (SimulationParams::ParamServCfgFileLong.data(), SimulationParams::ParamServCfgFileDesc.data(),
-	         cxxopts::value<SimulationParams::ParamServCfgFileT>())
 	        (SimulationParams::ParamSimCfgFileLong.data(), SimulationParams::ParamSimCfgFileDesc.data(),
 	         cxxopts::value<SimulationParams::ParamSimCfgFileT>())
 	        (SimulationParams::ParamPluginsLong.data(), SimulationParams::ParamPluginsDesc.data(),
-	         cxxopts::value<SimulationParams::ParamPluginsT>()->default_value({}))
-	        (SimulationParams::ParamExpManPipeLong.data(), SimulationParams::ParamExpManPipeDesc.data(),
-	         cxxopts::value<SimulationParams::ParamExpManPipeT>()->default_value({}));
+	         cxxopts::value<SimulationParams::ParamPluginsT>()->default_value({}));
 
 	return opts;
 }
@@ -81,11 +77,11 @@ SimulationManager::SimulationManager(const jsonSharedPtr &simulationConfig)
 SimulationManager::~SimulationManager()
 {
 	// Stop running threads
-	this->shutdownLoop(this->acquireSimLock());
+	this->shutdownLoop(this->acquireSimLock()); //TODO Refactor: why twice shutdownLoop?
 
 	// Prevent future sim initialization or loop execution
 	this->_internalLock.lock();
-	auto simLock = this->acquireSimLock();
+	auto simLock = this->acquireSimLock(); //TODO Refactor: review locks usage
 
 	// Ensure that any potentially created loops are stopped
 	this->shutdownLoop(simLock);
@@ -119,7 +115,8 @@ SimulationManager SimulationManager::createFromParams(const cxxopts::ParseResult
 
 	// Set default values
 
-	json_utils::set_default<std::vector<std::string>>(*simConfig, "PreprocessingFunctionConfigs", std::vector<std::string>());
+	json_utils::set_default<std::vector<std::string>>(*simConfig, "TransceiverFunctionConfigs", std::vector<std::string>());
+    json_utils::set_default<std::vector<std::string>>(*simConfig, "PreprocessingFunctionConfigs", std::vector<std::string>());
 
 	return SimulationManager(simConfig);
 }
@@ -194,11 +191,17 @@ bool SimulationManager::runSimulationUntilTimeout(sim_lock_t &simLock)
 		// Check whether the simLoop was stopped by any server threads
 		simLock.lock();
 
-		hasTimedOut = hasSimTimedOut(this->_loop->getSimTime(), toSimulationTime<unsigned, std::ratio<1>>(this->_simConfig->at("SimulationTimeout")));
+<<<<<<< HEAD
+		//hasTimedOut = hasSimTimedOut(this->_loop->getSimTime(), toSimulationTime<unsigned, std::ratio<1>>(this->_simConfig->at("SimulationTimeout")));
+		hasTimedOut = hasSimTimedOut(this->_loop->getSimTime(), toSimulationTime<float, std::ratio<1>>(this->_simConfig->at("SimulationTimeout")));
 
+=======
+		hasTimedOut = hasSimTimedOut(this->_loop->getSimTime(), toSimulationTime<unsigned, std::ratio<1>>(this->_simConfig->at("SimulationTimeout")));
+>>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
 		if(!this->isRunning() || hasTimedOut)
 			break;
-
+		std::cout << "++++++++++++++++++++++++++++++++++\n";
+		std::cout <<"TimeStep: " << this->_simConfig->at("SimulationTimestep") << std::endl;
 		SimulationTime timeStep = toSimulationTime<float, std::ratio<1>>(this->_simConfig->at("SimulationTimestep"));
 
 		this->_loop->runLoop(timeStep);
@@ -246,8 +249,18 @@ bool SimulationManager::runSimulation(const SimulationTime secs, sim_lock_t &sim
 
 void SimulationManager::shutdownLoop(const SimulationManager::sim_lock_t&)
 {
-	this->_loop = nullptr;
-	this->_runningSimulation = false;
+	try {
+		if(this->_loop != nullptr) {
+			this->_loop->shutdownLoop();
+
+			this->_loop = nullptr;
+			this->_runningSimulation = false;
+		}
+	}
+	catch(NRPException &e) {
+		throw NRPException::logCreate(e, "SimulationManager: Loop shutdown has FAILED");
+	}
+
 }
 
 bool SimulationManager::isSimInitializing()

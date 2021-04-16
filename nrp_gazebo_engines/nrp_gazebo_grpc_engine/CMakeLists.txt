@@ -25,6 +25,8 @@ set(LIB_SRC_FILES
 	nrp_gazebo_grpc_engine/devices/grpc_physics_camera.cpp
 	nrp_gazebo_grpc_engine/devices/grpc_physics_joint.cpp
 	nrp_gazebo_grpc_engine/devices/grpc_physics_link.cpp
+
+	nrp_gazebo_grpc_engine/devices/grpc_timeCheck.cpp
 )
 
 # List of python module build files
@@ -44,6 +46,10 @@ set(TEST_SRC_FILES
 
 ##########################################
 ## Dependencies
+
+if(ENABLE_GAZEBO STREQUAL FULL)
+	find_package(Gazebo REQUIRED)
+endif()
 
 ##########################################
 ## Header configuration
@@ -123,8 +129,6 @@ add_doxygen_source("${CMAKE_CURRENT_SOURCE_DIR}" ${EXEC_SRC_FILES} ${LIB_SRC_FIL
 
 ## This section needs Gazebo libraries installed
 if(ENABLE_GAZEBO STREQUAL FULL)
-
-	find_package(Gazebo REQUIRED)
 
 	##########################################
 	## Gazebo plugins

@@ -8,6 +8,8 @@ set(LIB_SRC_FILES
 	camera_device_controller.cpp
 	joint_device_controller.cpp
 	link_device_controller.cpp
+
+	time_device_controller.cpp
 )
 
 

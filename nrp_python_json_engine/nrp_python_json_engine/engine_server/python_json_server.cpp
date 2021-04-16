@@ -31,6 +31,7 @@
 
 #include <fstream>
 #include <filesystem>
+#include <cmath>
 
 namespace python = boost::python;
 
@@ -65,7 +66,22 @@ SimulationTime PythonJSONServer::runLoopStep(SimulationTime timestep)
 	try
 	{
 		PyEngineScript &script = python::extract<PyEngineScript&>(this->_pyEngineScript);
-		return script.runLoop(timestep);
+		//return script.runLoop(timestep);
+<<<<<<< HEAD
+		SimulationTime tTime = script.runLoop(timestep);
+		//std::cout << "Engine Name: " << this->curEngineName << " --> ";
+		//std::cout << "CLE Time cost: " << tTime.count() << "(NS) ->" << tTime.count()/pow(10, 9) << "(S)\n";
+		this->tData["time"] = tTime.count();
+		this->timeController->data() = this->tData;
+		return tTime;
+=======
+		/* ------------------------------------------ */
+		SimulationTime tTime = script.runLoop(timestep);
+		std::cout << "Engine Name: " << this->curEngineName << " --> ";
+		std::cout << "CLE Time cost: " << tTime.count() << "(NS) ->" << tTime.count()/pow(10, 9) << "(S)\n";
+		return tTime;
+		/* ------------------------------------------ */		
+>>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
 	}
 	catch(python::error_already_set &)
 	{
@@ -76,6 +92,7 @@ SimulationTime PythonJSONServer::runLoopStep(SimulationTime timestep)
 
 nlohmann::json PythonJSONServer::initialize(const nlohmann::json &data, EngineJSONServer::lock_t&)
 {
+	this->curEngineName = std::string(data.at("EngineName"));
 	PythonGILLock lock(this->_pyGILState, true);
 	try
 	{
@@ -134,6 +151,14 @@ nlohmann::json PythonJSONServer::initialize(const nlohmann::json &data, EngineJS
 	{
 		PyEngineScript &script = python::extract<PyEngineScript&>(this->_pyEngineScript);
 		script.initialize();
+
+		std::string tDeviceName = "time_"+this->curEngineName;
+		this->tData["time"] = 0.0;
+		PtrTemplates<PythonEngineJSONDeviceController<PyObjectDevice>>::shared_ptr
+	        newController(new PythonEngineJSONDeviceController<PyObjectDevice>(DeviceIdentifier(tDeviceName, "", PyObjectDevice::TypeName.data())));
+		newController->data() = this->tData;
+		this->timeController = newController;
+		this->registerDeviceNoLock(tDeviceName, newController.get());
 	}
 	catch(python::error_already_set &)
 	{

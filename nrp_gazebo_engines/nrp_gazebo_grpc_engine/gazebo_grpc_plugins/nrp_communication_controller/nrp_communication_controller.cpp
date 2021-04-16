@@ -70,7 +70,21 @@ SimulationTime NRPCommunicationController::runLoopStep(SimulationTime timeStep)
 	try
 	{
 		// Execute loop step (Note: The _deviceLock mutex has already been set by EngineJSONServer::runLoopStepHandler, so no calls to reading/writing from/to devices is possible at this moment)
-		return this->_stepController->runLoopStep(timeStep);
+		//return this->_stepController->runLoopStep(timeStep);
+<<<<<<< HEAD
+		SimulationTime tTime = this->_stepController->runLoopStep(timeStep);
+		this->timeController->setData(tTime.count());
+		//std::cout << "Engine Name: " << this->curEngineName << " --> ";
+		//std::cout << "Time cost: " << tTime.count() << "(NS) ->" << tTime.count()/pow(10, 9) << "(S)\n";
+		return tTime;
+=======
+		/* ---------------------------------------------------------------- */
+		SimulationTime tTime = this->_stepController->runLoopStep(timeStep);
+		std::cout << "Engine Name: " << this->curEngineName << " --> ";
+		std::cout << "Time cost: " << tTime.count() << "(NS) ->" << tTime.count()/pow(10, 9) << "(S)\n";
+		return tTime;
+		/* ---------------------------------------------------------------- */
+>>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
 	}
 	catch(const std::exception &e)
 	{
@@ -83,12 +97,20 @@ SimulationTime NRPCommunicationController::runLoopStep(SimulationTime timeStep)
 
 void NRPCommunicationController::initialize(const json &data, EngineGrpcServer::lock_t &lock)
 {
+	this->curEngineName = data.at("EngineName");
     double waitTime = data.at("WorldLoadTime");
 	if(waitTime <= 0)
 		waitTime = std::numeric_limits<double>::max();
 
 	// Allow devices to register
 	lock.unlock();
+
+	std::string tDeviceName = "time_"+this->curEngineName;
+	this->timeController = 
+		new GrpcDeviceControlSerializer<TimeDeviceController>(tDeviceName);
+	this->timeController->setData(0.0);
+	//this->timeController->timeval = 1.1;
+	this->registerDevice(tDeviceName, this->timeController);
 
 	// Wait until world plugin loads and forces a load of all other plugins
 	while(this->_stepController == nullptr ? 1 : !this->_stepController->finishWorldLoading())

@@ -30,6 +30,7 @@
 
 #include "nrp_nest_json_engine/python/create_device_class.h"
 
+#include "nrp_nest_json_engine/engine_server/nest_py_json_device_controller.h"
 
 #include <boost/python.hpp>
 
@@ -56,7 +57,15 @@ class NestJSONServer
 		virtual SimulationTime runLoopStep(SimulationTime timeStep) override;
 		virtual nlohmann::json initialize(const nlohmann::json &data, EngineJSONServer::lock_t &deviceLock) override;
 		virtual nlohmann::json shutdown(const nlohmann::json &data) override;
+<<<<<<< HEAD
 
+		std::string curEngineName;
+		boost::python::dict tData;
+		NestPyJSONDeviceController<NestDevice> *timeController;
+=======
+		
+		std::string curEngineName;
+>>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
 	private:
 		/*!
 		 * \brief Init Flag. Set to true once the server has executed the initialize function

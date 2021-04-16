@@ -37,7 +37,7 @@ class Script(EngineScript):
     def runLoop(self, timestep):
         """Update device1 at every timestep"""
         #print("1 ---> ")
-        self.tOS.run_step([0.0, 0.0, 0.0, 0.5, 0.0, 0.0], timestep.count())
+        self.tOS.run_step([0.0, 0.0, 0.0, 0.5, 0.0, 0.0])
         #print("2 ---> ")
         self._setDevice("device1", {"time":self.tOS.state.getTime(), "time_1":0})
         #self._setDevice("device1", { "cmd" : 1, "time": self.tOS.state.getTime()})

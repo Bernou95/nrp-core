@@ -23,6 +23,7 @@
 #include "nrp_gazebo_grpc_engine/devices/grpc_physics_camera.h"
 #include "nrp_gazebo_grpc_engine/devices/grpc_physics_joint.h"
 #include "nrp_gazebo_grpc_engine/devices/grpc_physics_link.h"
+#include "nrp_gazebo_grpc_engine/devices/grpc_timeCheck.h"
 
 #include "nrp_general_library/device_interface/device.h"
 #include "nrp_general_library/config/cmake_constants.h"
@@ -62,4 +63,10 @@ BOOST_PYTHON_MODULE(GAZEBO_PYTHON_MODULE_NAME)
 
 	register_ptr_to_python<std::shared_ptr<PhysicsJoint> >();
 	register_ptr_to_python<std::shared_ptr<const PhysicsJoint> >();
+
+	class_<TimeCheck, bases<DeviceInterface> >("TimeCheck", init<const std::string &>())
+	        .add_property("timeval", &TimeCheck::timeval, &TimeCheck::setTimeval);
+
+	register_ptr_to_python<std::shared_ptr<TimeCheck> >();
+	register_ptr_to_python<std::shared_ptr<const TimeCheck> >();
 }

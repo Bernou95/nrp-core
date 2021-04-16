@@ -24,6 +24,7 @@
 #include "nrp_gazebo_devices/physics_camera.h"
 #include "nrp_gazebo_devices/physics_joint.h"
 #include "nrp_gazebo_devices/physics_link.h"
+#include "nrp_gazebo_devices/timeCheck.h"
 
 #include "nrp_general_library/device_interface/device.h"
 #include "nrp_general_library/device_interface/device_python_wrappers.h"
@@ -76,12 +77,6 @@ BOOST_PYTHON_MODULE(GAZEBO_PYTHON_MODULE_NAME)
 	python_property_device_class<PhysicsJoint>::create();
 
 	python_property_device_class<PhysicsLink>::create();
+	
+	python_property_device_class<TimeCheck>::create();
 }
-
-
-/*! \defgroup gazebo_devices Gazebo Devices
- * Gazebo engines use the following devices:
- * - PhysicsCamera: Get camera image
- * - PhysicsJoint: Get/Set joint data
- * - PhysicsLink: Get link data
- */

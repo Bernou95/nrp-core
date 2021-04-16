@@ -45,7 +45,8 @@ PythonEngineJSONNRPClient::~PythonEngineJSONNRPClient()
 void PythonEngineJSONNRPClient::initialize()
 {
 	nlohmann::json resp = this->sendInitCommand(this->engineConfig());
-	if(!resp.at(PythonConfigConst::InitFileExecStatus.data()).get<bool>())
+	if(PythonConfigConst::InitFileExecStatus.data() == 0)
+	//if(!resp.at(PythonConfigConst::InitFileExecStatus.data()).get<bool>())
 	{
 		// Write the error message
 		this->_initErrMsg = resp.at(PythonConfigConst::InitFileErrorMsg.data());

@@ -64,6 +64,13 @@ class PythonJSONServer
 		 */
 		static PyEngineScript *registerScript(const boost::python::object &pythonScript);
 
+		std::string curEngineName;
+<<<<<<< HEAD
+		PtrTemplates<PythonEngineJSONDeviceController<PyObjectDevice>>::shared_ptr timeController;
+		boost::python::dict tData;
+=======
+
+>>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
 	private:
 		/*!
 		 * \brief Ptr to current PythonJSONServer.

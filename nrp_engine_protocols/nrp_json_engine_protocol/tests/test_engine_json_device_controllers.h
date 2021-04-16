@@ -19,8 +19,8 @@
  * Agreement No. 945539 (Human Brain Project SGA3).
  */
 
-#ifndef TEST_ENGINGE_JSON_DEVICE_INTERFACE_H
-#define TEST_ENGINGE_JSON_DEVICE_INTERFACE_H
+#ifndef TEST_ENGINE_JSON_DEVICE_INTERFACE_H
+#define TEST_ENGINE_JSON_DEVICE_INTERFACE_H
 
 #include "nrp_general_library/device_interface/device.h"
 #include "nrp_json_engine_protocol/engine_server/engine_json_device_controller.h"
@@ -58,14 +58,23 @@ struct TestJSONDevice1Controller
 		void handleDeviceDataCallback(TestJSONDevice1 &&data)
 		{	this->_dev = std::move(data);	}
 
-		const TestJSONDevice1 *getDeviceInformationCallback()
-		{	return &(this->_dev);	}
 
 		constexpr const auto &data() const
 		{	return this->_dev;	}
 
+		virtual const TestJSONDevice1 *getDeviceInformationCallback() override
+		{
+            return this->_returnEmptyDevice ? nullptr : &this->_dev;
+        }
+
+        void triggerEmptyDeviceReturn(bool value)
+        {
+            this->_returnEmptyDevice = value;
+        }
+
 	private:
 		TestJSONDevice1 _dev;
+		bool _returnEmptyDevice;
 };
 
 struct TestJSONDevice2
@@ -150,4 +159,4 @@ struct TestJSONDeviceThrowController
 		TestJSONDeviceThrow _dev;
 };
 
-#endif // TEST_ENGINGE_JSON_DEVICE_INTERFACE_H
+#endif // TEST_ENGINE_JSON_DEVICE_INTERFACE_H

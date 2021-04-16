@@ -35,6 +35,9 @@
 #include <map>
 #include <memory>
 
+#include "nrp_gazebo_devices/engine_server/time_device_controller.h"
+#include "nrp_gazebo_grpc_engine/devices/grpc_timeCheck.h"
+
 /*!
  * \brief Manages communication with the NRP. Uses a REST server to send/receive data. Singleton class.
  */
@@ -96,6 +99,12 @@ class NRPCommunicationController
 		static std::string createDeviceName(const gazebo::PluginT<T> &plugin, const std::string &objectName)
 		{	return plugin.GetHandle() + "::" + objectName;	}
 
+		std::string curEngineName;
+<<<<<<< HEAD
+		GrpcDeviceControlSerializer<TimeDeviceController> *timeController;
+=======
+
+>>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
 	private:
 
 		/*!
