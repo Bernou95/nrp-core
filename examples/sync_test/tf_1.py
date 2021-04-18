@@ -35,5 +35,8 @@ def transceiver_function(device_os_1, Check_Time, device_py):
     print("Opensim M1: " + str(rec_os_1.data))
     print("Python    : " + str(rec_py.data))
     return [ rec_os_1, rec_py ]
+<<<<<<< HEAD
+>>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
+=======
 >>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
 

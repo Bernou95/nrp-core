@@ -205,6 +205,9 @@ if(TARGET ${PYTHON_MODULE_NAME})
 		DESTINATION "${PYTHON_INSTALL_DIR_REL}/${PYTHON_MODULE_NAME}")
 	#install(FILES "nrp_python_json_engine/python/TMujocoLib.py"
 	#	DESTINATION "${PYTHON_INSTALL_DIR_REL}/${PYTHON_MODULE_NAME}")
+<<<<<<< HEAD
+>>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
+=======
 >>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
 endif()
 

@@ -121,6 +121,9 @@ void SimulationLoop::runLoop(SimulationTime runLoopTime)
 		// Get the next batch of engines which should finish next
 		// _engineQueue is sorted by completion time of engine last step
 		std::cout << "Test: " << count_t++ << std::endl;
+<<<<<<< HEAD
+>>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
+=======
 >>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
 		const auto nextCompletionTime = this->_engineQueue.begin()->first;
 		do

@@ -11,7 +11,10 @@ class Script(EngineScript):
     def runLoop(self, timestep):
         """Update device1 at every timestep"""
 <<<<<<< HEAD:examples/sync_test/server_py_1.py
+<<<<<<< HEAD:examples/sync_test/server_py_1.py
 =======
+=======
+>>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763:examples/sync_test/server_py.py
         t_Time = self._time.count() / self.math.pow(10, 9)
         self._setDevice("device_py", { "count":self.count, "time":t_Time})
 >>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763:examples/sync_test/server_py.py

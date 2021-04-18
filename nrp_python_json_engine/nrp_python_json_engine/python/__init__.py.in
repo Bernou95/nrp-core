@@ -23,4 +23,7 @@ from .@PYTHON_MODULE_NAME@ import *
 =======
 from .TOsimLib import *
 #from .TMujocoLib import *
+<<<<<<< HEAD
+>>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
+=======
 >>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763

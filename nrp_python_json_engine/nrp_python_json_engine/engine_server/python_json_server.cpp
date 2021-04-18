@@ -68,6 +68,7 @@ SimulationTime PythonJSONServer::runLoopStep(SimulationTime timestep)
 		PyEngineScript &script = python::extract<PyEngineScript&>(this->_pyEngineScript);
 		//return script.runLoop(timestep);
 <<<<<<< HEAD
+<<<<<<< HEAD
 		SimulationTime tTime = script.runLoop(timestep);
 		//std::cout << "Engine Name: " << this->curEngineName << " --> ";
 		//std::cout << "CLE Time cost: " << tTime.count() << "(NS) ->" << tTime.count()/pow(10, 9) << "(S)\n";
@@ -75,12 +76,17 @@ SimulationTime PythonJSONServer::runLoopStep(SimulationTime timestep)
 		this->timeController->data() = this->tData;
 		return tTime;
 =======
+=======
+>>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
 		/* ------------------------------------------ */
 		SimulationTime tTime = script.runLoop(timestep);
 		std::cout << "Engine Name: " << this->curEngineName << " --> ";
 		std::cout << "CLE Time cost: " << tTime.count() << "(NS) ->" << tTime.count()/pow(10, 9) << "(S)\n";
 		return tTime;
 		/* ------------------------------------------ */		
+<<<<<<< HEAD
+>>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
+=======
 >>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
 	}
 	catch(python::error_already_set &)

@@ -192,9 +192,13 @@ bool SimulationManager::runSimulationUntilTimeout(sim_lock_t &simLock)
 		simLock.lock();
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 		//hasTimedOut = hasSimTimedOut(this->_loop->getSimTime(), toSimulationTime<unsigned, std::ratio<1>>(this->_simConfig->at("SimulationTimeout")));
 		hasTimedOut = hasSimTimedOut(this->_loop->getSimTime(), toSimulationTime<float, std::ratio<1>>(this->_simConfig->at("SimulationTimeout")));
 
+=======
+		hasTimedOut = hasSimTimedOut(this->_loop->getSimTime(), toSimulationTime<unsigned, std::ratio<1>>(this->_simConfig->at("SimulationTimeout")));
+>>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
 =======
 		hasTimedOut = hasSimTimedOut(this->_loop->getSimTime(), toSimulationTime<unsigned, std::ratio<1>>(this->_simConfig->at("SimulationTimeout")));
 >>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763

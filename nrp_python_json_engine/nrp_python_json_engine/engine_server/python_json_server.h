@@ -66,8 +66,12 @@ class PythonJSONServer
 
 		std::string curEngineName;
 <<<<<<< HEAD
+<<<<<<< HEAD
 		PtrTemplates<PythonEngineJSONDeviceController<PyObjectDevice>>::shared_ptr timeController;
 		boost::python::dict tData;
+=======
+
+>>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
 =======
 
 >>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763

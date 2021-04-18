@@ -99,6 +99,7 @@ SimulationTime NestJSONServer::runLoopStep(SimulationTime timeStep)
 		// The time field of dictionary returned from GetKernelStatus contains time in milliseconds
 		//return toSimulationTime<float, std::milli>(python::extract<float>(this->_pyNest["GetKernelStatus"]("time")));
 <<<<<<< HEAD
+<<<<<<< HEAD
 		
 		SimulationTime tTime = toSimulationTime<float, std::milli>(python::extract<float>(this->_pyNest["GetKernelStatus"]("time")));
 		//std::cout << "Engine Name: " << this->curEngineName << " --> ";
@@ -107,12 +108,17 @@ SimulationTime NestJSONServer::runLoopStep(SimulationTime timeStep)
 		this->timeController->data() = this->tData;
 		return tTime;
 =======
+=======
+>>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
 		/* ---------------------------------------------------------------- */
 		SimulationTime tTime = toSimulationTime<float, std::milli>(python::extract<float>(this->_pyNest["GetKernelStatus"]("time")));
 		std::cout << "Engine Name: " << this->curEngineName << " --> ";
 		std::cout << "Time cost: " << tTime.count() << "(NS) ->" << tTime.count()/pow(10, 9) << "(S)\n";
 		return tTime;
 		/* ---------------------------------------------------------------- */		
+<<<<<<< HEAD
+>>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
+=======
 >>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
 	}
 	catch(python::error_already_set &)
@@ -207,6 +213,7 @@ nlohmann::json NestJSONServer::initialize(const nlohmann::json &data, EngineJSON
 		}
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 		std::string tDeviceName = "time_"+this->curEngineName;
 		this->tData["time"] = 0.0;
 		this->timeController = new NestPyJSONDeviceController<NestDevice>(
@@ -215,10 +222,15 @@ nlohmann::json NestJSONServer::initialize(const nlohmann::json &data, EngineJSON
 		this->registerDeviceNoLock(tDeviceName, this->timeController);
 		
 =======
+=======
+>>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
 		//std::string tDeviceName = "check_time";
 		//PtrTemplates<PythonEngineJSONDeviceController<PyObjectDevice>>::shared_ptr
 	    //    newController(new PythonEngineJSONDeviceController<PyObjectDevice>(DeviceIdentifier(tDeviceName, "", { "time": 0 })));
 		//this->registerDeviceNoLock(tDeviceName, newController.get());
+<<<<<<< HEAD
+>>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
+=======
 >>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
 		// Prepare Nest for execution
         // Commented out in the context of https://hbpneurorobotics.atlassian.net/browse/NRRPLT-8209
