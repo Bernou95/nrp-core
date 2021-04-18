@@ -57,48 +57,10 @@ class NestJSONServer
 		virtual SimulationTime runLoopStep(SimulationTime timeStep) override;
 		virtual nlohmann::json initialize(const nlohmann::json &data, EngineJSONServer::lock_t &deviceLock) override;
 		virtual nlohmann::json shutdown(const nlohmann::json &data) override;
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
 
 		std::string curEngineName;
 		boost::python::dict tData;
 		NestPyJSONDeviceController<NestDevice> *timeController;
-<<<<<<< HEAD
-=======
-=======
-		
-		std::string curEngineName;
->>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
-=======
-		
-		std::string curEngineName;
->>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
-<<<<<<< HEAD
->>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
-=======
-=======
-		
-		std::string curEngineName;
->>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
-<<<<<<< HEAD
->>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
-=======
-=======
-		
-		std::string curEngineName;
->>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
->>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
 	private:
 		/*!
 		 * \brief Init Flag. Set to true once the server has executed the initialize function

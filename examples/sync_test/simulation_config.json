@@ -1,145 +1,29 @@
 {
 	"SimulationName": "tf_exchange",
 	"SimulationDescription": "Launch two python engines. Engine1 will offer the current time as a device. tf_1 will request said device and send it to Engine2. Engine2 will receive the time and display it",
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 	"SimulationTimeout": 0.032,
 	"SimulationTimestep":0.001,
-=======
-<<<<<<< HEAD
-=======
->>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
-=======
->>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
-<<<<<<< HEAD
-	"SimulationTimeout": 0.032,
-	"SimulationTimestep":0.001,
-=======
-	"SimulationTimeout": 1,
-	"SimulationTimestep":0.016,
->>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
-=======
-	"SimulationTimeout": 1,
-	"SimulationTimestep":0.016,
->>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
-=======
->>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
-=======
->>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
 	"EngineConfigs": 
 	[
 		{
 			"EngineType": "gazebo_grpc",
 			"EngineName": "gazebo",
 			"EngineTimestep":0.001,
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 			"ServerAddress": "localhost:1234",
-=======
-<<<<<<< HEAD
-<<<<<<< HEAD
-			"ServerAddress": "localhost:1234",
-=======
-			"ServerAddress": "localhost:5432",
->>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
->>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
-=======
-<<<<<<< HEAD
-=======
->>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
-<<<<<<< HEAD
-			"ServerAddress": "localhost:1234",
-=======
-			"ServerAddress": "localhost:5432",
->>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
-<<<<<<< HEAD
->>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
-=======
->>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
 			"GazeboWorldFile": "empty_world.sdf"
 		},
 		{
 			"EngineType": "nest_json",
 			"EngineName": "nest",
 			"EngineTimestep":0.002,
-<<<<<<< HEAD
-<<<<<<< HEAD
 			"ServerAddress": "localhost:2345",
-=======
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
-			"ServerAddress": "localhost:2345",
-=======
-			"ServerAddress": "localhost:4321",
->>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
-<<<<<<< HEAD
->>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
-=======
-			"ServerAddress": "localhost:4321",
->>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
->>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
-=======
->>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
 			"NestInitFileName": "nest_simple.py"
 		},
 		{
 			"EngineType": "python_json",
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 			"EngineName": "py_1",
 			"EngineTimestep":0.004,
 			"PythonFileName": "server_py_1.py",
-=======
-<<<<<<< HEAD
-=======
->>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
-=======
->>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
-			"EngineName": "py_1",
-			"EngineTimestep":0.004,
-			"PythonFileName": "server_py_1.py",
-=======
-			"ServerAddress": "localhost:5432",
-			"GazeboWorldFile": "empty_world.sdf"
-		},
-		{
-			"EngineType": "nest_json",
-			"EngineName": "nest",
-			"EngineTimestep":0.002,
-			"ServerAddress": "localhost:4321",
-			"NestInitFileName": "nest_simple.py"
-		},
-		{
-			"EngineType": "python_json",
-			"EngineName": "server_os_1",
-			"EngineTimestep":0.004,
-			"PythonFileName": "server_os_1.py",
-			"ServerAddress": "localhost:1234"
-		},
-		{
-			"EngineType": "python_json",
-=======
-			"EngineName": "server_os_1",
-			"EngineTimestep":0.004,
-			"PythonFileName": "server_os_1.py",
-			"ServerAddress": "localhost:1234"
-		},
-		{
-			"EngineType": "python_json",
->>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
-			"EngineName": "server_py",
-			"EngineTimestep":0.008,
-			"PythonFileName": "server_py.py",
->>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
->>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
 			"ServerAddress": "localhost:3456"
 		},
 		{
@@ -152,38 +36,7 @@
 		{
 			"EngineType": "python_json",
 			"EngineName": "client",
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
-=======
->>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
-<<<<<<< HEAD
 			"EngineTimestep":0.001,
-=======
-<<<<<<< HEAD
-<<<<<<< HEAD
-			"EngineTimestep":0.001,
-=======
-			"EngineTimestep":0.008,
->>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
-=======
-			"EngineTimestep":0.008,
->>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
-<<<<<<< HEAD
->>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
-=======
-=======
-			"EngineTimestep":0.008,
->>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
-<<<<<<< HEAD
->>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
-=======
-=======
-			"EngineTimestep":0.008,
->>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
->>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
 			"PythonFileName": "client_py.py"
 		}
 	],

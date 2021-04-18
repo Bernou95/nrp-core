@@ -198,29 +198,6 @@ if(TARGET ${PYTHON_MODULE_NAME})
 
 	install(FILES "${CMAKE_CURRENT_BINARY_DIR}/src/__init__.py"
 		DESTINATION "${PYTHON_INSTALL_DIR_REL}/${PYTHON_MODULE_NAME}")
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-=======
-
-	install(FILES "nrp_python_json_engine/python/TOsimLib.py"
-		DESTINATION "${PYTHON_INSTALL_DIR_REL}/${PYTHON_MODULE_NAME}")
-	#install(FILES "nrp_python_json_engine/python/TMujocoLib.py"
-	#	DESTINATION "${PYTHON_INSTALL_DIR_REL}/${PYTHON_MODULE_NAME}")
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
-=======
->>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
-<<<<<<< HEAD
->>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
-=======
->>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
-=======
->>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
-=======
->>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
->>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
 endif()
 
 # Install executable files
