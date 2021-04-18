@@ -101,6 +101,7 @@ class NRPCommunicationController
 
 		std::string curEngineName;
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 >>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
@@ -108,6 +109,8 @@ class NRPCommunicationController
 		GrpcDeviceControlSerializer<TimeDeviceController> *timeController;
 =======
 <<<<<<< HEAD
+=======
+>>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
 <<<<<<< HEAD
 		GrpcDeviceControlSerializer<TimeDeviceController> *timeController;
 =======
@@ -117,11 +120,14 @@ class NRPCommunicationController
 
 >>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
 =======
 =======
 
 >>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
+>>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
+=======
 >>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
 	private:
 

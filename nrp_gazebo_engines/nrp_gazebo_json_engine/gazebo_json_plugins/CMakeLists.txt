@@ -11,6 +11,10 @@ find_package(Gazebo REQUIRED)
 <<<<<<< HEAD
 =======
 <<<<<<< HEAD
+>>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
 <<<<<<< HEAD
 >>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
 
@@ -22,6 +26,12 @@ pkg_check_modules(Pistache REQUIRED IMPORTED_TARGET libpistache)
 =======
 #find_package(Pistache REQUIRED)
 >>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
+=======
+#find_package(Pistache REQUIRED)
+>>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
+<<<<<<< HEAD
+>>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
+=======
 =======
 #find_package(Pistache REQUIRED)
 >>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763

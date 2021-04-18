@@ -78,6 +78,10 @@ SimulationTime NRPCommunicationController::runLoopStep(SimulationTime timeStep)
 <<<<<<< HEAD
 =======
 <<<<<<< HEAD
+>>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
 <<<<<<< HEAD
 >>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
 		SimulationTime tTime = this->_stepController->runLoopStep(timeStep);
@@ -97,12 +101,18 @@ SimulationTime NRPCommunicationController::runLoopStep(SimulationTime timeStep)
 		return tTime;
 		/* ---------------------------------------------------------------- */
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
 =======
 >>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
 <<<<<<< HEAD
 >>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
 =======
+>>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
+=======
+>>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
+=======
+>>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
 >>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
 	}
 	catch(const std::exception &e)

@@ -64,6 +64,10 @@ class NestJSONServer
 <<<<<<< HEAD
 =======
 <<<<<<< HEAD
+>>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
 <<<<<<< HEAD
 >>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
 
@@ -76,6 +80,13 @@ class NestJSONServer
 		
 		std::string curEngineName;
 >>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
+=======
+		
+		std::string curEngineName;
+>>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
+<<<<<<< HEAD
+>>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
+=======
 =======
 		
 		std::string curEngineName;
