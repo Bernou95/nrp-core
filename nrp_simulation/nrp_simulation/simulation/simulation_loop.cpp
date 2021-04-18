@@ -96,7 +96,6 @@ void SimulationLoop::shutdownLoop()
 
 void SimulationLoop::runLoop(SimulationTime runLoopTime)
 {
-	//std::cout <<"TimeStep -->: " << runLoopTime.count() << std::endl;
 	const auto loopStopTime = this->_simTime + runLoopTime;
 
 	if(this->_engineQueue.empty())
@@ -105,13 +104,14 @@ void SimulationLoop::runLoop(SimulationTime runLoopTime)
 		return;
 	}
 
-<<<<<<< HEAD
 	// Continue processing engines until all engines next step completion time is greater than loopStopTime
     // _engineQueue is sorted by completion time of engine last step
 	while(this->_engineQueue.begin()->first < loopStopTime)
 	{
 		// Get the next batch of engines which should finish next
         std::vector<EngineClientInterfaceSharedPtr> idleEngines;
+<<<<<<< HEAD
+=======
 =======
 	// Compute all engines which should finish before loopStopTime
 	std::vector<EngineClientInterfaceSharedPtr> processedEngines;
@@ -121,7 +121,17 @@ void SimulationLoop::runLoop(SimulationTime runLoopTime)
 		// Get the next batch of engines which should finish next
 		// _engineQueue is sorted by completion time of engine last step
 		std::cout << "Test: " << count_t++ << std::endl;
+<<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
+=======
+>>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
+>>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
+=======
+>>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
+=======
+>>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
+>>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
 		const auto nextCompletionTime = this->_engineQueue.begin()->first;
 		do
 		{
@@ -191,6 +201,7 @@ void SimulationLoop::runLoop(SimulationTime runLoopTime)
 		for(auto &engine : idleEngines)
 		{
 			const auto trueRunTime = this->_simTime - engine->getEngineTime() + engine->getEngineTimestep();
+
 			if(trueRunTime >= SimulationTime::zero())
 			{
 				try

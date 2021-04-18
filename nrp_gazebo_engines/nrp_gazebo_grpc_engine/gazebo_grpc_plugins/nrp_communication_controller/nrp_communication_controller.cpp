@@ -72,19 +72,38 @@ SimulationTime NRPCommunicationController::runLoopStep(SimulationTime timeStep)
 		// Execute loop step (Note: The _deviceLock mutex has already been set by EngineJSONServer::runLoopStepHandler, so no calls to reading/writing from/to devices is possible at this moment)
 		//return this->_stepController->runLoopStep(timeStep);
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
 		SimulationTime tTime = this->_stepController->runLoopStep(timeStep);
 		this->timeController->setData(tTime.count());
 		//std::cout << "Engine Name: " << this->curEngineName << " --> ";
 		//std::cout << "Time cost: " << tTime.count() << "(NS) ->" << tTime.count()/pow(10, 9) << "(S)\n";
 		return tTime;
+<<<<<<< HEAD
 =======
+=======
+=======
+>>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
 		/* ---------------------------------------------------------------- */
 		SimulationTime tTime = this->_stepController->runLoopStep(timeStep);
 		std::cout << "Engine Name: " << this->curEngineName << " --> ";
 		std::cout << "Time cost: " << tTime.count() << "(NS) ->" << tTime.count()/pow(10, 9) << "(S)\n";
 		return tTime;
 		/* ---------------------------------------------------------------- */
+<<<<<<< HEAD
 >>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
+=======
+>>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
+<<<<<<< HEAD
+>>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
+=======
+>>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
 	}
 	catch(const std::exception &e)
 	{

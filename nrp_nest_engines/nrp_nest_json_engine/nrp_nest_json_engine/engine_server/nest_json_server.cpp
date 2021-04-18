@@ -30,7 +30,6 @@
 #include "nrp_nest_json_engine/python/create_device_class.h"
 
 #include "nrp_nest_json_engine/config/nest_config.h"
-//#include "nrp_python_json_engine/engine_server/python_engine_json_device_controller.h"
 
 #include <fstream>
 
@@ -99,6 +98,14 @@ SimulationTime NestJSONServer::runLoopStep(SimulationTime timeStep)
 		// The time field of dictionary returned from GetKernelStatus contains time in milliseconds
 		//return toSimulationTime<float, std::milli>(python::extract<float>(this->_pyNest["GetKernelStatus"]("time")));
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
 		
 		SimulationTime tTime = toSimulationTime<float, std::milli>(python::extract<float>(this->_pyNest["GetKernelStatus"]("time")));
 		//std::cout << "Engine Name: " << this->curEngineName << " --> ";
@@ -106,14 +113,32 @@ SimulationTime NestJSONServer::runLoopStep(SimulationTime timeStep)
 		this->tData["time"] = tTime.count();
 		this->timeController->data() = this->tData;
 		return tTime;
+<<<<<<< HEAD
 =======
+=======
+=======
+<<<<<<< HEAD
+=======
+=======
+>>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
+>>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
 		/* ---------------------------------------------------------------- */
 		SimulationTime tTime = toSimulationTime<float, std::milli>(python::extract<float>(this->_pyNest["GetKernelStatus"]("time")));
 		std::cout << "Engine Name: " << this->curEngineName << " --> ";
 		std::cout << "Time cost: " << tTime.count() << "(NS) ->" << tTime.count()/pow(10, 9) << "(S)\n";
 		return tTime;
 		/* ---------------------------------------------------------------- */		
+<<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
+=======
+>>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
+>>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
+=======
+>>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
+=======
+>>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
+>>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
 	}
 	catch(python::error_already_set &)
 	{
@@ -184,19 +209,15 @@ nlohmann::json NestJSONServer::initialize(const nlohmann::json &data, EngineJSON
 		jsonDevMap = nlohmann::json::parse(jsonStr);
 
 		// Register devices
-		
 		this->_devMap = python::dict(this->_pyNRPNest["GetDevMap"]());
 		python::list devMapKeys = this->_devMap.keys();
 		const long numDevices = python::len(devMapKeys);
-
-		//std::cout << "NEST JSON SERVER \n";
 		//const long numDevices = python::len(this->_pyNRPNest["GetDevMap"]());
 		for(long i=0; i < numDevices; ++i)
 		{
 			const python::object &devKey = devMapKeys[i];
 			const std::string devName = python::extract<std::string>(python::str(devKey));
 			python::object devNodes = this->_devMap[devKey];
-			//std::cout << i << " " << devName << std::endl;
 
 			auto devController = std::shared_ptr<NestEngineJSONDeviceController<NestDevice> >(new
 			            NestEngineJSONDeviceController<NestDevice>(DeviceIdentifier(devName, data.at("EngineName"), NestDevice::TypeName.data()),
@@ -207,6 +228,14 @@ nlohmann::json NestJSONServer::initialize(const nlohmann::json &data, EngineJSON
 		}
 
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
 		std::string tDeviceName = "time_"+this->curEngineName;
 		this->tData["time"] = 0.0;
 		this->timeController = new NestPyJSONDeviceController<NestDevice>(
@@ -214,12 +243,23 @@ nlohmann::json NestJSONServer::initialize(const nlohmann::json &data, EngineJSON
 		this->timeController->data() = this->tData;
 		this->registerDeviceNoLock(tDeviceName, this->timeController);
 		
+<<<<<<< HEAD
 =======
+=======
+=======
+>>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
 		//std::string tDeviceName = "check_time";
 		//PtrTemplates<PythonEngineJSONDeviceController<PyObjectDevice>>::shared_ptr
 	    //    newController(new PythonEngineJSONDeviceController<PyObjectDevice>(DeviceIdentifier(tDeviceName, "", { "time": 0 })));
 		//this->registerDeviceNoLock(tDeviceName, newController.get());
+<<<<<<< HEAD
 >>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
+=======
+>>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
+<<<<<<< HEAD
+>>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
+=======
+>>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
 		// Prepare Nest for execution
         // Commented out in the context of https://hbpneurorobotics.atlassian.net/browse/NRRPLT-8209
 		// this->_pyNest["Prepare"]();

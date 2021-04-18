@@ -31,7 +31,6 @@
 
 #include <fstream>
 #include <filesystem>
-#include <cmath>
 
 namespace python = boost::python;
 
@@ -68,20 +67,39 @@ SimulationTime PythonJSONServer::runLoopStep(SimulationTime timestep)
 		PyEngineScript &script = python::extract<PyEngineScript&>(this->_pyEngineScript);
 		//return script.runLoop(timestep);
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
 		SimulationTime tTime = script.runLoop(timestep);
 		//std::cout << "Engine Name: " << this->curEngineName << " --> ";
 		//std::cout << "CLE Time cost: " << tTime.count() << "(NS) ->" << tTime.count()/pow(10, 9) << "(S)\n";
 		this->tData["time"] = tTime.count();
 		this->timeController->data() = this->tData;
 		return tTime;
+<<<<<<< HEAD
 =======
+=======
+=======
+>>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
 		/* ------------------------------------------ */
 		SimulationTime tTime = script.runLoop(timestep);
 		std::cout << "Engine Name: " << this->curEngineName << " --> ";
 		std::cout << "CLE Time cost: " << tTime.count() << "(NS) ->" << tTime.count()/pow(10, 9) << "(S)\n";
 		return tTime;
 		/* ------------------------------------------ */		
+<<<<<<< HEAD
 >>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
+=======
+>>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
+<<<<<<< HEAD
+>>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
+=======
+>>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
 	}
 	catch(python::error_already_set &)
 	{

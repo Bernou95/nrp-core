@@ -5,13 +5,33 @@ include(GNUInstallDirs)
 
 find_package(Gazebo REQUIRED)
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
 
 find_package(PkgConfig)
 pkg_check_modules(Pistache REQUIRED IMPORTED_TARGET libpistache)
 
+<<<<<<< HEAD
+=======
 =======
 #find_package(Pistache REQUIRED)
 >>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
+=======
+#find_package(Pistache REQUIRED)
+>>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
+<<<<<<< HEAD
+>>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
+=======
+=======
+#find_package(Pistache REQUIRED)
+>>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
+>>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
 find_package(nlohmann_json REQUIRED)
 
 if(NOT DEFINED NRP_GAZEBO_COMMUNICATION_PLUGIN)
