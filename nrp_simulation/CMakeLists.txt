@@ -44,6 +44,7 @@ set(TEST_SRC_FILES
 
 # pistache: REST server library
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 >>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
@@ -53,13 +54,18 @@ pkg_check_modules(Pistache REQUIRED IMPORTED_TARGET libpistache)
 =======
 <<<<<<< HEAD
 <<<<<<< HEAD
+=======
+>>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
 <<<<<<< HEAD
 find_package(PkgConfig)
 pkg_check_modules(Pistache REQUIRED IMPORTED_TARGET libpistache)
 =======
 =======
+<<<<<<< HEAD
 >>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
 =======
+=======
+>>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
 >>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
 #find_package(Pistache REQUIRED)
 

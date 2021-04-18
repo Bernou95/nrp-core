@@ -104,6 +104,10 @@ SimulationTime NestJSONServer::runLoopStep(SimulationTime timeStep)
 <<<<<<< HEAD
 =======
 <<<<<<< HEAD
+>>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
 <<<<<<< HEAD
 >>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
 		
@@ -118,7 +122,10 @@ SimulationTime NestJSONServer::runLoopStep(SimulationTime timeStep)
 =======
 =======
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
 =======
 >>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
 >>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
@@ -130,6 +137,12 @@ SimulationTime NestJSONServer::runLoopStep(SimulationTime timeStep)
 		/* ---------------------------------------------------------------- */		
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
+=======
+>>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
+>>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
+=======
 >>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
 =======
 >>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
@@ -234,6 +247,10 @@ nlohmann::json NestJSONServer::initialize(const nlohmann::json &data, EngineJSON
 <<<<<<< HEAD
 =======
 <<<<<<< HEAD
+>>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
 <<<<<<< HEAD
 >>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
 		std::string tDeviceName = "time_"+this->curEngineName;
@@ -247,11 +264,16 @@ nlohmann::json NestJSONServer::initialize(const nlohmann::json &data, EngineJSON
 =======
 =======
 =======
+<<<<<<< HEAD
+=======
+=======
+>>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
 >>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
 		//std::string tDeviceName = "check_time";
 		//PtrTemplates<PythonEngineJSONDeviceController<PyObjectDevice>>::shared_ptr
 	    //    newController(new PythonEngineJSONDeviceController<PyObjectDevice>(DeviceIdentifier(tDeviceName, "", { "time": 0 })));
 		//this->registerDeviceNoLock(tDeviceName, newController.get());
+<<<<<<< HEAD
 <<<<<<< HEAD
 >>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
 =======
@@ -259,6 +281,11 @@ nlohmann::json NestJSONServer::initialize(const nlohmann::json &data, EngineJSON
 <<<<<<< HEAD
 >>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
 =======
+>>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
+=======
+>>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
+=======
+>>>>>>> dc7adbacd5ccbb81923578be0a04c242f0c3a763
 >>>>>>> 6d4c0601f0eecb37b4ff9a94480f3c2e251e244b
 		// Prepare Nest for execution
         // Commented out in the context of https://hbpneurorobotics.atlassian.net/browse/NRRPLT-8209
