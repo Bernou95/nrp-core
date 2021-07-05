@@ -21,7 +21,12 @@
 //
 
 #include "nrp_link_controller_plugin/nrp_link_controller_plugin.h"
+<<<<<<< HEAD
 #include "nrp_gazebo_grpc_engine/engine_server/nrp_communication_controller.h"
+=======
+
+#include "nrp_communication_controller/nrp_communication_controller.h"
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 
 #include <gazebo/physics/Model.hh>
 #include <gazebo/physics/Link.hh>
@@ -30,8 +35,11 @@ using namespace nlohmann;
 
 void gazebo::NRPLinkControllerPlugin::Load(gazebo::physics::ModelPtr model, sdf::ElementPtr)
 {
+<<<<<<< HEAD
 	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 	
+=======
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 	auto &commControl = NRPCommunicationController::getInstance();
 
 	// Register a device for each link
@@ -42,7 +50,11 @@ void gazebo::NRPLinkControllerPlugin::Load(gazebo::physics::ModelPtr model, sdf:
 
 		std::cout << "Registering link controller for link \"" << deviceName << "\"\n";
 
+<<<<<<< HEAD
 		this->_linkInterfaces.push_back(LinkGrpcDeviceController(deviceName, link));
+=======
+		this->_linkInterfaces.push_back(GrpcDeviceControlSerializer<LinkDeviceController>(deviceName, link));
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 		commControl.registerDevice(deviceName, &(this->_linkInterfaces.back()));
 	}
 }

@@ -24,7 +24,11 @@
 
 #include "python_server_executable/python_server_executable.h"
 #include "nrp_general_library/utils/pipe_communication.h"
+<<<<<<< HEAD
 #include "nrp_general_library/utils/nrp_logger.h"
+=======
+#include "nrp_general_library/utils/spdlog_setup.h"
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 #include "nrp_python_json_engine/config/python_config.h"
 #include "tests/test_env_cmake.h"
 
@@ -59,7 +63,11 @@ void handle_signal(int signal)
 		// Finish printing
 		std::cout.flush();
 		std::cerr.flush();
+<<<<<<< HEAD
 
+=======
+		SPDLogSetup::shutdownDefault();
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 		exit(0);
 	}
 }
@@ -188,6 +196,10 @@ TEST(TestPythonExecutable, TestPython)
 		// Finish printing
 		std::cout.flush();
 		std::cerr.flush();
+<<<<<<< HEAD
+=======
+		SPDLogSetup::shutdownDefault();
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 
 		exit(0);
 	}

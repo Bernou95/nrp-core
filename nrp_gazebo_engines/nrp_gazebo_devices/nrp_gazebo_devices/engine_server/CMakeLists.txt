@@ -24,7 +24,11 @@ find_package(Gazebo REQUIRED)
 
 add_library(NRPGazeboDeviceControllers SHARED ${LIB_SRC_FILES})
 add_library(NRPGazeboDeviceControllers::NRPGazeboDeviceControllers ALIAS NRPGazeboDeviceControllers)
+<<<<<<< HEAD
 target_compile_options(NRPGazeboDeviceControllers PUBLIC $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:GNU>>:${NRP_COMMON_COMPILATION_FLAGS}>)
+=======
+target_compile_options(NRPGazeboDeviceControllers PUBLIC $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:GNU>>:-Wall -Wextra>)
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 
 target_link_directories(NRPGazeboDeviceControllers PUBLIC ${GAZEBO_LIBRARY_DIRS})
 set_target_properties(NRPGazeboDeviceControllers PROPERTIES PREFIX "")

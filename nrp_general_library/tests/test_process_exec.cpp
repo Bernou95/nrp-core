@@ -74,6 +74,7 @@ int main(int argc, char *argv[])
 
 //	printf("Finished writing " TEST_PROC_STR_START "to pipe\n");
 
+<<<<<<< HEAD
 	// TODO fread doesn't read anything, to be fixed
 	/*char readDat[50] = "";
 	const size_t r = fread(readDat, 50, 1, pRead);
@@ -87,6 +88,12 @@ int main(int argc, char *argv[])
 	}*/
 
 
+=======
+	char readDat[50] = "";
+	fread(readDat, 50, 1, pRead);
+
+//	printf("Read %s from pipe\n", readDat);
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 	const char *pTestEnvVal = getenv(TEST_PROC_ENV_VAR_NAME);
 	if(pTestEnvVal == nullptr)
 		fwrite("", 1, sizeof(""), pWrite);

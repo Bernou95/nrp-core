@@ -65,8 +65,13 @@ class ProcessLauncherInterface
 		                                  const std::vector<std::string> &startParams, bool appendParentEnv = true) = 0;
 		/*!
 		 * \brief Stop a running engine process
+<<<<<<< HEAD
 		 * \param killWait Time (in seconds) to wait for process to quit by itself before force killing it. 0 means it will wait indefinitely
 		 * \return Returns child PID on success, negative value on error
+=======
+		 * \param killWait Time (in seconds) to wait for process to quit by itself before force killing it. 0 means it will wait indefinetly
+		 * \return Returns child PID on sucess, negative value on error
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 		 */
 		virtual pid_t stopEngineProcess(unsigned int killWait) = 0;
 

@@ -22,7 +22,11 @@
 
 #include "python_server_executable/python_server_executable.h"
 
+<<<<<<< HEAD
 #include "nrp_general_library/utils/nrp_logger.h"
+=======
+#include "nrp_general_library/utils/spdlog_setup.h"
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 
 #include <boost/python.hpp>
 #include <csignal>
@@ -123,6 +127,10 @@ void PythonServerExecutable::handleSIGTERM(int signal)
 			NRPException::logCreate(e, "NRP Server shutdown failed after receiving SIGTERM signal");
 		}
 
+<<<<<<< HEAD
+=======
+		SPDLogSetup::shutdownDefault();
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 		exit(signal);
 	}
 }

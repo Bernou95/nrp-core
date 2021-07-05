@@ -41,7 +41,11 @@
  */
 uint16_t findUnboundPort(uint16_t startPort)
 {
+<<<<<<< HEAD
     int sock = socket(AF_INET, SOCK_STREAM, 0);
+=======
+    uint16_t sock = socket(AF_INET, SOCK_STREAM, 0);
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
     if(sock < 0)
         throw std::runtime_error(std::string("Socket Error: ") + strerror(errno));
 
@@ -68,4 +72,8 @@ uint16_t findUnboundPort(uint16_t startPort)
     return startPort++;
 }
 
+<<<<<<< HEAD
 #endif // UTILS_H
+=======
+#endif UTILS_H
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283

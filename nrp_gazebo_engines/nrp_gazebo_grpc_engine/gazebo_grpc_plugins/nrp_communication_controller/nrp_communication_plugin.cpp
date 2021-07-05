@@ -22,13 +22,20 @@
 
 #include "nrp_communication_controller/nrp_communication_plugin.h"
 
+<<<<<<< HEAD
 #include "nrp_gazebo_grpc_engine/engine_server/nrp_communication_controller.h"
+=======
+#include "nrp_communication_controller/nrp_communication_controller.h"
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 #include "nrp_grpc_engine_protocol/engine_server/engine_grpc_opts_parser.h"
 
 void gazebo::NRPCommunicationPlugin::Load(int argc, char **argv)
 {
+<<<<<<< HEAD
 	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
+=======
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 	std::cout << "NRP Communication plugin: Initializing...\n";
 
 	std::string serverAddr, engineName, registrationAddr;
@@ -67,8 +74,11 @@ void gazebo::NRPCommunicationPlugin::Load(int argc, char **argv)
 
 void gazebo::NRPCommunicationPlugin::Reset()
 {
+<<<<<<< HEAD
 	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 	
+=======
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 	// Reset server
 	std::cout << "NRP Communication plugin: Resetting controller...\n";
 	auto &newController = NRPCommunicationController::resetInstance(this->_serverAddress);

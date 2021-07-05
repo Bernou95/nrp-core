@@ -20,7 +20,15 @@ include(GNUInstallDirs)
 # List library build files
 set(LIB_SRC_FILES
 	nrp_gazebo_grpc_engine/config/gazebo_grpc_config.cpp
+<<<<<<< HEAD
 	nrp_gazebo_grpc_engine/nrp_client/gazebo_engine_grpc_nrp_client.cpp
+=======
+	nrp_gazebo_grpc_engine/engine_server/gazebo_step_controller.cpp
+	nrp_gazebo_grpc_engine/nrp_client/gazebo_engine_grpc_nrp_client.cpp
+	nrp_gazebo_grpc_engine/devices/grpc_physics_camera.cpp
+	nrp_gazebo_grpc_engine/devices/grpc_physics_joint.cpp
+	nrp_gazebo_grpc_engine/devices/grpc_physics_link.cpp
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 )
 
 # List of python module build files
@@ -62,11 +70,21 @@ list(JOIN GAZEBO_LIBRARY_DIRS ":" DEFAULT_GAZEBO_LIB_DIRS)
 # Gazebo defines
 configure_file("nrp_gazebo_grpc_engine/config/cmake_constants.h.in" "${CMAKE_CURRENT_BINARY_DIR}/include/${HEADER_DIRECTORY}/config/cmake_constants.h" @ONLY)
 
+<<<<<<< HEAD
+=======
+# Python module dependencies
+configure_file("nrp_gazebo_grpc_engine/python/__init__.py.in" "${CMAKE_CURRENT_BINARY_DIR}/src/__init__.py" @ONLY)
+
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 ##########################################
 # NRPGazeboGrpcEngine
 add_library("${LIBRARY_NAME}" SHARED ${LIB_SRC_FILES})
 add_library(${NAMESPACE_NAME}::${LIBRARY_NAME} ALIAS ${LIBRARY_NAME})
+<<<<<<< HEAD
 target_compile_options(${LIBRARY_NAME} PUBLIC $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:GNU>>:${NRP_COMMON_COMPILATION_FLAGS}>)
+=======
+target_compile_options(${LIBRARY_NAME} PUBLIC $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:GNU>>:-Wall -Wextra>)
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 
 set_target_properties(${LIBRARY_NAME} PROPERTIES PREFIX "")
 
@@ -81,9 +99,14 @@ target_include_directories(${LIBRARY_NAME} BEFORE
 
 target_link_libraries(${LIBRARY_NAME}
 	PUBLIC
+<<<<<<< HEAD
 		NRPGRPCEngineProtocol::NRPGRPCEngineProtocol
 
 	PRIVATE
+=======
+	    NRPGazeboDevices::NRPGazeboDevices
+		NRPGRPCEngineProtocol::NRPGRPCEngineProtocol
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 )
 
 
@@ -92,7 +115,11 @@ target_link_libraries(${LIBRARY_NAME}
 if(NOT ${PYTHON_MODULE_SRC_FILES} STREQUAL "")
 	add_library(${PYTHON_MODULE_NAME} SHARED ${PYTHON_MODULE_SRC_FILES})
 	add_library(${NAMESPACE_NAME}::${PYTHON_MODULE_NAME} ALIAS ${PYTHON_MODULE_NAME})
+<<<<<<< HEAD
 	target_compile_options(${PYTHON_MODULE_NAME} PRIVATE $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:GNU>>:${NRP_COMMON_COMPILATION_FLAGS}>)
+=======
+	target_compile_options(${PYTHON_MODULE_NAME} PRIVATE $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:GNU>>:-Wall -Wextra>)
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 	set_target_properties(${PYTHON_MODULE_NAME} PROPERTIES PREFIX "")
 
 	target_include_directories(${PYTHON_MODULE_NAME}
@@ -123,6 +150,7 @@ add_doxygen_source("${CMAKE_CURRENT_SOURCE_DIR}" ${EXEC_SRC_FILES} ${LIB_SRC_FIL
 if(ENABLE_GAZEBO STREQUAL FULL)
 
 	##########################################
+<<<<<<< HEAD
 	## Gazebo Grpc Device Controllers
 	set(NRP_GAZEBO_GRPC_LIB "${NAMESPACE_NAME}::${LIBRARY_NAME}")
 	add_subdirectory(nrp_gazebo_grpc_engine/engine_server)
@@ -132,6 +160,12 @@ if(ENABLE_GAZEBO STREQUAL FULL)
 	set(NRP_GAZEBO_LIB_TARGETS
 			"${NAMESPACE_NAME}::${LIBRARY_NAME}"
 			NRPGazeboGrpcDeviceControllers::NRPGazeboGrpcDeviceControllers)
+=======
+	## Gazebo plugins
+	set(NRP_GAZEBO_LIB_TARGETS
+			"${NAMESPACE_NAME}::${LIBRARY_NAME}"
+			NRPGazeboDeviceControllers::NRPGazeboDeviceControllers)
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 
 	add_subdirectory(gazebo_grpc_plugins)
 
@@ -145,7 +179,10 @@ if(ENABLE_GAZEBO STREQUAL FULL)
 		# Create testing executable
 		enable_testing()
 		add_executable(${TEST_NAME} ${TEST_SRC_FILES})
+<<<<<<< HEAD
 		target_compile_options(${TEST_NAME} PUBLIC $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:GNU>>:${NRP_COMMON_COMPILATION_FLAGS}>)
+=======
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 		target_link_libraries(${TEST_NAME}
 			PUBLIC
 			${NAMESPACE_NAME}::${LIBRARY_NAME}

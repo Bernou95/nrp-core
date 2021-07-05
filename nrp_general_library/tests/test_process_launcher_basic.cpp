@@ -21,11 +21,16 @@
 //
 
 #include <gtest/gtest.h>
+<<<<<<< HEAD
 #include <string>
 #include <vector>
 
 #include "nrp_general_library/process_launchers/process_launcher_basic.h"
 #include "nrp_general_library/process_launchers/launch_commands/launch_command.h"
+=======
+
+#include "nrp_general_library/process_launchers/process_launcher_basic.h"
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 #include "nrp_general_library/utils/pipe_communication.h"
 #include "nrp_general_library/utils/json_schema_utils.h"
 
@@ -74,6 +79,7 @@ TEST(ProcessLauncherBasicTest, TestLaunch)
 	ASSERT_EQ(pCommCtP.readP(readDat, sizeof(TEST_PROC_STR_SIGTERM), 5, 1), sizeof(TEST_PROC_STR_SIGTERM));
 	ASSERT_STREQ(readDat, TEST_PROC_STR_SIGTERM);
 }
+<<<<<<< HEAD
 
 
 TEST(ProcessLauncherBasicTest, TestEmptyLaunchCommand)
@@ -101,3 +107,5 @@ TEST(ProcessLauncherBasicTest, TestEmptyLaunchCommand)
 	ASSERT_EQ(launcher.stopEngineProcess(42), 0);
 
 }
+=======
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283

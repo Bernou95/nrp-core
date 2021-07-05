@@ -32,8 +32,11 @@ using engine_launch_fcn_t = NRP_ENGINE_LAUNCH_FCN_T;
 
 EngineLauncherInterface::unique_ptr PluginManager::loadPlugin(const std::string &pluginLibFile)
 {
+<<<<<<< HEAD
 	NRP_LOGGER_TRACE("{} called [ pluginLibFile: {} ]", __FUNCTION__, pluginLibFile);
 
+=======
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 	dlerror();	// Clear previous error msgs
 
 	// Try loading plugin with given paths
@@ -44,10 +47,14 @@ EngineLauncherInterface::unique_ptr PluginManager::loadPlugin(const std::string 
 
 		pLibHandle = dlopen(fileName.c_str(), RTLD_LAZY | RTLD_GLOBAL);
 		if(pLibHandle != nullptr)
+<<<<<<< HEAD
 		{
 			NRPLogger::debug("Plugin {} found at {}", pluginLibFile, fileName);
 			break;
 		}
+=======
+			break;
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 	}
 
 	// Print error if opening failed
@@ -55,7 +62,11 @@ EngineLauncherInterface::unique_ptr PluginManager::loadPlugin(const std::string 
 	{
 		const auto dlerr = dlerror();
 
+<<<<<<< HEAD
 		NRPLogger::error("Unable to load plugin library \"" + pluginLibFile + "\"" + (dlerr ? std::string(": ")+dlerr : ""));
+=======
+		NRPLogger::SPDErrLogDefault("Unable to load plugin library \"" + pluginLibFile + "\"" + (dlerr ? std::string(": ")+dlerr : ""));
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 
 		return nullptr;
 	}
@@ -67,8 +78,13 @@ EngineLauncherInterface::unique_ptr PluginManager::loadPlugin(const std::string 
 	engine_launch_fcn_t *pLaunchFcn = reinterpret_cast<engine_launch_fcn_t*>(dlsym(pLibHandle, CREATE_NRP_ENGINE_LAUNCHER_FCN_STR));
 	if(pLaunchFcn == nullptr)
 	{
+<<<<<<< HEAD
 		NRPLogger::error("Plugin Library \"" + pluginLibFile + "\" does not contain an engine load creation function");
 		NRPLogger::error("Register a plugin using CREATE_NRP_ENGINE_LAUNCHER(engine_launcher_name)");
+=======
+		NRPLogger::SPDErrLogDefault("Plugin Library \"" + pluginLibFile + "\" does not contain an engine load creation function");
+		NRPLogger::SPDErrLogDefault("Register a plugin using CREATE_NRP_ENGINE_LAUNCHER(engine_launcher_name)");
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 
 		return nullptr;
 	}
@@ -78,8 +94,11 @@ EngineLauncherInterface::unique_ptr PluginManager::loadPlugin(const std::string 
 
 PluginManager::~PluginManager()
 {
+<<<<<<< HEAD
 	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
+=======
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 	// Unload all plugins
 	while(!this->_loadedLibs.empty())
 	{
@@ -87,7 +106,11 @@ PluginManager::~PluginManager()
 		if(dlclose(curLibIt->second) != 0)
 		{
 			const auto errStr = dlerror();
+<<<<<<< HEAD
 			NRPLogger::error("Couldn't unload plugin \"" + curLibIt->first + "\": " + errStr);
+=======
+			NRPLogger::SPDErrLogDefault("Couldn't unload plugin \"" + curLibIt->first + "\": " + errStr);
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 		}
 
 		this->_loadedLibs.erase(curLibIt);

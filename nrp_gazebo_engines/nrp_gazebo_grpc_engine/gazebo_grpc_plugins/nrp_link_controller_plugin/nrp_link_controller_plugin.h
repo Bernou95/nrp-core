@@ -22,7 +22,14 @@
 #ifndef NRP_LINK_CONTROLLER_PLUGIN_H
 #define NRP_LINK_CONTROLLER_PLUGIN_H
 
+<<<<<<< HEAD
 #include "nrp_gazebo_grpc_engine/engine_server/link_device_controller.h"
+=======
+#include "nrp_gazebo_devices/engine_server/link_device_controller.h"
+#include "nrp_gazebo_grpc_engine/devices/grpc_physics_link.h"
+#include "nrp_grpc_engine_protocol/engine_server/engine_grpc_device_controller.h"
+
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 #include <gazebo/gazebo.hh>
 
 namespace gazebo
@@ -35,7 +42,11 @@ namespace gazebo
 
 		private:
 
+<<<<<<< HEAD
 			std::list< LinkGrpcDeviceController > _linkInterfaces;
+=======
+			std::list<GrpcDeviceControlSerializer<LinkDeviceController> > _linkInterfaces;
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 	};
 
 	GZ_REGISTER_MODEL_PLUGIN(NRPLinkControllerPlugin)

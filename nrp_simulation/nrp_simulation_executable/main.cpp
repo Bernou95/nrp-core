@@ -28,21 +28,31 @@
 #include "nrp_general_library/utils/restclient_setup.h"
 #include "nrp_simulation/config/cmake_conf.h"
 #include "nrp_simulation/simulation/simulation_manager.h"
+<<<<<<< HEAD
 #include "nrp_general_library/utils/nrp_logger.h"
 
+=======
+
+#include <spdlog/spdlog.h>
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 #include <stdlib.h>
 #include <string.h>
 
 void loadPlugins(const char *libName, PluginManager &pluginManager, const EngineLauncherManagerSharedPtr &engines)
 {
+<<<<<<< HEAD
 	NRP_LOGGER_TRACE("{} called [ libName: {} ]", __FUNCTION__, libName);
 
 	// Extract plugin file name and load it
 	NRPLogger::debug("Loading {} plugin", libName);
+=======
+	// Extract plugin file name and load it
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 	auto engineLauncher = pluginManager.loadPlugin(libName);
 	if(engineLauncher == nullptr)
 		throw NRPException::logCreate(std::string("Failed to load engine launcher from plugin \"") + libName + "\"");
 
+<<<<<<< HEAD
 	NRPLogger::info("Plugin {} is loaded", libName);
 
 	// Register launcher
@@ -52,6 +62,14 @@ void loadPlugins(const char *libName, PluginManager &pluginManager, const Engine
 
 int main(int argc, char *argv[])
 {
+=======
+	// Register launcher
+	engines->registerLauncher(EngineLauncherInterfaceSharedPtr(engineLauncher.release()));
+}
+
+int main(int argc, char *argv[])
+{	
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 	RestClientSetup::ensureInstance();
 
 	// Parse start params
@@ -72,12 +90,17 @@ int main(int argc, char *argv[])
 	auto &startParams = *startParamPtr;
 
 	// If help output was requested, only print that, then exit
+<<<<<<< HEAD
 	if(startParams[SimulationParams::ParamHelp.data()].as<SimulationParams::ParamHelpT>())
+=======
+	if(startParams[SimulationParams::ParamHelp.data()].as<bool>())
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 	{
 		std::cout << optParser.help();
 		return 0;
 	}
 
+<<<<<<< HEAD
 	// Create default logger for the launcher
 	auto logger = NRPLogger
 	(
@@ -92,6 +115,8 @@ int main(int argc, char *argv[])
 		true
 	);
 
+=======
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 	// Setup Python
 	PythonInterpreterState pythonInterp(argc, argv);
 
@@ -124,7 +149,11 @@ int main(int argc, char *argv[])
 	// Check if configuration file was specified
 	if(manager.simulationConfig() != nullptr)
 	{
+<<<<<<< HEAD
 		NRPLogger::info("Config file specified, launching...");
+=======
+		spdlog::info("Config file specified, launching...\n");
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 
 		auto simLock = manager.acquireSimLock();
 		manager.initSimulationLoop(engines, processLaunchers, simLock);

@@ -25,12 +25,19 @@
 #include "nrp_general_library/utils/file_finder.h"
 #include "nrp_general_library/utils/nrp_exceptions.h"
 #include "nrp_simulation/config/cmake_conf.h"
+<<<<<<< HEAD
 #include "nrp_general_library/utils/nrp_logger.h"
+=======
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 
 #include <iostream>
 #include <fstream>
 #include <future>
+<<<<<<< HEAD
 #include <filesystem>
+=======
+#include <spdlog/spdlog.h>
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 
 
 cxxopts::Options SimulationParams::createStartParamParser()
@@ -42,6 +49,7 @@ cxxopts::Options SimulationParams::createStartParamParser()
 	        (SimulationParams::ParamSimCfgFileLong.data(), SimulationParams::ParamSimCfgFileDesc.data(),
 	         cxxopts::value<SimulationParams::ParamSimCfgFileT>())
 	        (SimulationParams::ParamPluginsLong.data(), SimulationParams::ParamPluginsDesc.data(),
+<<<<<<< HEAD
 	         cxxopts::value<SimulationParams::ParamPluginsT>()->default_value({}))
 	        (SimulationParams::ParamExpDirLong.data(), SimulationParams::ParamExpDirDesc.data(),
 	         cxxopts::value<SimulationParams::ParamExpDirT>())
@@ -51,6 +59,9 @@ cxxopts::Options SimulationParams::createStartParamParser()
 	         cxxopts::value<SimulationParams::ParamFileLogLevelT>()->default_value("off"))
 	        (SimulationParams::ParamLogDirLong.data(), SimulationParams::ParamLogDirDesc.data(),
 	         cxxopts::value<SimulationParams::ParamLogDirT>()->default_value("logs"));
+=======
+	         cxxopts::value<SimulationParams::ParamPluginsT>()->default_value({}));
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 
 	return opts;
 }
@@ -78,6 +89,7 @@ nlohmann::json SimulationParams::parseJSONFile(const std::string &fileName)
 	return cfgJSON;
 }
 
+<<<<<<< HEAD
 NRPLogger::level_t SimulationParams::parseLogLevel(const std::string &strLogLevel)
 {
 	// try to parse log level taken from paramters
@@ -96,6 +108,8 @@ NRPLogger::level_t SimulationParams::parseLogLevel(const std::string &strLogLeve
 	return level;
 }
 
+=======
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 
 SimulationManager::SimulationManager(const jsonSharedPtr &simulationConfig)
     : _simConfig(simulationConfig)
@@ -103,8 +117,11 @@ SimulationManager::SimulationManager(const jsonSharedPtr &simulationConfig)
 
 SimulationManager::~SimulationManager()
 {
+<<<<<<< HEAD
 	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
+=======
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 	// Stop running threads
 	this->shutdownLoop(this->acquireSimLock()); //TODO Refactor: why twice shutdownLoop?
 
@@ -122,13 +139,17 @@ SimulationManager::~SimulationManager()
 
 SimulationManager SimulationManager::createFromParams(const cxxopts::ParseResult &args)
 {
+<<<<<<< HEAD
 	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
+=======
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
     jsonSharedPtr simConfig = nullptr;
 
 	// Get file names from start params
 	std::string simCfgFileName;
 
+<<<<<<< HEAD
 	bool directoryIsSet = false;
 
 	// Get and check experiment directory from start params
@@ -170,16 +191,27 @@ SimulationManager SimulationManager::createFromParams(const cxxopts::ParseResult
 		if (!std::filesystem::is_regular_file(simCfgFileName)){
 			throw std::invalid_argument("The provided configuration file [ " + simCfgFileName + " ] is invalid");
 		}
+=======
+	try
+	{
+		simCfgFileName = args[SimulationParams::ParamSimCfgFile.data()].as<SimulationParams::ParamSimCfgFileT>();
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 	}
 	catch(std::domain_error&)
 	{
 		// If no simulation file name is present, return empty config
+<<<<<<< HEAD
 		NRPLogger::debug("Couldn't get configuration file from parameters, returning empty config");
 		return SimulationManager(simConfig);
 	}
 
 	NRPLogger::info("Working directory: [ {} ]", std::filesystem::current_path().c_str());
 	NRPLogger::info("Configuration file: [ {} ]", simCfgFileName);
+=======
+		return SimulationManager(simConfig);
+	}
+
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 
 	simConfig.reset(new nlohmann::json(SimulationParams::parseJSONFile(simCfgFileName)));
 
@@ -218,8 +250,11 @@ void SimulationManager::initSimulationLoop(const EngineLauncherManagerConstShare
                                                                     const MainProcessLauncherManager::const_shared_ptr &processLauncherManager,
                                                                     sim_lock_t &simLock)
 {
+<<<<<<< HEAD
 	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
+=======
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 	// Make sure initLock is retrieved before simLock
 	if(simLock.owns_lock())
 		simLock.unlock();
@@ -229,8 +264,12 @@ void SimulationManager::initSimulationLoop(const EngineLauncherManagerConstShare
 	simLock.lock();
 
 	// Create and initialize loop
+<<<<<<< HEAD
 	NRPLogger::info("Initializing simulation loop");
 
+=======
+	spdlog::info("Initializing simulation loop");
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 	this->_loop.reset(new SimulationLoop(this->createSimLoop(engineLauncherManager, processLauncherManager)));
 
 	//sleep(10);
@@ -245,14 +284,20 @@ bool SimulationManager::isRunning() const
 
 void SimulationManager::stopSimulation(const sim_lock_t&)
 {
+<<<<<<< HEAD
 	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
+=======
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 	this->_runningSimulation = false;
 }
 
 bool SimulationManager::runSimulationUntilTimeout(sim_lock_t &simLock)
 {
+<<<<<<< HEAD
 	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 	
+=======
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 	if(this->_loop == nullptr)
 		return false;
 
@@ -289,8 +334,11 @@ bool SimulationManager::runSimulationUntilTimeout(sim_lock_t &simLock)
 
 bool SimulationManager::runSimulation(const SimulationTime secs, sim_lock_t &simLock)
 {
+<<<<<<< HEAD
 	NRP_LOGGER_TRACE("{} called [ secs: {} ]", __FUNCTION__, secs.count());
 
+=======
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 	if(this->_loop == nullptr)
 		return false;
 
@@ -323,8 +371,11 @@ bool SimulationManager::runSimulation(const SimulationTime secs, sim_lock_t &sim
 
 void SimulationManager::shutdownLoop(const SimulationManager::sim_lock_t&)
 {
+<<<<<<< HEAD
 	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
+=======
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 	try {
 		if(this->_loop != nullptr) {
 			this->_loop->shutdownLoop();
@@ -341,8 +392,11 @@ void SimulationManager::shutdownLoop(const SimulationManager::sim_lock_t&)
 
 bool SimulationManager::isSimInitializing()
 {
+<<<<<<< HEAD
 	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
+=======
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 	if(this->_loop != nullptr)
 		return false;
 
@@ -352,8 +406,11 @@ bool SimulationManager::isSimInitializing()
 
 SimulationLoop SimulationManager::createSimLoop(const EngineLauncherManagerConstSharedPtr &engineManager, const MainProcessLauncherManager::const_shared_ptr &processLauncherManager)
 {
+<<<<<<< HEAD
 	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
+=======
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 	SimulationLoop::engine_interfaces_t engines;
 	auto &engineConfigs = this->_simConfig->at("EngineConfigs");
 
@@ -367,7 +424,11 @@ SimulationLoop SimulationManager::createSimLoop(const EngineLauncherManagerConst
 		if(engineLauncher == nullptr)
 		{
 			const auto errMsg = "Failed to find engine interface \"" + engineType + "\"";
+<<<<<<< HEAD
 			NRPLogger::error(errMsg);
+=======
+			spdlog::error(errMsg);
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 
 			throw std::invalid_argument(errMsg);
 		}

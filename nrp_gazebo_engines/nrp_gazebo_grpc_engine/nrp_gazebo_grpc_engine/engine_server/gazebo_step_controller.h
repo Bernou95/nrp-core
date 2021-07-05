@@ -25,7 +25,11 @@
 #include "nrp_general_library/engine_interfaces/engine_client_interface.h"
 
 /*!
+<<<<<<< HEAD
  *  \brief Controls execution of Gazebo steps. Will be inherited by a Gazebo WorldPlugin
+=======
+ *  \brief Controlls execution of Gazebo steps. Will be inherited by a Gazebo WorldPlugin
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
  */
 class GazeboStepController
 {

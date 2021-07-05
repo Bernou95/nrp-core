@@ -20,7 +20,11 @@
 // Agreement No. 945539 (Human Brain Project SGA3).
 //
 
+<<<<<<< HEAD
 #include "nrp_general_library/device_interface/device_interface.h"
+=======
+#include "nrp_general_library/device_interface/device.h"
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 
 
 DeviceIdentifier::DeviceIdentifier(const std::string &_name, const std::string &_engineName, const std::string &_type)

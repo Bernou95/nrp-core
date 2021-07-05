@@ -61,7 +61,11 @@ configure_file("nrp_example_engine/python/__init__.py.in" "${CMAKE_CURRENT_BINAR
 ## NRPExampleEngineLibrary
 add_library("${LIBRARY_NAME}" SHARED ${LIB_SRC_FILES})
 add_library(${NAMESPACE_NAME}::${LIBRARY_NAME} ALIAS ${LIBRARY_NAME})
+<<<<<<< HEAD
 target_compile_options(${LIBRARY_NAME} PUBLIC $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:GNU>>:${NRP_COMMON_COMPILATION_FLAGS}>)
+=======
+target_compile_options(${LIBRARY_NAME} PUBLIC $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:GNU>>:-Wall -Wextra>)
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 target_compile_options(${LIBRARY_NAME} PUBLIC $<$<CXX_COMPILER_ID:GNU>:-fconcepts>)
 
 set_target_properties(${LIBRARY_NAME} PROPERTIES PREFIX "")
@@ -89,7 +93,11 @@ target_include_directories(${LIBRARY_NAME} BEFORE
 if(NOT ${PYTHON_MODULE_SRC_FILES} STREQUAL "")
 	add_library(${PYTHON_MODULE_NAME} SHARED ${PYTHON_MODULE_SRC_FILES})
 	add_library(${NAMESPACE_NAME}::${PYTHON_MODULE_NAME} ALIAS ${PYTHON_MODULE_NAME})
+<<<<<<< HEAD
 	target_compile_options(${PYTHON_MODULE_NAME} PRIVATE $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:GNU>>:${NRP_COMMON_COMPILATION_FLAGS}>)
+=======
+	target_compile_options(${PYTHON_MODULE_NAME} PRIVATE $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:GNU>>:-Wall -Wextra>)
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 	set_target_properties(${PYTHON_MODULE_NAME} PROPERTIES PREFIX "")
 
 	target_include_directories(${PYTHON_MODULE_NAME}

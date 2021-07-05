@@ -22,6 +22,7 @@
 
 #include "nrp_general_library/utils/nrp_logger.h"
 
+<<<<<<< HEAD
 #include <iomanip>
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
@@ -331,3 +332,5 @@ void NRPLogger::shutdownDefault()
 {
 	spdlog::shutdown();
 }
+=======
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283

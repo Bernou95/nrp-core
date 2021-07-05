@@ -28,6 +28,10 @@
 #include <exception>
 #include <iostream>
 #include <string>
+<<<<<<< HEAD
+=======
+#include <spdlog/spdlog.h>
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 
 class NRPExceptionNonRecoverable;
 
@@ -58,7 +62,11 @@ class NRPException
 
 	public:
 		template<class EXCEPTION>
+<<<<<<< HEAD
 		static void logOnce(EXCEPTION &exception, NRPLogger::spdlog_out_fcn_t spdlogCall = NRPLogger::critical)
+=======
+		static void logOnce(EXCEPTION &exception, NRPLogger::spdlog_out_fcn_t spdlogCall = NRPLogger::SPDErrLogDefault)
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 		{
 			NRPException *const logData = NRPException::nrpException(exception);
 			if(logData == nullptr)
@@ -72,7 +80,11 @@ class NRPException
 
 		template<class EXCEPTION = NRPExceptionNonRecoverable, class LOG_EXCEPTION_T>
 		requires(std::constructible_from<EXCEPTION, const std::string&>)
+<<<<<<< HEAD
 		static EXCEPTION logCreate(LOG_EXCEPTION_T &exception, const std::string &msg, NRPLogger::spdlog_out_fcn_t spdlogCall = NRPLogger::critical)
+=======
+		static EXCEPTION logCreate(LOG_EXCEPTION_T &exception, const std::string &msg, NRPLogger::spdlog_out_fcn_t spdlogCall = NRPLogger::SPDErrLogDefault)
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 		{
 			NRPException::logOnce(exception, spdlogCall);
 
@@ -91,7 +103,11 @@ class NRPException
 		 */
 		template<class EXCEPTION = NRPExceptionNonRecoverable>
 		requires(std::constructible_from<EXCEPTION, const std::string&> || std::same_as<EXCEPTION, void>)
+<<<<<<< HEAD
 		static EXCEPTION logCreate(const std::string &msg, NRPLogger::spdlog_out_fcn_t spdlogCall = NRPLogger::critical)
+=======
+		static EXCEPTION logCreate(const std::string &msg, NRPLogger::spdlog_out_fcn_t spdlogCall = NRPLogger::SPDErrLogDefault)
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 		{
 			std::invoke(spdlogCall, msg);
 			if constexpr (std::constructible_from<EXCEPTION, const std::string&, bool>)

@@ -74,7 +74,11 @@ concept DEV_ID_C = requires()
 {	std::same_as<T, DeviceIdentifier>;	};
 
 /*!
+<<<<<<< HEAD
  * \brief Interface to devices
+=======
+ * \brief Interface to devices, both for physics as well as brain simulators
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
  */
 class DeviceInterface
         : public PtrTemplates<DeviceInterface>
@@ -102,7 +106,11 @@ class DeviceInterface
 		const DeviceIdentifier &id() const;
 		void setID(const DeviceIdentifier &id);
 
+<<<<<<< HEAD
 		virtual DeviceInterface::const_shared_ptr moveToSharedPtr()
+=======
+		virtual DeviceInterface::const_shared_ptr moveToSharedPtr() const
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 		{
 			return DeviceInterface::const_shared_ptr(new DeviceInterface(this->_id));
 		}
@@ -137,7 +145,15 @@ using DeviceInterfaceConstSharedPtr = DeviceInterface::const_shared_ptr;
 
 template<class T>
 concept DEVICE_C = requires {
+<<<<<<< HEAD
         std::derived_from<T, DeviceInterface>;
+=======
+        {	T::TypeName	};
+        std::derived_from<T, DeviceInterface>;
+        std::derived_from<T, PropertyTemplateGeneral>;
+        std::constructible_from<T, DeviceIdentifier&&>;
+        std::constructible_from<T, DeviceIdentifier&&, typename T::property_template_t &&>;
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 };
 
 #endif // DEVICE_INTERFACE_H

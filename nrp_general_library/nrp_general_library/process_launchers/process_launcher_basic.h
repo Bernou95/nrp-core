@@ -25,14 +25,21 @@
 #include "nrp_general_library/config/cmake_constants.h"
 #include "nrp_general_library/process_launchers/process_launcher.h"
 #include "nrp_general_library/process_launchers/launch_commands/basic_fork.h"
+<<<<<<< HEAD
 #include "nrp_general_library/process_launchers/launch_commands/empty_launch_command.h"
 
+=======
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 
 /*!
  * \brief Basic Process Launcher, for simple process management
  */
 class ProcessLauncherBasic
+<<<<<<< HEAD
         : public ProcessLauncher<ProcessLauncherBasic, "Basic", BasicFork, EmptyLaunchCommand>
+=======
+        : public ProcessLauncher<ProcessLauncherBasic, "Basic", BasicFork>
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 {
 	public:	~ProcessLauncherBasic() override = default;
 };

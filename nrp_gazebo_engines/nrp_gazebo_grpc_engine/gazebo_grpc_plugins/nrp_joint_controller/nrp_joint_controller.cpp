@@ -21,6 +21,7 @@
 //
 
 #include "nrp_joint_controller/nrp_joint_controller.h"
+<<<<<<< HEAD
 #include "nrp_gazebo_grpc_engine/engine_server/nrp_communication_controller.h"
 #include <gazebo/physics/Model.hh>
 
@@ -32,6 +33,15 @@ gazebo::NRPJointController::PIDConfig::PIDConfig(const PIDConfig& pid)
 	: gazebo::common::PID(pid.GetPGain(), pid.GetIGain(), pid.GetDGain(),
 	                      pid.GetIMax(), pid.GetIMin(), pid.GetCmdMax(), pid.GetCmdMin()),
 						  Type(pid.Type)
+=======
+
+#include "nrp_communication_controller/nrp_communication_controller.h"
+
+#include <gazebo/physics/Model.hh>
+
+gazebo::NRPJointController::PIDConfig::PIDConfig(PID &&_pid, gazebo::NRPJointController::PIDConfig::PID_TYPE _type)
+    : gazebo::common::PID(std::move(_pid)), Type(_type)
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 {}
 
 gazebo::NRPJointController::PIDConfig::PID_TYPE gazebo::NRPJointController::PIDConfig::convertStringToType(std::string type)
@@ -51,8 +61,11 @@ gazebo::NRPJointController::~NRPJointController() = default;
 
 void gazebo::NRPJointController::Load(gazebo::physics::ModelPtr model, sdf::ElementPtr sdf)
 {
+<<<<<<< HEAD
 	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 	
+=======
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 	std::map<std::string, double> jointTargets;
 
 	// Iterate over sdf configurations
@@ -74,7 +87,11 @@ void gazebo::NRPJointController::Load(gazebo::physics::ModelPtr model, sdf::Elem
 			}
 
 			// Read PID settings
+<<<<<<< HEAD
 			PIDConfig jointConfig(pJointPID->Get<double>("P"), pJointPID->Get<double>("I"), pJointPID->Get<double>("D"),
+=======
+			PIDConfig jointConfig(common::PID(pJointPID->Get<double>("P"), pJointPID->Get<double>("I"), pJointPID->Get<double>("D")),
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 			                      PIDConfig::convertStringToType(pJointPID->Get<std::string>("Type")));
 
 			// Save target
@@ -130,7 +147,11 @@ void gazebo::NRPJointController::Load(gazebo::physics::ModelPtr model, sdf::Elem
 		const auto deviceName = NRPCommunicationController::createDeviceName(*this, joint->GetName());
 
 		std::cout << "Registering joint controller for joint \"" << jointName << "\"\n";
+<<<<<<< HEAD
 		this->_jointDeviceControllers.push_back(JointGrpcDeviceController(jointName, joint, jointControllerPtr));
+=======
+		this->_jointDeviceControllers.push_back(GrpcDeviceControlSerializer<JointDeviceController>(joint, jointControllerPtr, jointName));
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 		NRPCommunicationController::getInstance().registerDevice(deviceName, &(this->_jointDeviceControllers.back()));
 	}
 }

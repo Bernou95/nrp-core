@@ -42,8 +42,11 @@ NRPCommunicationController &NRPCommunicationController::getInstance()
 
 NRPCommunicationController &NRPCommunicationController::resetInstance(const std::string &serverURL)
 {
+<<<<<<< HEAD
 	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
+=======
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 	// Remove old server, start new one with given server URL
 	NRPCommunicationController::_instance.reset(new NRPCommunicationController(serverURL));
 	return NRPCommunicationController::getInstance();
@@ -51,8 +54,11 @@ NRPCommunicationController &NRPCommunicationController::resetInstance(const std:
 
 NRPCommunicationController &NRPCommunicationController::resetInstance(const std::string &serverURL, const std::string &engineName, const std::string &registrationURL)
 {
+<<<<<<< HEAD
 	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
+=======
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 	NRPCommunicationController::_instance.reset(new NRPCommunicationController(serverURL, engineName, registrationURL));
 	return NRPCommunicationController::getInstance();
 
@@ -60,16 +66,22 @@ NRPCommunicationController &NRPCommunicationController::resetInstance(const std:
 
 void NRPCommunicationController::registerStepController(GazeboStepController *stepController)
 {
+<<<<<<< HEAD
 	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
+=======
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 	EngineJSONServer::lock_t lock(this->_deviceLock);
 	this->_stepController = stepController;
 }
 
 SimulationTime NRPCommunicationController::runLoopStep(SimulationTime timeStep)
 {
+<<<<<<< HEAD
 	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
+=======
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 	if(this->_stepController == nullptr)
 		throw NRPException::logCreate("Tried to run loop while the controller has not yet been initialized");
 
@@ -86,8 +98,11 @@ SimulationTime NRPCommunicationController::runLoopStep(SimulationTime timeStep)
 
 json NRPCommunicationController::initialize(const json &data, EngineJSONServer::lock_t &lock)
 {
+<<<<<<< HEAD
 	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
+=======
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 	double waitTime = data.at("WorldLoadTime");
 	if(waitTime <= 0)
 		waitTime = std::numeric_limits<double>::max();
@@ -116,13 +131,17 @@ json NRPCommunicationController::initialize(const json &data, EngineJSONServer::
 
 json NRPCommunicationController::shutdown(const json&)
 {
+<<<<<<< HEAD
 	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
+=======
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 	return nlohmann::json();
 }
 
 NRPCommunicationController::NRPCommunicationController(const std::string &address)
     : EngineJSONServer(address)
+<<<<<<< HEAD
 {
 	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 }
@@ -132,3 +151,10 @@ NRPCommunicationController::NRPCommunicationController(const std::string &server
 {
 	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 }
+=======
+{}
+
+NRPCommunicationController::NRPCommunicationController(const std::string &serverURL, const std::string &engineName, const std::string &registrationURL)
+    : EngineJSONServer(serverURL, engineName, registrationURL)
+{}
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283

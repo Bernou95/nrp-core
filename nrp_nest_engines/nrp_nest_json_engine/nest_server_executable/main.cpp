@@ -21,13 +21,19 @@
 //
 
 #include "nest_server_executable/nest_server_executable.h"
+<<<<<<< HEAD
 #include "nrp_general_library/utils/nrp_logger.h"
+=======
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 
 #include <boost/python.hpp>
 
 int main(int argc, char *argv[])
 {
+<<<<<<< HEAD
 
+=======
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 	// Load the Nest server
 	auto &server = NestServerExecutable::resetInstance(argc, argv);
 

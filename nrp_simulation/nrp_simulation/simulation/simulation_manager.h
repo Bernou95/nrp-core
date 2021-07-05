@@ -56,6 +56,7 @@ struct SimulationParams
 	static constexpr std::string_view ParamPluginsDesc = "Additional engine plugins to load";
 	using ParamPluginsT = std::vector<std::string>;
 
+<<<<<<< HEAD
 	static constexpr std::string_view ParamExpDir = "d";
 	static constexpr std::string_view ParamExpDirLong = "d,dir";
 	static constexpr std::string_view ParamExpDirDesc = "The explicit location of the experiment folder";
@@ -74,6 +75,8 @@ struct SimulationParams
 	static constexpr std::string_view ParamLogDirDesc = "Directory for the file logs";
 	using ParamLogDirT = std::string;
 
+=======
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 	/*!
 	 * \brief Create a parser for start parameters
 	 * \return Returns parser
@@ -86,6 +89,7 @@ struct SimulationParams
 	 * \return Returns parsed JSON
 	 */
 	static nlohmann::json parseJSONFile(const std::string &fileName);
+<<<<<<< HEAD
 
 	/*!
 	 * \brief parsing input parameter string log level into enum type
@@ -97,6 +101,8 @@ struct SimulationParams
 	 * \brief default log level for the acses when the parameters are specified wrongly
 	 */
 	static const NRPLogger::level_t _defaultLogLevel = NRPLogger::level_t::info;
+=======
+>>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 };
 
 
