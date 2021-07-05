@@ -112,15 +112,9 @@ message GetDeviceReply
 
     oneof data
     {
-<<<<<<< HEAD
         GazeboCamera camera = 2;
         GazeboLink   link   = 3;
         GazeboJoint  joint  = 4;
-=======
-	    GazeboCamera camera = 2;
-		GazeboLink   link   = 3;
-		GazeboJoint  joint  = 4;
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
         TestPayload  test   = 5;
     }
 }

@@ -103,11 +103,7 @@ ZipContainer::ZipFileWrapper::~ZipFileWrapper()
 		if(errCode != 0)
 		{
 			ZipErrorT zErr(errCode);
-<<<<<<< HEAD
 			NRPLogger::error(std::string("Zip File could not be closed: ") + zip_error_strerror(&zErr));
-=======
-			NRPLogger::SPDErrLogDefault(std::string("Zip File could not be closed: ") + zip_error_strerror(&zErr));
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 		}
 	}
 }
@@ -138,11 +134,7 @@ ZipContainer::~ZipContainer() noexcept
 			const auto zErr = zip_close(this->_data);
 			if(zErr != 0)
 			{
-<<<<<<< HEAD
 				NRPLogger::error("Could not save Zip Container");
-=======
-				NRPLogger::SPDErrLogDefault("Could not save Zip Container");
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 
 				zip_discard(this->_data);
 			}

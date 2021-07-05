@@ -99,8 +99,4 @@ TEST(DeviceInterfaceTest, Constructor)
 	ASSERT_STREQ(interface.engineName().data(), id1.EngineName.data());
 
 	ASSERT_EQ(interface.id(), id1);
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283

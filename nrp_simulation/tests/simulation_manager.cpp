@@ -59,15 +59,11 @@ TEST(SimulationManagerTest, OptParser)
 	// Test valid parameters
 	startParamDat = {"nrp_server",
 	                std::string("-") + SimulationParams::ParamHelp.data(),
-<<<<<<< HEAD
 	                std::string("-") + SimulationParams::ParamSimCfgFile.data(), "cfgFile.json",
 	                std::string("-") + SimulationParams::ParamExpDir.data(), "experiment_dir",
 	                std::string("--") + SimulationParams::ParamConsoleLogLevelLong.data(), "debug",
 	                std::string("--") + SimulationParams::ParamFileLogLevelLong.data(), "trace",
 	                std::string("--") + SimulationParams::ParamLogDirLong.data(), ""};
-=======
-	                std::string("-") + SimulationParams::ParamSimCfgFile.data(), "cfgFile.json"};
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 
 	startParams = createStartParamPtr(startParamDat);
 
@@ -92,20 +88,10 @@ TEST(SimulationManagerTest, OptParser)
 	ASSERT_THROW(optParser.parse(argc, argv), cxxopts::OptionParseException);
 }
 
-<<<<<<< HEAD
 TEST(SimulationManagerTest, SetupExperimentConfig)
 {
 	auto optParser(SimulationParams::createStartParamParser());
 
-=======
-TEST(SimulationManagerTest, SimulationManagerSetup)
-{
-	auto optParser(SimulationParams::createStartParamParser());
-
-	const char *pPyArgv = "simtest";
-	PythonInterpreterState pyInterp(1, const_cast<char**>(&pPyArgv));
-
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 	// Test no simulation file passed
 	std::vector<std::string> startParamDat;
 	std::vector<const char*> startParams = {"nrp_server"};
@@ -161,7 +147,6 @@ TEST(SimulationManagerTest, SimulationManagerSetup)
 	}
 }
 
-<<<<<<< HEAD
 TEST(SimulationManagerTest, SetupExperimentDirectory)
 {
 	auto optParser(SimulationParams::createStartParamParser());
@@ -238,8 +223,6 @@ TEST(SimulationManagerTest, SetupExperimentDirectory)
 	}
 }
 
-=======
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 TEST(SimulationManagerTest, SimulationManagerLoop)
 {
 	auto optParser(SimulationParams::createStartParamParser());

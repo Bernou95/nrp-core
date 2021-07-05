@@ -22,13 +22,7 @@
 #ifndef NRP_JOINT_CONTROLLER_H
 #define NRP_JOINT_CONTROLLER_H
 
-<<<<<<< HEAD
 #include "nrp_gazebo_grpc_engine/engine_server/joint_device_controller.h"
-=======
-#include "nrp_gazebo_devices/engine_server/joint_device_controller.h"
-#include "nrp_gazebo_grpc_engine/devices/grpc_physics_joint.h"
-#include "nrp_grpc_engine_protocol/engine_server/engine_grpc_device_controller.h"
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 
 
 namespace gazebo
@@ -43,12 +37,8 @@ namespace gazebo
 
 				PID_TYPE Type = POSITION;
 
-<<<<<<< HEAD
 				PIDConfig(double p, double i, double d, PID_TYPE _type);
 				PIDConfig(const PIDConfig& pid);
-=======
-				PIDConfig(PID &&_pid, PID_TYPE _type);
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 
 				static PID_TYPE convertStringToType(std::string type);
 			};
@@ -63,11 +53,7 @@ namespace gazebo
 			/*!
 			 * \brief List containing all joint interfaces. TODO: Change to shared_ptr to prevent segfault errors when this plugin is destroyed
 			 */
-<<<<<<< HEAD
 			std::list< JointGrpcDeviceController > _jointDeviceControllers;
-=======
-			std::list<GrpcDeviceControlSerializer<JointDeviceController> > _jointDeviceControllers;
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 
 			/*!
 			 * \brief Joint PID Configuration

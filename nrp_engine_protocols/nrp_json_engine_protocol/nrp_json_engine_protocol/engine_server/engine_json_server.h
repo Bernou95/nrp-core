@@ -27,10 +27,7 @@
 #include "nrp_json_engine_protocol/engine_server/engine_json_device_controller.h"
 
 #include "nrp_general_library/utils/time_utils.h"
-<<<<<<< HEAD
 #include "nrp_general_library/utils/nrp_logger.h"
-=======
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 
 #include <map>
 #include <memory>
@@ -204,11 +201,8 @@ class EngineJSONServer
 		 */
 		std::map<std::string, controller_t*> _devicesControllers;
 
-<<<<<<< HEAD
 		NRPLogger _loggerCfg;
 
-=======
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 		/*!
 		 * \brief Set routes used by server
 		 */

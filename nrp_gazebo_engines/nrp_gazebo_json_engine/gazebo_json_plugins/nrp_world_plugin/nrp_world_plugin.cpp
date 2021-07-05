@@ -30,11 +30,8 @@
 
 void gazebo::NRPWorldPlugin::Load(gazebo::physics::WorldPtr world, sdf::ElementPtr sdf)
 {
-<<<<<<< HEAD
 	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
-=======
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 	std::cout << "NRPWorldPlugin: Loading world plugin...\n";
 
 	this->_initialWorldState = gazebo::physics::WorldState(world);
@@ -53,11 +50,8 @@ void gazebo::NRPWorldPlugin::Load(gazebo::physics::WorldPtr world, sdf::ElementP
 
 void gazebo::NRPWorldPlugin::Reset()
 {
-<<<<<<< HEAD
 	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
-=======
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 	// Reset the world to the initial state
 	// Reset doesn't take into account the <state> tag, so we have to reload it manually
 
@@ -67,11 +61,8 @@ void gazebo::NRPWorldPlugin::Reset()
 
 SimulationTime gazebo::NRPWorldPlugin::runLoopStep(SimulationTime timeStep)
 {
-<<<<<<< HEAD
 	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
-=======
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 	std::scoped_lock lock(this->_lockLoop);
 
 	//std::cout << "NRPWorldPlugin: Executing loop step\n";
@@ -98,11 +89,8 @@ SimulationTime gazebo::NRPWorldPlugin::runLoopStep(SimulationTime timeStep)
 
 bool gazebo::NRPWorldPlugin::finishWorldLoading()
 {
-<<<<<<< HEAD
 	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
-=======
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 	std::cout << "Finalizing gazebo loading... Time:" <<  this->_world->SimTime().Double() << "\n";
 
 	// Run a single iteration and reset the world
@@ -118,11 +106,8 @@ bool gazebo::NRPWorldPlugin::finishWorldLoading()
 
 void gazebo::NRPWorldPlugin::startLoop(unsigned int numIterations)
 {
-<<<<<<< HEAD
 	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 	
-=======
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 	//std::cout << "NRPWorldPlugin: Running " << numIterations << " iterations\n";
 
 	this->_world->Step(numIterations);

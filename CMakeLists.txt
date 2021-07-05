@@ -12,14 +12,11 @@ set (CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set (CMAKE_INTERPROCEDURAL_OPTIMIZATION OFF)
 #string(APPEND CMAKE_SHARED_LINKER_FLAGS " -Wl,--no-undefined")
 
-<<<<<<< HEAD
 set (NRP_COMMON_COMPILATION_FLAGS -Wall -Wextra -Werror)
 
 # Uncomment to compile a production version of code (without trace calls)
 # add_definitions(-DPRODUCTION_RELEASE)
 
-=======
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 include(GNUInstallDirs)
 include(ExternalProject)
 include(FetchContent)
@@ -180,7 +177,6 @@ set(NRP_SIMULATION_DEFAULT_ENGINE_LAUNCHERS "NRPPythonJSONEngine.so"
 add_subdirectory(nrp_simulation)
 
 ##########################################
-<<<<<<< HEAD
 ## cppcheck
 
 # Generates a file with exact compiler calls for all translation units, which is needed by cppcheck
@@ -215,8 +211,6 @@ add_custom_target(cppcheck
 )
 
 ##########################################
-=======
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 ## Doxygen
 
 set(DOXYGEN_GENERATE_LATEX YES)

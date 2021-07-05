@@ -29,10 +29,7 @@
 
 #include <iostream>
 
-<<<<<<< HEAD
 // Implements conversion from c++ array to numpy array
-=======
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 template<class VALUE, size_t SIZE, class MakeHolder>
 requires(std::is_scalar_v<VALUE>)
 struct boost::python::to_python_indirect<const std::array<VALUE,SIZE>&, MakeHolder>
@@ -69,11 +66,7 @@ concept PY_CONVERTIBLE_ARRAY_C =
         std::same_as<T, std::array<typename T::value_type, std::tuple_size_v<T> > >&&
         std::is_scalar_v<typename T::value_type>;
 
-<<<<<<< HEAD
 // Implements conversion from numpy array to c++ array
-=======
-
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 template<PY_CONVERTIBLE_ARRAY_C ARRAY>
 struct array_from_python
 {
@@ -120,10 +113,7 @@ struct array_from_python
 	}
 };
 
-<<<<<<< HEAD
 // Implements conversion from c++ vector to numpy array
-=======
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 template<class VALUE, class MakeHolder>
 requires(std::is_scalar_v<VALUE>)
 struct boost::python::to_python_indirect<const std::vector<VALUE>&, MakeHolder>
@@ -159,10 +149,7 @@ concept PY_CONVERTIBLE_VECTOR_C =
     std::same_as<T, std::vector<typename T::value_type> > &&
     std::is_scalar_v<typename T::value_type>;
 
-<<<<<<< HEAD
 // Implements conversion from numpy array to c++ vector
-=======
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 template<PY_CONVERTIBLE_VECTOR_C VECTOR>
 struct vector_from_python
 {

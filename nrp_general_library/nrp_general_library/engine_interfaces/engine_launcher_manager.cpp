@@ -22,11 +22,7 @@
 
 #include "nrp_general_library/engine_interfaces/engine_launcher_manager.h"
 
-<<<<<<< HEAD
 #include "nrp_general_library/utils/nrp_logger.h"
-=======
-#include <spdlog/spdlog.h>
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 
 void EngineLauncherManager::registerLauncher(const EngineLauncherInterfaceSharedPtr &launcher)
 {
@@ -34,11 +30,7 @@ void EngineLauncherManager::registerLauncher(const EngineLauncherInterfaceShared
 	if(sameLauncherPtr != nullptr)
 	{
 		// TODO: Handle error where two launchers have same name
-<<<<<<< HEAD
 		NRPLogger::error("Launcher with same name \"" + sameLauncherPtr->engineType() + "\"already registered");
-=======
-		spdlog::warn("Launcher with same name \"" + sameLauncherPtr->engineType() + "\"already registered");
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 	}
 
 	this->_launchers.emplace(launcher);
@@ -46,20 +38,13 @@ void EngineLauncherManager::registerLauncher(const EngineLauncherInterfaceShared
 
 EngineLauncherInterfaceSharedPtr EngineLauncherManager::findLauncher(const EngineLauncherInterface::engine_type_t &type) const
 {
-<<<<<<< HEAD
 	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 	
-=======
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 	for(const auto &launcher : this->_launchers)
 	{
 		if(launcher->engineType() == type)
 		{
-<<<<<<< HEAD
 			NRPLogger::debug("Found launcher for engine " + type);
-=======
-			spdlog::info("Found launcher for engine " + type);
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 			return launcher;
 		}
 	}

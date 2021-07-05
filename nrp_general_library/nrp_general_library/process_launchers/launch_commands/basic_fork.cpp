@@ -35,11 +35,8 @@
 
 BasicFork::~BasicFork()
 {
-<<<<<<< HEAD
 	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
-=======
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 	// Stop engine process if it's still running
 	this->stopEngineProcess(60);
 }
@@ -47,11 +44,8 @@ BasicFork::~BasicFork()
 pid_t BasicFork::launchEngineProcess(const nlohmann::json &engineConfig, const std::vector<std::string> &envParams,
                                      const std::vector<std::string> &startParams, bool appendParentEnv)
 {
-<<<<<<< HEAD
 	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
-=======
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 	// Parent PID
 	const auto ppid = getpid();
 
@@ -108,16 +102,10 @@ pid_t BasicFork::launchEngineProcess(const nlohmann::json &engineConfig, const s
 		// Parameter end
 		startParamPtrs.push_back(nullptr);
 
-<<<<<<< HEAD
 		NRPLogger::info("Engine type: {}, name: {}, PID: {}", engineConfig.at("EngineType"), engineConfig.at("EngineName"), getpid());
 
 		// Start engine, stop current execution
 		NRPLogger::debug("Starting engine with cmd: {}",  engineProcCmd.data());
-=======
-		std::cout << "Current engine PID: " <<getpid() << std::endl;
-
-		// Start engine, stop current execution
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 		auto res = execvp(BasicFork::EnvCfgCmd.data(), const_cast<char *const *>(startParamPtrs.data()));
 
 		// Don't use the logger here, as this is a separate process
@@ -144,11 +132,8 @@ pid_t BasicFork::launchEngineProcess(const nlohmann::json &engineConfig, const s
 
 pid_t BasicFork::stopEngineProcess(unsigned int killWait)
 {
-<<<<<<< HEAD
 	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
-=======
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 	if(this->_enginePID > 0)
 	{
 		// Send SIGTERM to gracefully stop Nest process
@@ -188,11 +173,8 @@ pid_t BasicFork::stopEngineProcess(unsigned int killWait)
 
 LaunchCommandInterface::ENGINE_RUNNING_STATUS BasicFork::getProcessStatus()
 {
-<<<<<<< HEAD
 	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
-=======
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 	// Check if engine was already stopped before
 	if(this->_enginePID < 0)
 		return ENGINE_RUNNING_STATUS::RUNNING;
@@ -210,11 +192,8 @@ LaunchCommandInterface::ENGINE_RUNNING_STATUS BasicFork::getProcessStatus()
 
 void BasicFork::appendEnvVars(const std::vector<std::string> &envVars)
 {
-<<<<<<< HEAD
 	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 	
-=======
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 	// Modify child environment variables
 	for(auto &envVar : envVars)
 	{

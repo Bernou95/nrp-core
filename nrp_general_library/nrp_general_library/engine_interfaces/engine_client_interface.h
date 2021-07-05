@@ -274,7 +274,6 @@ class EngineClient
 				 */
 				EngineClientInterfaceSharedPtr launchEngine(nlohmann::json &engineConfig, ProcessLauncherInterface::unique_ptr &&launcher) override
 				{
-<<<<<<< HEAD
 					auto launcherName = launcher->launcherName();
 
 					EngineClientInterfaceSharedPtr engine(new ENGINE(engineConfig, std::move(launcher)));
@@ -294,11 +293,6 @@ class EngineClient
 									"\"{}\" EngineServer (type: \"{}\") launched successfully by \"{}\" launcher.", engine->engineName(), this->engineType(), launcherName);
 							}; break;
 					};
-=======
-					EngineClientInterfaceSharedPtr engine(new ENGINE(engineConfig, std::move(launcher)));
-					if(engine->launchEngine() == 0)
-					{	/*TODO: Handle process forking error*/	}
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 
 					return engine;
 				}

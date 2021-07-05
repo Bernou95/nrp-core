@@ -37,7 +37,6 @@
 using namespace nlohmann;
 
 
-<<<<<<< HEAD
 gazebo::NRPJointController::PIDConfig::PIDConfig(double p, double i, double d, gazebo::NRPJointController::PIDConfig::PID_TYPE _type)
     : gazebo::common::PID(p, i, d), Type(_type)
 {}
@@ -46,10 +45,6 @@ gazebo::NRPJointController::PIDConfig::PIDConfig(const PIDConfig& pid)
 	: gazebo::common::PID(pid.GetPGain(), pid.GetIGain(), pid.GetDGain(),
 	                      pid.GetIMax(), pid.GetIMin(), pid.GetCmdMax(), pid.GetCmdMin()),
 						  Type(pid.Type)
-=======
-gazebo::NRPJointController::PIDConfig::PIDConfig(PID _pid, gazebo::NRPJointController::PIDConfig::PID_TYPE _type)
-    : gazebo::common::PID(_pid), Type(_type)
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 {}
 
 gazebo::NRPJointController::PIDConfig::PID_TYPE gazebo::NRPJointController::PIDConfig::convertStringToType(std::string type)
@@ -86,11 +81,7 @@ void gazebo::NRPJointController::Load(gazebo::physics::ModelPtr model, sdf::Elem
 				throw NRPException::logCreate("Joint \"" + jointName + "\" not found in model \"" + model->GetScopedName() + "\"");
 
 			// Read PID settings
-<<<<<<< HEAD
 			PIDConfig jointConfig(pJointPID->Get<double>("P"), pJointPID->Get<double>("I"), pJointPID->Get<double>("D"),
-=======
-			PIDConfig jointConfig(common::PID(pJointPID->Get<double>("P"), pJointPID->Get<double>("I"), pJointPID->Get<double>("D")),
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 			                      PIDConfig::convertStringToType(pJointPID->Get<std::string>("Type")));
 
 			// Set target

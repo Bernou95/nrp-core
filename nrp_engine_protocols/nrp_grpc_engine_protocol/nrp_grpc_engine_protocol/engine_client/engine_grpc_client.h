@@ -30,19 +30,11 @@
 
 #include "nrp_grpc_engine_protocol/config/engine_grpc_config.h"
 #include "nrp_general_library/engine_interfaces/engine_client_interface.h"
-<<<<<<< HEAD
 #include "nrp_grpc_engine_protocol/grpc_server/engine_grpc.grpc.pb.h"
 #include "nrp_general_library/device_interface/data_device.h"
 #include "proto_python_bindings/proto_python_bindings.h"
 
 template<class ENGINE, FixedString SCHEMA, PROTO_MSG_C ...MSG_TYPES>
-=======
-#include "nrp_grpc_engine_protocol/device_interfaces/grpc_device_serializer.h"
-#include "nrp_grpc_engine_protocol/grpc_server/engine_grpc.grpc.pb.h"
-
-
-template<class ENGINE, FixedString SCHEMA, DEVICE_C ...DEVICES>
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 class EngineGrpcClient
     : public EngineClient<ENGINE, SCHEMA>
 {
@@ -66,11 +58,8 @@ class EngineGrpcClient
         EngineGrpcClient(nlohmann::json &config, ProcessLauncherInterface::unique_ptr &&launcher)
             : EngineClient<ENGINE, SCHEMA>(config, std::move(launcher))
         {
-<<<<<<< HEAD
 		    NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
-=======
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
             std::string serverAddress = this->engineConfig().at("ServerAddress");
 
             // Timeouts of less than 1ms will be rounded up to 1ms
@@ -97,11 +86,8 @@ class EngineGrpcClient
 
         grpc_connectivity_state connect()
         {
-<<<<<<< HEAD
 		    NRP_LOGGER_TRACE("{} called", __FUNCTION__);
             
-=======
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
             _channel->GetState(true);
             _channel->WaitForConnected(gpr_time_add(
             gpr_now(GPR_CLOCK_REALTIME), gpr_time_from_seconds(10, GPR_TIMESPAN)));
@@ -110,11 +96,8 @@ class EngineGrpcClient
 
         void sendInitCommand(const nlohmann::json & data)
         {
-<<<<<<< HEAD
 		    NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
-=======
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
             EngineGrpc::InitRequest  request;
             EngineGrpc::InitReply    reply;
             grpc::ClientContext      context;
@@ -134,11 +117,8 @@ class EngineGrpcClient
 
         void sendShutdownCommand(const nlohmann::json & data)
         {
-<<<<<<< HEAD
 		    NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
-=======
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
             EngineGrpc::ShutdownRequest request;
             EngineGrpc::ShutdownReply   reply;
             grpc::ClientContext         context;
@@ -158,11 +138,8 @@ class EngineGrpcClient
 
         SimulationTime sendRunLoopStepCommand(const SimulationTime timeStep)
         {
-<<<<<<< HEAD
 		    NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
-=======
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
             EngineGrpc::RunLoopStepRequest request;
             EngineGrpc::RunLoopStepReply   reply;
             grpc::ClientContext            context;
@@ -214,11 +191,8 @@ class EngineGrpcClient
 
         virtual void waitForStepCompletion(float timeOut) override
         {
-<<<<<<< HEAD
 		    NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
-=======
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
             // If thread state is invalid, loop thread has completed and waitForStepCompletion was called once before
             if(!this->_loopStepThread.valid())
             {
@@ -239,11 +213,8 @@ class EngineGrpcClient
 
 		virtual void sendDevicesToEngine(const typename EngineClientInterface::devices_ptr_t &devicesArray) override
         {
-<<<<<<< HEAD
 		    NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
-=======
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
             EngineGrpc::SetDeviceRequest request;
             EngineGrpc::SetDeviceReply   reply;
             grpc::ClientContext          context;
@@ -254,17 +225,12 @@ class EngineGrpcClient
             {
                 if(device->engineName().compare(this->engineName()) == 0)
                 {
-<<<<<<< HEAD
                     if(device->isEmpty())
                         throw NRPException::logCreate("Attempt to send empty device " + device->name() + " to Engine " + this->engineName());
                     else {
                         auto r = request.add_request();
                         setProtoFromDeviceInterface<MSG_TYPES...>(r, device);
                     }
-=======
-                    auto r = request.add_request();
-                    this->getProtoFromSingleDeviceInterface<DEVICES...>(*device, r);
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
                 }
             }
 
@@ -277,81 +243,10 @@ class EngineGrpcClient
             }
         }
 
-<<<<<<< HEAD
         virtual const std::vector<std::string> engineProcStartParams() const override
         {
 		    NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
-=======
-        template<class DEVICE, class ...REMAINING_DEVICES>
-		inline void getProtoFromSingleDeviceInterface(const DeviceInterface &device, EngineGrpc::DeviceMessage * request) const
-        {
-            if(DEVICE::TypeName.compare(device.type()) == 0)
-            {
-				*request = GRPCDeviceSerializerMethods::template serialize<DEVICE>(dynamic_cast<const DEVICE&>(device));
-
-                return;
-            }
-
-            // If device classess are left to check, go through them. If all device classes have been checked without proper result, throw an error
-
-            if constexpr (sizeof...(REMAINING_DEVICES) > 0)
-            {
-                this->getProtoFromSingleDeviceInterface<REMAINING_DEVICES...>(device, request);
-            }
-            else
-            {
-				throw std::logic_error("Could not serialize given device of type \"" + device.type() + "\"");
-            }
-        }
-
-        typename EngineClientInterface::devices_set_t getDeviceInterfacesFromProto(const EngineGrpc::GetDeviceReply & reply)
-        {
-            typename EngineClientInterface::devices_set_t interfaces;
-
-            for(int i = 0; i < reply.reply_size(); i++)
-            {
-				interfaces.insert(this->getSingleDeviceInterfaceFromProto<DEVICES...>(reply.reply(i)));
-            }
-
-            return interfaces;
-        }
-
-        template<class DEVICE, class ...REMAINING_DEVICES>
-        inline DeviceInterfaceConstSharedPtr getSingleDeviceInterfaceFromProto(const EngineGrpc::DeviceMessage &deviceData) const
-        {
-            if(DEVICE::TypeName.compare(deviceData.deviceid().devicetype()) == 0)
-            {
-                DeviceIdentifier devId(deviceData.deviceid().devicename(),
-				                       this->engineName(),
-                                       deviceData.deviceid().devicetype());
-
-                // Check whether the requested device has new data
-
-                if(deviceData.data_case() == EngineGrpc::DeviceMessage::DataCase::DATA_NOT_SET)
-                {
-                    // There's no meaningful data in the device, so create an empty device with device ID only
-
-                    return DeviceInterfaceSharedPtr(new DeviceInterface(std::move(devId)));
-                }
-
-				return DeviceInterfaceConstSharedPtr(new DEVICE(DeviceSerializerMethods<GRPCDevice>::template deserialize<DEVICE>(std::move(devId), &deviceData)));
-            }
-
-            // If device classess are left to check, go through them. If all device classes have been checked without proper result, throw an error
-            if constexpr (sizeof...(REMAINING_DEVICES) > 0)
-            {
-                return this->getSingleDeviceInterfaceFromProto<REMAINING_DEVICES...>(deviceData);
-            }
-            else
-            {
-				throw std::logic_error("Could not deserialize given device of type \"" + deviceData.deviceid().devicetype() + "\"");
-            }
-        }
-
-        virtual const std::vector<std::string> engineProcStartParams() const override
-        {
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
             std::vector<std::string> startParams = this->engineConfig().at("EngineProcStartParams");
 
             std::string name = this->engineConfig().at("EngineName");
@@ -369,7 +264,6 @@ class EngineGrpcClient
             return this->engineConfig().at("EngineEnvParams");
         }
 
-<<<<<<< HEAD
         template<class MSG_TYPE, class ...REMAINING_MSG_TYPES>
         DeviceInterfaceConstSharedPtr getDeviceInterfaceFromProto(EngineGrpc::DeviceMessage &deviceData) const
         {
@@ -428,11 +322,6 @@ class EngineGrpcClient
 		{
 		    NRP_LOGGER_TRACE("{} called", __FUNCTION__);
             
-=======
-	protected:
-		virtual typename EngineClientInterface::devices_set_t getDevicesFromEngine(const typename EngineClientInterface::device_identifiers_set_t &deviceIdentifiers) override
-		{
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 			EngineGrpc::GetDeviceRequest request;
 			EngineGrpc::GetDeviceReply   reply;
 			grpc::ClientContext          context;
@@ -457,15 +346,11 @@ class EngineGrpcClient
 				throw std::runtime_error(errMsg);
 			}
 
-<<<<<<< HEAD
             typename EngineClientInterface::devices_set_t interfaces;
             for(int i = 0; i < reply.reply_size(); i++)
                 interfaces.insert(this->getDeviceInterfaceFromProto<MSG_TYPES...>(*reply.mutable_reply(i)));
 
             return interfaces;
-=======
-			return this->getDeviceInterfacesFromProto(reply);
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 		}
 
     private:

@@ -35,7 +35,6 @@ class TGymLib(object):
 	def getReward(self):
 		return self.reward
 	def getObservation(self):
-<<<<<<< HEAD
 		return self.observation
 	def getDone(self):
 		return self.doneFlag
@@ -54,25 +53,13 @@ class TGymLib(object):
 			self.observation = self.env.reset()
 		return self.doneFlag
 
-=======
-		return observation
-	def getDone(self):
-		return doneFlag
-	def getTrainInfo(self):
-		return self.info
-
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 	def run_step(self):
 		if self.isVisualizer:
 			self.env.render()
 		self.action = self.env.action_space.sample()
 		tObservation, tReward, tDoneFlag, tInfo = self.env.step(self.action)
-<<<<<<< HEAD
 
 		self.observation = tObservation
-=======
-		self.tObservation = tObservation
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 		self.reward = tReward
 		self.doneFlag = tDoneFlag
 		self.info = tInfo

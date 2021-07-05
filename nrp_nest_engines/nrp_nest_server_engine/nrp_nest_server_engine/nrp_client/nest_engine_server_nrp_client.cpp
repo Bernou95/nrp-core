@@ -49,11 +49,8 @@ namespace
 	 */
 	std::string readBrainFile(const std::string & brainFileName)
 	{
-<<<<<<< HEAD
 		NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
-=======
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 		std::string initCode;
 		{
 			std::ifstream initFile(brainFileName);
@@ -183,41 +180,6 @@ namespace
 	}
 
     /*!
-<<<<<<< HEAD
-=======
-     * \brief Sends Prepare request to NEST server
-     *
-     * \param serverAddress Address of the NEST server
-     */
-    void nestPrepare(const std::string & serverAddress)
-    {
-        nestGenericCall(serverAddress + "/api/Prepare", "text/plain", "");
-    }
-
-	/*!
-	 * \brief Sends Run request to NEST server
-	 *
-	 * \param serverAddress Address of the NEST server
-	 * \param timeStep Step of the simulation in milliseconds
-	 */
-	void nestRun(const std::string & serverAddress, const float timeStep)
-	{
-		nestGenericCall(serverAddress + "/api/Run", "application/json", "[" + std::to_string(timeStep) + "]");
-	}
-
-	/*!
-	 * \brief Sends SetStatus request to NEST server
-	 *
-	 * \param serverAddress Address of the NEST server
-	 * \param data Arguments to SetStatus
-	 */
-	void nestCleanup(const std::string & serverAddress)
-	{
-		nestGenericCall(serverAddress + "/api/Cleanup", "text/plain", "");
-	}
-
-    /*!
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
      * \brief Sends Run request to NEST server
      *
      * \param serverAddress Address of the NEST server
@@ -270,11 +232,8 @@ NestEngineServerNRPClient::~NestEngineServerNRPClient()
 
 void NestEngineServerNRPClient::initialize()
 {
-<<<<<<< HEAD
 	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
-=======
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 	const auto initCode    = readBrainFile(this->engineConfig().at("NestInitFileName"));
 	const auto timeout     = processCommandTimeout(this->engineConfig().at("EngineCommandTimeout"));
 	const auto startTime   = std::chrono::system_clock::now();
@@ -324,37 +283,22 @@ void NestEngineServerNRPClient::initialize()
 	{
 		throw NRPException::logCreate("Failed to initialize Nest server. Received no response before timeout reached");
 	}
-<<<<<<< HEAD
 	else
 	{
 		NRPLogger::info("Nest server is initialized.");
 	}
-=======
-
-    // Commented out in the context of https://hbpneurorobotics.atlassian.net/browse/NRRPLT-8209
-	// Run Prepare(). runLoopStep() can now use Run() for stepping
-	// nestPrepare(this->serverAddress());
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 
 	// Get simulation resolution and cache it
 
 	this->_simulationResolution = std::stof(nestGetKernelStatus(this->serverAddress(), "[\"resolution\"]"));
-<<<<<<< HEAD
 
 	NRPLogger::debug("NestEngineServerNRPClient::initialize(...) completed with no errors.");
-=======
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 }
 
 void NestEngineServerNRPClient::shutdown()
 {
-<<<<<<< HEAD
 	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 	// Empty
-=======
-    // Commented out in the context of https://hbpneurorobotics.atlassian.net/browse/NRRPLT-8209
-	// nestCleanup(this->serverAddress());
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 }
 
 SimulationTime NestEngineServerNRPClient::getEngineTime() const
@@ -364,21 +308,15 @@ SimulationTime NestEngineServerNRPClient::getEngineTime() const
 
 void NestEngineServerNRPClient::runLoopStep(SimulationTime timeStep)
 {
-<<<<<<< HEAD
 	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
-=======
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 	this->_runStepThread = std::async(std::launch::async, &NestEngineServerNRPClient::runStepFcn, this, timeStep);
 }
 
 void NestEngineServerNRPClient::waitForStepCompletion(float timeOut)
 {
-<<<<<<< HEAD
 	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
-=======
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 	// If thread state is invalid, loop thread has completed and waitForStepCompletion was called once before
 	if(!this->_runStepThread.valid())
 		return;
@@ -403,11 +341,8 @@ void NestEngineServerNRPClient::waitForStepCompletion(float timeOut)
 
 const std::string & NestEngineServerNRPClient::getDeviceIdList(const std::string & deviceName) const
 {
-<<<<<<< HEAD
 	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
-=======
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 	// Check if the device is in the populations map
 
 	if(this->_populations.count(deviceName) == 0)
@@ -422,11 +357,8 @@ const std::string & NestEngineServerNRPClient::getDeviceIdList(const std::string
 
 EngineClientInterface::devices_set_t NestEngineServerNRPClient::getDevicesFromEngine(const device_identifiers_set_t &deviceIdentifiers)
 {
-<<<<<<< HEAD
 	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
-=======
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 	EngineClientInterface::devices_set_t retVals;
 
 	for(const auto &devID : deviceIdentifiers)
@@ -460,11 +392,8 @@ EngineClientInterface::devices_set_t NestEngineServerNRPClient::getDevicesFromEn
 
 void NestEngineServerNRPClient::sendDevicesToEngine(const devices_ptr_t &devicesArray)
 {
-<<<<<<< HEAD
 	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
-=======
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 	for(DeviceInterface * const device : devicesArray)
 	{
 		if(isDeviceTypeValid(device->id(), this->engineName()))
@@ -496,11 +425,6 @@ bool NestEngineServerNRPClient::runStepFcn(SimulationTime timeStep)
 
 	try
 	{
-<<<<<<< HEAD
-=======
-        // Commented out in the context of https://hbpneurorobotics.atlassian.net/browse/NRRPLT-8209
-		// nestRun(this->serverAddress(), runTimeMsRounded);
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 		nestSimulate(this->serverAddress(), runTimeMsRounded);
 	}
 	catch(const std::exception& e)
@@ -518,11 +442,8 @@ std::string NestEngineServerNRPClient::serverAddress() const
 
 const std::vector<std::string> NestEngineServerNRPClient::engineProcEnvParams() const
 {
-<<<<<<< HEAD
 	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
-=======
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
     std::vector<std::string> envVars = this->engineConfig().at("EngineEnvParams");
 
     // Add NRP library path
@@ -536,11 +457,8 @@ const std::vector<std::string> NestEngineServerNRPClient::engineProcEnvParams() 
 
 const std::vector<std::string> NestEngineServerNRPClient::engineProcStartParams() const
 {
-<<<<<<< HEAD
 	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 	
-=======
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
     std::vector<std::string> startParams;
 
     // Add Server address

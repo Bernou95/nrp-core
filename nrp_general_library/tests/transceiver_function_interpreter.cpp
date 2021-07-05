@@ -356,11 +356,7 @@ TEST_F(InterpreterTest, TestFunctionChain)
 	// Test the results
 
 	ASSERT_EQ(boost::python::len(resPf), 1);
-<<<<<<< HEAD
 	PyObjectDevice retDevice = boost::python::extract<PyObjectDevice>(resPf[0]);
-=======
-	const PyObjectDevice &retDevice = boost::python::extract<PyObjectDevice>(resPf[0]);
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 	ASSERT_EQ(retDevice.data().serialize(), "{\"test_value\": \"5\"}");
 
 	// Inject the returned device to the pool of devices, so that it's accesible by the transceiver function

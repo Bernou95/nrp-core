@@ -24,7 +24,6 @@
 
 #include <string>
 #include <map>
-<<<<<<< HEAD
 #include <type_traits>
 
 #include <grpcpp/grpcpp.h>
@@ -38,15 +37,6 @@
 
 
 using ProtoDeviceController = DataDeviceController<google::protobuf::Message>;
-=======
-
-#include <grpcpp/grpcpp.h>
-#include <nlohmann/json.hpp>
-
-#include "nrp_grpc_engine_protocol/grpc_server/engine_grpc.grpc.pb.h"
-#include "nrp_grpc_engine_protocol/engine_server/engine_grpc_device_controller.h"
-#include "nrp_general_library/utils/time_utils.h"
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 
 using EngineGrpc::EngineGrpcService;
 
@@ -57,10 +47,7 @@ using EngineGrpc::EngineGrpcService;
  * as middleware. All RPC services are implemented. Derived classes are responsible
  * for implementing simulation initialization, shutdown and run step methods.
  */
-<<<<<<< HEAD
 template<PROTO_MSG_C ...MSG_TYPES>
-=======
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 class EngineGrpcServer : public EngineGrpcService::Service
 {
     public:
@@ -68,7 +55,6 @@ class EngineGrpcServer : public EngineGrpcService::Service
         using mutex_t = std::timed_mutex;
         using lock_t  = std::unique_lock<EngineGrpcServer::mutex_t>;
 
-<<<<<<< HEAD
         EngineGrpcServer(const std::string address)
         {
             this->_serverAddress   = address;
@@ -76,9 +62,6 @@ class EngineGrpcServer : public EngineGrpcService::Service
 
             grpc::EnableDefaultHealthCheckService(true);
         }
-=======
-        EngineGrpcServer(const std::string address);
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 
         /*!
          * \brief Constructor
@@ -88,32 +71,23 @@ class EngineGrpcServer : public EngineGrpcService::Service
          * \param[in] registrationAddress Should be removed
          */
         // TODO registrationAddress isn't needed
-<<<<<<< HEAD
         EngineGrpcServer(const std::string &serverAddress, const std::string &engineName, const std::string &/*registrationAddress*/)
                 : EngineGrpcServer(serverAddress)
         {
             this->_engineName = engineName;
         }
-=======
-        EngineGrpcServer(const std::string &serverAddress, const std::string &engineName, const std::string &registrationAddress);
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 
         /*!
          * \brief Destructor
          */
-<<<<<<< HEAD
         virtual ~EngineGrpcServer()
         {
             this->shutdownServer();
         }
-=======
-        virtual ~EngineGrpcServer();
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 
         /*!
          * \brief Starts the gRPC server in synchronous mode
          */
-<<<<<<< HEAD
         void startServer()
         {
             if(!this->_isServerRunning)
@@ -127,26 +101,18 @@ class EngineGrpcServer : public EngineGrpcService::Service
                 this->_isServerRunning = true;
             }
         }
-=======
-        void startServer();
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 
         /*!
          * \brief Starts the gRPC server in asynchronous mode
          */
-<<<<<<< HEAD
         void startServerAsync()
         {
             this->startServer();
         }
-=======
-        void startServerAsync();
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 
         /*!
          * \brief Shutdowns the gRPC server
          */
-<<<<<<< HEAD
         void shutdownServer()
         {
             if(this->_isServerRunning)
@@ -156,33 +122,22 @@ class EngineGrpcServer : public EngineGrpcService::Service
                 this->_isServerRunning = false;
             }
         }
-=======
-        void shutdownServer();
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 
         /*!
          * \brief Indicates whether the gRPC server is currently running
          */
-<<<<<<< HEAD
         bool isServerRunning() const
         {
             return this->_isServerRunning;
         }
-=======
-        bool isServerRunning() const;
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 
         /*!
          * \brief Returns address of the gRPC server
          */
-<<<<<<< HEAD
         const std::string serverAddress() const
         {
             return this->_serverAddress;
         }
-=======
-        const std::string serverAddress() const;
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 
         /*!
          * \brief Registers a device controller with the given name in the engine
@@ -191,7 +146,6 @@ class EngineGrpcServer : public EngineGrpcService::Service
          * \param[in] deviceController Pointer to the device controller object that's supposed to be
          *                             registered in the engine
          */
-<<<<<<< HEAD
         void registerDevice(const std::string & deviceName, ProtoDeviceController *interface)
         {
             EngineGrpcServer::lock_t lock(this->_deviceLock);
@@ -214,16 +168,6 @@ class EngineGrpcServer : public EngineGrpcService::Service
 
             this->_devicesControllers.clear();
         }
-=======
-        void registerDevice(const std::string & deviceName, EngineGrpcDeviceControllerInterface *interface);
-
-        // TODO used only in tests, try to remove it?
-        unsigned getNumRegisteredDevices();
-
-    protected:
-        mutex_t                       _deviceLock;
-        void clearRegisteredDevices();
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 
     private:
 
@@ -233,7 +177,6 @@ class EngineGrpcServer : public EngineGrpcService::Service
         std::string _serverAddress;
 
         /*!
-<<<<<<< HEAD
          * \brief Indicates whether the gRPC server is currently running
          */
         bool _isServerRunning;
@@ -244,8 +187,6 @@ class EngineGrpcServer : public EngineGrpcService::Service
 		NRPLogger _loggerCfg;
 
         /*!
-=======
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
          * \brief Name of the simulation engine
          *
          * Must be the same on the server and the client side. It should be imprinted
@@ -259,20 +200,9 @@ class EngineGrpcServer : public EngineGrpcService::Service
         std::unique_ptr<grpc::Server> _server;
 
         /*!
-<<<<<<< HEAD
          * \brief Map of device names and device controllers used by the engine
          */
          std::map<std::string, ProtoDeviceController*> _devicesControllers;
-=======
-         * \brief Indicates whether the gRPC server is currently running
-         */
-        bool _isServerRunning;
-
-        /*!
-         * \brief Map of device names and device controllers used by the engine
-         */
-         std::map<std::string, EngineGrpcDeviceControllerInterface*> _devicesControllers;
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 
         /*!
          * \brief Initializes the simulation
@@ -311,7 +241,6 @@ class EngineGrpcServer : public EngineGrpcService::Service
          *
          * \return gRPC request status
          */
-<<<<<<< HEAD
         grpc::Status init(grpc::ServerContext * /*context*/, const EngineGrpc::InitRequest * request, EngineGrpc::InitReply * /*reply*/) override
         {
             try
@@ -331,9 +260,6 @@ class EngineGrpcServer : public EngineGrpcService::Service
 
             return grpc::Status::OK;
         }
-=======
-        grpc::Status init(grpc::ServerContext * context, const EngineGrpc::InitRequest * request, EngineGrpc::InitReply * reply) override;
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 
         /*!
          * \brief Shutdowns the simulation
@@ -348,7 +274,6 @@ class EngineGrpcServer : public EngineGrpcService::Service
          *
          * \return gRPC request status
          */
-<<<<<<< HEAD
         grpc::Status shutdown(grpc::ServerContext * /*context*/, const EngineGrpc::ShutdownRequest * request, EngineGrpc::ShutdownReply * /*reply*/) override
         {
             try
@@ -368,9 +293,6 @@ class EngineGrpcServer : public EngineGrpcService::Service
 
             return grpc::Status::OK;
         }
-=======
-        grpc::Status shutdown(grpc::ServerContext * context, const EngineGrpc::ShutdownRequest * request, EngineGrpc::ShutdownReply * reply) override;
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 
         /*!
          * \brief Runs a single loop step of the simulation
@@ -385,7 +307,6 @@ class EngineGrpcServer : public EngineGrpcService::Service
          *
          * \return gRPC request status
          */
-<<<<<<< HEAD
         grpc::Status runLoopStep(grpc::ServerContext * /*context*/, const EngineGrpc::RunLoopStepRequest * request, EngineGrpc::RunLoopStepReply * reply) override
         {
             try
@@ -403,9 +324,6 @@ class EngineGrpcServer : public EngineGrpcService::Service
 
             return grpc::Status::OK;
         }
-=======
-        grpc::Status runLoopStep(grpc::ServerContext * context, const EngineGrpc::RunLoopStepRequest * request, EngineGrpc::RunLoopStepReply * reply) override;
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 
         /*!
          * \brief Sets received data into proper devices
@@ -420,7 +338,6 @@ class EngineGrpcServer : public EngineGrpcService::Service
          *
          * \return gRPC request status
          */
-<<<<<<< HEAD
         grpc::Status setDevice(grpc::ServerContext * /*context*/, const EngineGrpc::SetDeviceRequest * request, EngineGrpc::SetDeviceReply * /*reply*/) override
         {
             try
@@ -434,9 +351,6 @@ class EngineGrpcServer : public EngineGrpcService::Service
 
             return grpc::Status::OK;
         }
-=======
-        grpc::Status setDevice(grpc::ServerContext * context, const EngineGrpc::SetDeviceRequest * request, EngineGrpc::SetDeviceReply * reply) override;
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 
         /*!
          * \brief Gets data from requested devices
@@ -451,7 +365,6 @@ class EngineGrpcServer : public EngineGrpcService::Service
          *
          * \return gRPC request status
          */
-<<<<<<< HEAD
         grpc::Status getDevice(grpc::ServerContext * /*context*/, const EngineGrpc::GetDeviceRequest * request, EngineGrpc::GetDeviceReply * reply) override
         {
             try
@@ -545,12 +458,6 @@ class EngineGrpcServer : public EngineGrpcService::Service
             }
 
         }
-=======
-        grpc::Status getDevice(grpc::ServerContext * context, const EngineGrpc::GetDeviceRequest * request, EngineGrpc::GetDeviceReply * reply) override;
-
-        virtual void setDeviceData(const EngineGrpc::SetDeviceRequest & data);
-        virtual void getDeviceData(const EngineGrpc::GetDeviceRequest & request, EngineGrpc::GetDeviceReply * reply);
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 
         /*!
          * \brief Helper function for handling errors inside Remote Procedure Calls (RPCs)
@@ -560,7 +467,6 @@ class EngineGrpcServer : public EngineGrpcService::Service
          *
          * \return gRPC request status, containing the error message and grpc::StatusCode::CANCELLED error code
          */
-<<<<<<< HEAD
         grpc::Status handleGrpcError(const std::string & contextMessage, const std::string & errorMessage)
         {
             std::cerr << contextMessage << std::endl;
@@ -572,9 +478,6 @@ class EngineGrpcServer : public EngineGrpcService::Service
 
             return status;
         }
-=======
-        grpc::Status handleGrpcError(const std::string & contextMessage, const std::string & errorMessage);
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 };
 
 #endif // ENGINE_GRPC_SERVER_H

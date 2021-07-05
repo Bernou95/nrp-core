@@ -19,11 +19,7 @@ endif()
 ## Gazebo Communication Plugin
 add_library(${NRP_GAZEBO_COMMUNICATION_PLUGIN} SHARED "nrp_communication_controller/nrp_communication_controller.cpp" "nrp_communication_controller/nrp_communication_plugin.cpp")
 add_library("NRPGazeboJSONPlugins::${NRP_GAZEBO_COMMUNICATION_PLUGIN}" ALIAS ${NRP_GAZEBO_COMMUNICATION_PLUGIN})
-<<<<<<< HEAD
 target_compile_options(${NRP_GAZEBO_COMMUNICATION_PLUGIN} PRIVATE $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:GNU>>:${NRP_COMMON_COMPILATION_FLAGS}>)
-=======
-target_compile_options(${NRP_GAZEBO_COMMUNICATION_PLUGIN} PRIVATE $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:GNU>>:-Wall -Wextra>)
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 
 target_link_directories(${NRP_GAZEBO_COMMUNICATION_PLUGIN} PUBLIC ${GAZEBO_LIBRARY_DIRS})
 
@@ -50,11 +46,7 @@ target_link_libraries(${NRP_GAZEBO_COMMUNICATION_PLUGIN}
 ## Gazebo World Plugin
 add_library(NRPGazeboJSONWorldPlugin SHARED "nrp_world_plugin/nrp_world_plugin.cpp")
 add_library(NRPGazeboJSONPlugins::NRPGazeboJSONWorldPlugin ALIAS NRPGazeboJSONWorldPlugin)
-<<<<<<< HEAD
 target_compile_options(NRPGazeboJSONWorldPlugin PRIVATE $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:GNU>>:${NRP_COMMON_COMPILATION_FLAGS}>)
-=======
-target_compile_options(NRPGazeboJSONWorldPlugin PRIVATE $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:GNU>>:-Wall -Wextra>)
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 target_include_directories(NRPGazeboJSONWorldPlugin
 	PUBLIC
 	    $<INSTALL_INTERFACE:include>
@@ -76,11 +68,7 @@ target_link_libraries(NRPGazeboJSONWorldPlugin
 ## Gazebo Joint Controller Plugin
 add_library(NRPGazeboJSONJointControllerPlugin SHARED "nrp_joint_controller/nrp_joint_controller.cpp")
 add_library(NRPGazeboJSONPlugins::NRPGazeboJSONJointControllerPlugin ALIAS NRPGazeboJSONJointControllerPlugin)
-<<<<<<< HEAD
 target_compile_options(NRPGazeboJSONJointControllerPlugin PRIVATE $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:GNU>>:${NRP_COMMON_COMPILATION_FLAGS}>)
-=======
-target_compile_options(NRPGazeboJSONJointControllerPlugin PRIVATE $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:GNU>>:-Wall -Wextra>)
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 
 target_include_directories(NRPGazeboJSONJointControllerPlugin
 	PUBLIC
@@ -103,11 +91,7 @@ target_link_libraries(NRPGazeboJSONJointControllerPlugin
 ## Gazebo Link Controller Plugin
 add_library(NRPGazeboJSONLinkControllerPlugin SHARED "nrp_link_controller_plugin/nrp_link_controller_plugin.cpp")
 add_library(NRPGazeboJSONPlugins::NRPGazeboJSONLinkControllerPlugin ALIAS NRPGazeboJSONLinkControllerPlugin)
-<<<<<<< HEAD
 target_compile_options(NRPGazeboJSONLinkControllerPlugin PRIVATE $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:GNU>>:${NRP_COMMON_COMPILATION_FLAGS}>)
-=======
-target_compile_options(NRPGazeboJSONLinkControllerPlugin PRIVATE $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:GNU>>:-Wall -Wextra>)
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 add_library(NRPGazeboJSONPlugins::NRPGazeboJSONLinkControllerPlugin ALIAS NRPGazeboJSONLinkControllerPlugin)
 
 target_include_directories(NRPGazeboJSONLinkControllerPlugin
@@ -131,11 +115,7 @@ target_link_libraries(NRPGazeboJSONLinkControllerPlugin
 ## Gazebo Camera Controller Plugin
 add_library(NRPGazeboJSONCameraControllerPlugin SHARED "nrp_camera_controller_plugin/nrp_camera_controller_plugin.cpp")
 add_library(NRPGazeboJSONPlugins::NRPGazeboJSONCameraControllerPlugin ALIAS NRPGazeboJSONCameraControllerPlugin)
-<<<<<<< HEAD
 target_compile_options(NRPGazeboJSONCameraControllerPlugin PRIVATE $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:GNU>>:${NRP_COMMON_COMPILATION_FLAGS}>)
-=======
-target_compile_options(NRPGazeboJSONCameraControllerPlugin PRIVATE $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:GNU>>:-Wall -Wextra>)
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 
 target_include_directories(NRPGazeboJSONCameraControllerPlugin
 	PUBLIC

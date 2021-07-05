@@ -40,19 +40,14 @@ NestJSONServer::NestJSONServer(const std::string &serverAddress, python::dict gl
     : EngineJSONServer(serverAddress),
       _pyGlobals(globals),
       _pyLocals(locals)
-<<<<<<< HEAD
 {
 	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 }
-=======
-{}
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 
 NestJSONServer::NestJSONServer(const std::string &serverAddress, const std::string &engineName, const std::string &registrationAddress, python::dict globals, boost::python::object locals)
     : EngineJSONServer(serverAddress, engineName, registrationAddress),
       _pyGlobals(globals),
       _pyLocals(locals)
-<<<<<<< HEAD
 {
 	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 }
@@ -61,12 +56,6 @@ NestJSONServer::~NestJSONServer()
 {
 	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 	
-=======
-{}
-
-NestJSONServer::~NestJSONServer()
-{
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 	try
 	{
 		// If Nest has been initialized, run cleanup
@@ -103,11 +92,8 @@ bool NestJSONServer::shutdownFlag() const
 
 SimulationTime NestJSONServer::runLoopStep(SimulationTime timeStep)
 {
-<<<<<<< HEAD
 	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
-=======
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 	PythonGILLock lock(this->_pyGILState, true);
 
 	try
@@ -129,19 +115,13 @@ SimulationTime NestJSONServer::runLoopStep(SimulationTime timeStep)
 
 nlohmann::json NestJSONServer::initialize(const nlohmann::json &data, EngineJSONServer::lock_t&)
 {
-<<<<<<< HEAD
 	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
-=======
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 	PythonGILLock lock(this->_pyGILState, true);
 	try
 	{
 		// Import modules
-<<<<<<< HEAD
 		NRPLogger::debug("NestJSONServer: importing nest module...");
-=======
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 		python::object nestModule = python::import("nest");
 		this->_pyNest = python::dict(nestModule.attr("__dict__"));
 
@@ -150,20 +130,13 @@ nlohmann::json NestJSONServer::initialize(const nlohmann::json &data, EngineJSON
 
 		this->_pyGlobals["nest"] = nestModule;
 		this->_pyGlobals[NRP_NEST_PYTHON_MODULE_STR] = nrpNestModule;
-<<<<<<< HEAD
 		NRPLogger::debug("NestJSONServer: importing nest module is finished");
-=======
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 	}
 	catch(python::error_already_set &)
 	{
 		// If an error occured, return the message to the NRP server without setting the initRunFlag
 		const auto msg = handle_pyerror();
-<<<<<<< HEAD
 		NRPLogger::error(msg);
-=======
-		NRPLogger::SPDErrLogDefault(msg);
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 		return this->formatInitErrorMessage(msg);
 	}
 
@@ -172,22 +145,15 @@ nlohmann::json NestJSONServer::initialize(const nlohmann::json &data, EngineJSON
 
 	// Read init file if present
 	const std::string &initFileName = data.at("NestInitFileName");
-<<<<<<< HEAD
 	NRPLogger::debug("NestJSONServer: reading init file: {}", initFileName);
-=======
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 	if(!initFileName.empty())
 	{
 		std::fstream initFile(initFileName, std::ios_base::in);
 		if(!initFile.good())
-<<<<<<< HEAD
 		{
 			NRPLogger::error("Could not find init file {}", initFileName);
 			return this->formatInitErrorMessage("Could not find init file " + initFileName);
 		}
-=======
-			return this->formatInitErrorMessage("Could not find init file " + initFileName);
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 
 		// Execute Init File
 		try
@@ -198,11 +164,7 @@ nlohmann::json NestJSONServer::initialize(const nlohmann::json &data, EngineJSON
 		{
 			// If an error occured, return the message to the NRP server without setting the initRunFlag
 			const auto msg = handle_pyerror();
-<<<<<<< HEAD
 			NRPLogger::error(msg);
-=======
-			NRPLogger::SPDErrLogDefault(msg);
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 			return this->formatInitErrorMessage(msg);
 		}
 
@@ -212,10 +174,7 @@ nlohmann::json NestJSONServer::initialize(const nlohmann::json &data, EngineJSON
 	nlohmann::json jsonDevMap;
 	try
 	{
-<<<<<<< HEAD
 		NRPLogger::debug("NestJSONServer: registering devices");
-=======
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 		// Read device map
 		python::dict jsonModule = static_cast<python::dict>(python::import("json").attr("__dict__"));
 		python::object jsonSerialize = jsonModule["dumps"];
@@ -233,10 +192,7 @@ nlohmann::json NestJSONServer::initialize(const nlohmann::json &data, EngineJSON
 			const python::object &devKey = devMapKeys[i];
 			const std::string devName = python::extract<std::string>(python::str(devKey));
 			python::object devNodes = this->_devMap[devKey];
-<<<<<<< HEAD
 			NRPLogger::debug("NestJSONServer: registering device {:d} {}", i, devName);
-=======
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 
 			auto devController = std::shared_ptr<NestEngineJSONDeviceController<NestDevice> >(new
 			            NestEngineJSONDeviceController<NestDevice>(DeviceIdentifier(devName, data.at("EngineName"), NestDevice::TypeName.data()),
@@ -244,10 +200,7 @@ nlohmann::json NestJSONServer::initialize(const nlohmann::json &data, EngineJSON
 
 			this->_deviceControllerPtrs.push_back(devController);
 			this->registerDeviceNoLock(devName, devController.get());
-<<<<<<< HEAD
 			NRPLogger::debug("NestJSONServer: device {:d} {} is registered", i, devName);
-=======
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 		}
 
 		// Prepare Nest for execution
@@ -259,33 +212,23 @@ nlohmann::json NestJSONServer::initialize(const nlohmann::json &data, EngineJSON
 	{
 		// If an error occured, print the error
 		const auto msg = handle_pyerror();
-<<<<<<< HEAD
 		NRPLogger::error(msg);
-=======
-		NRPLogger::SPDErrLogDefault(msg);
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 		return this->formatInitErrorMessage(msg);
 	}
 
 	// Init has run once
 	this->_initRunFlag = true;
 
-<<<<<<< HEAD
 	NRPLogger::debug("NestJSONServer::initialize(...) completed with no errors.");
 
-=======
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 	// Return success and parsed devmap
 	return nlohmann::json({{NestConfigConst::InitFileExecStatus, true}, {NestConfigConst::InitFileParseDevMap, jsonDevMap}});
 }
 
 nlohmann::json NestJSONServer::shutdown(const nlohmann::json &)
 {
-<<<<<<< HEAD
 	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 	
-=======
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 	PythonGILLock lock(this->_pyGILState, true);
 
 	this->_shutdownFlag = true;

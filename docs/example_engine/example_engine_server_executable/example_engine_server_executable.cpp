@@ -3,11 +3,7 @@
 #include "nrp_json_engine_protocol/engine_server/engine_json_opts_parser.h"
 #include "nrp_json_engine_protocol/config/engine_json_config.h"
 
-<<<<<<< HEAD
 #include "nrp_general_library/utils/nrp_logger.h"
-=======
-#include "nrp_general_library/utils/spdlog_setup.h"
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 
 #include <boost/python.hpp>
 #include <csignal>
@@ -90,10 +86,6 @@ void ExampleEngineServerExecutable::handleSIGTERM(int signal)
 			NRPException::logCreate(e, "NRP Nest Server shutdown failed after receiving SIGTERM signal");
 		}
 
-<<<<<<< HEAD
-=======
-		SPDLogSetup::shutdownDefault();
->>>>>>> 0c552da4cd6b3368efa7cf51b04f1c46ad2e2283
 		exit(signal);
 	}
 }
