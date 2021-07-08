@@ -34,22 +34,25 @@ pipeline {
                 sh 'bash .ci/20-build.sh'
             }
         }
-       
-        stage('Unit tests') {
-            steps {
-                bitbucketStatusNotify(buildState: 'INPROGRESS', buildName: 'Testing nrp-core')
+        
+        stage('Testing') {
+            parallel {                       
+                stage('Unit tests') {
+                    steps {
+                        bitbucketStatusNotify(buildState: 'INPROGRESS', buildName: 'Testing nrp-core')
 
-                // Determine explicitly the shell as bash (needed for proper user-scripts operation)
-                sh 'bash .ci/30-run-tests.sh'
-            }
-        }
-       
-        stage('Static tests') {
-            steps {
-                bitbucketStatusNotify(buildState: 'INPROGRESS', buildName: 'Testing nrp-core')
+                        // Determine explicitly the shell as bash (needed for proper user-scripts operation)
+                        sh 'bash .ci/30-run-tests.sh'
+                    }
+                }       
+                stage('Static tests') {
+                    steps {
+                        bitbucketStatusNotify(buildState: 'INPROGRESS', buildName: 'Testing nrp-core')
 
-                // Determine explicitly the shell as bash (needed for proper user-scripts operation)
-                sh 'bash .ci/40-run-cppcheck.sh'
+                        // Determine explicitly the shell as bash (needed for proper user-scripts operation)
+                        sh 'bash .ci/40-run-cppcheck.sh'
+                    }
+                }
             }
         }
        
