@@ -108,6 +108,12 @@ class DeviceInterface
 		}
 
 		/*!
+		 * \brief Virtual clone method to support polymorphic copy
+		 */
+        virtual DeviceInterface* clone()
+        { return new DeviceInterface(this->name(), this->engineName(), this->type()); }
+
+		/*!
 		 * \brief Indicates if the device contains any data aside from device ID
 		 *
 		 * The function will return true, if the device is of DeviceInterface type, which

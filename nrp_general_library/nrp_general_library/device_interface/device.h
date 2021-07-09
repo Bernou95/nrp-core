@@ -68,6 +68,12 @@ class Device
 			this->setIsEmpty(false);
 		};
 
+        DeviceInterface* clone() override
+        {
+            auto self = new DEVICE(static_cast<const DEVICE&>(*this));
+            return self;
+        }
+
 		template<class STRING1_T, class STRING2_T>
 		requires(std::constructible_from<std::string, STRING1_T> && std::constructible_from<std::string, STRING2_T>)
 		static DeviceIdentifier createID(STRING1_T &&name, STRING2_T &&engineName)

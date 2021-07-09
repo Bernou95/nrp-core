@@ -38,6 +38,9 @@ public:
     : DeviceInterface(createID(name, engineName)), data(new DATA_TYPE())
     { this->setIsEmpty(false); }
 
+    DeviceInterface* clone() override
+    { return new DataDevice<DATA_TYPE>(this->name(), this->engineName(), new DATA_TYPE(*data)); }
+
     DataDevice (const DataDevice&) = delete;
     DataDevice& operator= (const DataDevice&) = delete;
 
