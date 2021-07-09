@@ -114,6 +114,7 @@ endfunction(add_doxygen_source)
 ## General NRP library
 ## Includes components to create new devices and engines
 add_subdirectory(nrp_general_library)
+add_subdirectory(nrp_event_loop)
 
 
 ##########################################

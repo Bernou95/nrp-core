@@ -30,6 +30,8 @@
 #include "nrp_simulation/simulation/simulation_manager.h"
 #include "nrp_general_library/utils/nrp_logger.h"
 
+#include "nrp_event_loop/event_loop/event_loop.h"
+
 #include <stdlib.h>
 #include <string.h>
 
@@ -130,9 +132,39 @@ int main(int argc, char *argv[])
 	{
 		NRPLogger::info("Config file specified, launching...");
 
-		auto simLock = manager.acquireSimLock();
-		manager.initSimulationLoop(engines, processLaunchers, simLock);
+        auto simLock = manager.acquireSimLock();
+		auto simConfig = manager.simulationConfig(simLock);
 
+		auto eleConfigFileName = startParams[SimulationParams::ParamELECfgFile.data()].as<SimulationParams::ParamELECfgFileT>();
+		bool startELE = !eleConfigFileName.empty();
+
+        // Setup Python
+        PythonInterpreterState pythonInterp(argc, argv, startELE);
+
+        // Creates and start ELE
+        std::unique_ptr<EventLoop> e;
+        if(startELE) {
+            NRPLogger::debug("Starting simulation with Event Loop");
+
+            // Loads configuration
+            auto eleConfig = SimulationParams::parseJSONFile(eleConfigFileName);
+            json_utils::validate_json(eleConfig, "https://neurorobotics.net/event_loop.json#EventLoop");
+            json_utils::set_default<std::vector<std::string>>(eleConfig, "ComputationalGraph", std::vector<std::string>());
+
+            // Ensure SimulationLoop and EventLoop are using the same graph
+            simConfig->at("DeviceHandle") = "cg_slave";
+            simConfig->at("ComputationalGraph") = eleConfig.at("ComputationalGraph");
+
+            // Compute ELE frequency from config
+            float e_freq = eleConfig.contains("EventLoopFreq") ? eleConfig.at("EventLoopFreq").get<float>() : 1;
+            int e_tstep = e_freq != 0 ? 1000 * (1 / e_freq) : 0;
+
+            // Starts event loop
+            e.reset(new EventLoop(eleConfig, std::chrono::milliseconds(e_tstep), false));
+            e->runLoopAsync();
+        }
+
+		manager.initSimulationLoop(engines, processLaunchers, simLock);
 		manager.runSimulationUntilTimeout(simLock);
 	}
 

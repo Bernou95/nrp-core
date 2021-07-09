@@ -50,7 +50,9 @@ cxxopts::Options SimulationParams::createStartParamParser()
 	        (SimulationParams::ParamFileLogLevelLong.data(), SimulationParams::ParamFileLogLevelDesc.data(),
 	         cxxopts::value<SimulationParams::ParamFileLogLevelT>()->default_value("off"))
 	        (SimulationParams::ParamLogDirLong.data(), SimulationParams::ParamLogDirDesc.data(),
-	         cxxopts::value<SimulationParams::ParamLogDirT>()->default_value("logs"));
+	         cxxopts::value<SimulationParams::ParamLogDirT>()->default_value("logs"))
+            (SimulationParams::ParamELECfgFileLong.data(), SimulationParams::ParamELECfgFileDesc.data(),
+             cxxopts::value<SimulationParams::ParamELECfgFileT>()->default_value(""));
 
 	return opts;
 }
@@ -191,6 +193,7 @@ SimulationManager SimulationManager::createFromConfig(jsonSharedPtr &config)
 	// Set default values
 
 	json_utils::set_default<std::vector<std::string>>(*config, "TransceiverFunctionConfigs", std::vector<std::string>());
+    json_utils::set_default<std::vector<std::string>>(*config, "ComputationalGraph", std::vector<std::string>());
     json_utils::set_default<std::vector<std::string>>(*config, "PreprocessingFunctionConfigs", std::vector<std::string>());
 
 	return SimulationManager(config);

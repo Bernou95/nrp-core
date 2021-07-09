@@ -27,13 +27,28 @@
 #include "nrp_general_library/utils/time_utils.h"
 
 #include "nrp_simulation/device_handle/tf_manager_handle.h"
+#include "nrp_simulation/device_handle/computational_graph_handle.h"
 
 #include <iostream>
+
+// Helper function which reads simulation config and returns the correct DeviceHandle
+static DeviceHandle* makeHandleFromConfig(jsonSharedPtr config)
+{
+    std::string dev_p = config->at("DeviceHandle").get<std::string>();
+    if(dev_p == "tf")
+        return new TFManagerHandle();
+    else if(dev_p == "cg")
+        return new ComputationalGraphHandle();
+    else if(dev_p == "cg_slave")
+        return new ComputationalGraphHandle(true);
+    else
+        throw NRPException::logCreate("Unsupported DeviceHandle: " + dev_p);
+}
 
 SimulationLoop::SimulationLoop(jsonSharedPtr config, DeviceHandle::engine_interfaces_t engines)
     : _config(config),
       _engines(engines),
-      _devHandler(new TFManagerHandle())
+      _devHandler(makeHandleFromConfig(config))
 {
 	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 }

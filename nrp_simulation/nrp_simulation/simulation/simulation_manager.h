@@ -74,6 +74,11 @@ struct SimulationParams
 	static constexpr std::string_view ParamLogDirDesc = "Directory for the file logs";
 	using ParamLogDirT = std::string;
 
+    static constexpr std::string_view ParamELECfgFile = "e";
+    static constexpr std::string_view ParamELECfgFileLong = "e,eventloop";
+    static constexpr std::string_view ParamELECfgFileDesc = "Event Loop config file";
+    using ParamELECfgFileT = std::string;
+
 	/*!
 	 * \brief Create a parser for start parameters
 	 * \return Returns parser
