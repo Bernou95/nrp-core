@@ -1,0 +1,8 @@
+prefix=/home/bernardo/catkin_ws/devel
+
+Name: boost_python_catkin_example
+Description: Description of boost_python_catkin_example
+Version: 1.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 
