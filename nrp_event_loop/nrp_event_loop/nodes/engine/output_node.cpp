@@ -19,4 +19,4 @@
  * Agreement No. 945539 (Human Brain Project SGA3).
  */
 
-#include "nrp_event_loop/python/output_dummy.h"
+#include "nrp_event_loop/nodes/engine/output_node.h"

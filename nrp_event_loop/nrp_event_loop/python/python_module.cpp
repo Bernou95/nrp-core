@@ -1,8 +1,10 @@
 #include <boost/python.hpp>
 
 #include "nrp_event_loop/python/functional_node.h"
-#include "nrp_event_loop/python/input_dummy.h"
-#include "nrp_event_loop/python/output_dummy.h"
+#include "nrp_event_loop/nodes/dummy/input_dummy.h"
+#include "nrp_event_loop/nodes/dummy/output_dummy.h"
+#include "nrp_event_loop/nodes/engine/input_node.h"
+#include "nrp_event_loop/nodes/engine/output_node.h"
 
 namespace bpy = boost::python;
 
@@ -22,4 +24,11 @@ BOOST_PYTHON_MODULE(NRPEventLoopEngine)
             .def("__call__", &OutputDummyEdge::pySetup);
 
     bpy::register_ptr_to_python<std::shared_ptr<PythonFunctionalNode> >();
+    
+    
+    bpy::class_< InputEngineEdge >("FromEngine", bpy::init<const std::string &, const std::string &>((bpy::arg("keyword"), bpy::arg("address")) ))
+            .def("__call__", &InputEngineEdge::pySetup);
+
+    bpy::class_< OutputEngineEdge >("ToEngine", bpy::init<const std::string &, const std::string &>( (bpy::arg("keyword"), bpy::arg("address")) ))
+            .def("__call__", &OutputEngineEdge::pySetup);
 }

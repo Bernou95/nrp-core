@@ -23,15 +23,7 @@ set(LIB_SRC_FILES
 	nrp_simulation/simulation/simulation_manager.cpp
 		nrp_simulation/device_handle/device_handle.cpp
 		nrp_simulation/device_handle/tf_manager_handle.cpp
-
-		nrp_simulation/engine_node/input_node.cpp
-		nrp_simulation/engine_node/output_node.cpp
 		nrp_simulation/device_handle/computational_graph_handle.cpp
-)
-
-# List of python module build files
-set(PYTHON_MODULE_SRC_FILES
-		nrp_simulation/python/python_module.cpp
 )
 
 # List executable build files
@@ -61,10 +53,6 @@ list(JOIN NRP_SIMULATION_DEFAULT_ENGINE_LAUNCHERS "\", \"" NRP_SIMULATION_DEFAUL
 
 # General Header defines
 configure_file("nrp_simulation/config/cmake_conf.h.in" "${CMAKE_CURRENT_BINARY_DIR}/include/${HEADER_DIRECTORY}/config/cmake_conf.h" @ONLY)
-
-# Python Module defines
-configure_file("nrp_simulation/python/__init__.py.in" "${CMAKE_CURRENT_BINARY_DIR}/src/__init__.py" @ONLY)
-
 
 ##########################################
 # NRPSimulation

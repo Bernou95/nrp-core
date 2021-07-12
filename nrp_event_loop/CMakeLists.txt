@@ -39,8 +39,12 @@ set(LIB_SRC_FILES
 		nrp_event_loop/python/functional_node.cpp
 		nrp_event_loop/python/input_edge.cpp
 		nrp_event_loop/python/output_edge.cpp
-		nrp_event_loop/python/input_dummy.cpp
-		nrp_event_loop/python/output_dummy.cpp
+
+		nrp_event_loop/nodes/dummy/input_dummy.cpp
+		nrp_event_loop/nodes/dummy/output_dummy.cpp
+
+		nrp_event_loop/nodes/engine/input_node.cpp
+		nrp_event_loop/nodes/engine/output_node.cpp
 
 		nrp_event_loop/utils/graph_utils.cpp
 )

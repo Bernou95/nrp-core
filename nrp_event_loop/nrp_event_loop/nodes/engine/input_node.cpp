@@ -19,4 +19,4 @@
  * Agreement No. 945539 (Human Brain Project SGA3).
  */
 
-#include "nrp_simulation/engine_node/input_node.h"
+#include "nrp_event_loop/nodes/engine/input_node.h"

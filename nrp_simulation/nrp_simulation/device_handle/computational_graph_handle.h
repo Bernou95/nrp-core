@@ -23,8 +23,8 @@
 #define COMPUTATION_GRAPH_HANDLE_H
 
 #include "nrp_event_loop/computational_graph/computational_graph_manager.h"
-#include "nrp_simulation/engine_node/input_node.h"
-#include "nrp_simulation/engine_node/output_node.h"
+#include "nrp_event_loop/nodes/engine/input_node.h"
+#include "nrp_event_loop/nodes/engine/output_node.h"
 
 #include "nrp_simulation/device_handle/device_handle.h"
 
