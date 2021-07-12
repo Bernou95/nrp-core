@@ -42,9 +42,11 @@ set(LIB_SRC_FILES
 
 		nrp_event_loop/nodes/dummy/input_dummy.cpp
 		nrp_event_loop/nodes/dummy/output_dummy.cpp
-
 		nrp_event_loop/nodes/engine/input_node.cpp
 		nrp_event_loop/nodes/engine/output_node.cpp
+		nrp_event_loop/nodes/ros/input_node.cpp
+		nrp_event_loop/nodes/ros/output_node.cpp
+
 
 		nrp_event_loop/utils/graph_utils.cpp
 )
@@ -68,6 +70,9 @@ set(TEST_SRC_FILES
 ##########################################
 ## Dependencies
 
+find_package(roscpp REQUIRED)
+find_package(std_msgs REQUIRED)
+
 ##########################################
 ## Header configuration
 
@@ -89,6 +94,9 @@ target_link_libraries(${LIBRARY_NAME}
 	PUBLIC
 		${NRP_GEN_LIB_TARGET}
 
+		${roscpp_LIBRARIES}
+		${std_msgs_LIBRARIES}
+
 	PRIVATE
 )
 
@@ -97,6 +105,9 @@ target_include_directories(${LIBRARY_NAME} BEFORE
 	    "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
 		"$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>"
 		"$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>"
+
+		${roscpp_INCLUDE_DIRS}
+		${std_msgs_INCLUDE_DIRS}
 
 	PRIVATE
 )
