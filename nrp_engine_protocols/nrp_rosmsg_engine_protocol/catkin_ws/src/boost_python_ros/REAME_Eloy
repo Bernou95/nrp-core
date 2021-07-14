@@ -1,0 +1,27 @@
+It should compile now with catkin_make
+
+Afterwards you need to move "rostime_boost_python.so" to "boost_python_ros/munged", or make it accessible to PYTHONPATH in another way.
+
+Next steps:
+1. review that wrappers work for every case supported by ros msg syntax. Concretely
+    a) arrays []
+    b) I guess that the supported types by the code generator are those in the dictionary:
+
+    MSG_TYPE_TO_CPP = {'byte': 'int8_t', 'char': 'uint8_t',
+                   'bool': 'uint8_t',
+                   'uint8': 'uint8_t', 'int8': 'int8_t', 
+                   'uint16': 'uint16_t', 'int16': 'int16_t', 
+                   'uint32': 'uint32_t', 'int32': 'int32_t',
+                   'uint64': 'uint64_t', 'int64': 'int64_t',
+                   'float32': 'float',
+                   'float64': 'double',
+                   'string': 'std::string',
+                   'time': 'ros::Time',
+                   'duration': 'ros::Duration'}
+
+    Compare the mapping with the table in http://wiki.ros.org/msg and check that is complete
+
+2. There are several warnings while compiling with catkin_make, maybe they can be addressed
+
+Cheers,
+Eloy
