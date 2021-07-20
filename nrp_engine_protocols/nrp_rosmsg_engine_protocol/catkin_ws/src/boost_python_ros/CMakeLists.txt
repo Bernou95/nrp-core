@@ -97,3 +97,6 @@ message_gen_wrap(std_msgs)
 message_gen_wrap(geometry_msgs)
 message_gen_wrap(sensor_msgs)
 message_gen_wrap(nav_msgs)
+#message_gen_wrap(gazebo_msgs3)
+
+

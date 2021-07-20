@@ -6,7 +6,7 @@ from os import path as os_path
 from pkgutil import extend_path
 from sys import path as sys_path
 
-__extended_path = '/home/bernardo/catkin_ws/src/python_bindings_tutorial/src'.split(';')
+__extended_path = '/home/bernardo/8282/nrp-core/nrp_engine_protocols/nrp_rosmsg_engine_protocol/catkin_ws/src/python_bindings_tutorial/src'.split(';')
 for p in reversed(__extended_path):
     sys_path.insert(0, p)
     del p

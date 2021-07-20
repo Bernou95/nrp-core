@@ -268,7 +268,7 @@ if __name__ == '__main__':
 
         if not args.local:
             # environment at generation time
-            CMAKE_PREFIX_PATH = r'/home/bernardo/vision_ws/devel;/home/bernardo/catkin_hbp_task/devel;/home/bernardo/catkin_ws/devel;/home/bernardo/turtle_ws/devel;/opt/ros/noetic'.split(';')
+            CMAKE_PREFIX_PATH = r'/home/bernardo/8282/nrp-core/nrp_engine_protocols/nrp_rosmsg_engine_protocol/catkin_ws/devel;/opt/ros/noetic'.split(';')
         else:
             # don't consider any other prefix path than this one
             CMAKE_PREFIX_PATH = []

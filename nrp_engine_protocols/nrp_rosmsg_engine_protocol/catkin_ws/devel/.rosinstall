@@ -1,2 +1,2 @@
 - setup-file:
-    local-name: /home/bernardo/catkin_ws/devel/setup.sh
+    local-name: /home/bernardo/8282/nrp-core/nrp_engine_protocols/nrp_rosmsg_engine_protocol/catkin_ws/devel/setup.sh

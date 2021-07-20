@@ -4,7 +4,7 @@ Afterwards you need to move "rostime_boost_python.so" to "boost_python_ros/munge
 
 Next steps:
 1. review that wrappers work for every case supported by ros msg syntax. Concretely
-    a) arrays []
+    a) arrays [] - checked and works
     b) I guess that the supported types by the code generator are those in the dictionary:
 
     MSG_TYPE_TO_CPP = {'byte': 'int8_t', 'char': 'uint8_t',
@@ -20,6 +20,8 @@ Next steps:
                    'duration': 'ros::Duration'}
 
     Compare the mapping with the table in http://wiki.ros.org/msg and check that is complete
+    
+    Update: is complete
 
 2. There are several warnings while compiling with catkin_make, maybe they can be addressed
 

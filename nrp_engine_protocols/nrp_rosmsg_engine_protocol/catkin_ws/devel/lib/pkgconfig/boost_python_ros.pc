@@ -1,0 +1,8 @@
+prefix=/home/bernardo/8282/nrp-core/nrp_engine_protocols/nrp_rosmsg_engine_protocol/catkin_ws/devel
+
+Name: boost_python_ros
+Description: Description of boost_python_ros
+Version: 1.0.0
+Cflags: 
+Libs: -L${prefix}/lib -lstd_msgs_cpp -lstd_msgs_String
+Requires: std_msgs roscpp
