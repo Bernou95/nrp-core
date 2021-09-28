@@ -36,62 +36,62 @@
 PythonEngineJSONNRPClient::PythonEngineJSONNRPClient(nlohmann::json &config, ProcessLauncherInterface::unique_ptr &&launcher)
     : EngineJSONNRPClient(config, std::move(launcher))
 {
-	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
+    NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
     setDefaultProperty<std::string>("EngineProcCmd", NRP_PYTHON_EXECUTABLE_PATH);
 }
 
 PythonEngineJSONNRPClient::~PythonEngineJSONNRPClient()
 {
-	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
+    NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 }
 
 void PythonEngineJSONNRPClient::initialize()
 {
-	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
+    NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
-	nlohmann::json resp = this->sendInitCommand(this->engineConfig());
-	if(!resp.at(PythonConfigConst::InitFileExecStatus.data()).get<bool>())
-	{
-		// Write the error message
-		this->_initErrMsg = resp.at(PythonConfigConst::ErrorMsg.data());
-		NRPLogger::error(this->_initErrMsg);
+    nlohmann::json resp = this->sendInitCommand(this->engineConfig());
+    if(!resp.at(PythonConfigConst::InitFileExecStatus.data()).get<bool>())
+    {
+        // Write the error message
+        this->_initErrMsg = resp.at(PythonConfigConst::ErrorMsg.data());
+        NRPLogger::error(this->_initErrMsg);
 
-		throw NRPException::logCreate("Initialization failed: " + this->_initErrMsg);
-	}
+        throw NRPException::logCreate("Initialization failed: " + this->_initErrMsg);
+    }
 
-	NRPLogger::debug("PythonEngineJSONNRPClient::initialize(...) completed with no errors.");
+    NRPLogger::debug("PythonEngineJSONNRPClient::initialize(...) completed with no errors.");
 }
 
 void PythonEngineJSONNRPClient::reset()
 {
     NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
-	nlohmann::json resp = this->sendResetCommand(nlohmann::json("reset"));
+    nlohmann::json resp = this->sendResetCommand(nlohmann::json("reset"));
     NRPLogger::debug("NestEngineJSONNRPClient:reset()::resp [ {} ]", resp.dump());
 
-	if(!resp.at(PythonConfigConst::ResetExecStatus.data()).get<bool>())
-	{
-		// Write the error message
-		std::string msg = resp.at(PythonConfigConst::ErrorMsg.data());
-		NRPLogger::error(msg);
+    if(!resp.at(PythonConfigConst::ResetExecStatus.data()).get<bool>())
+    {
+        // Write the error message
+        std::string msg = resp.at(PythonConfigConst::ErrorMsg.data());
+        NRPLogger::error(msg);
 
-		throw NRPException::logCreate("Reset failed: " + msg);
-	}
+        throw NRPException::logCreate("Reset failed: " + msg);
+    }
 
-	this->resetEngineTime();
+    this->resetEngineTime();
 }
 
 void PythonEngineJSONNRPClient::shutdown()
 {
-	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
+    NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
-	this->sendShutdownCommand(nlohmann::json());
+    this->sendShutdownCommand(nlohmann::json());
 }
 
 const std::vector<std::string> PythonEngineJSONNRPClient::engineProcStartParams() const
 {
-	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
+    NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
     std::vector<std::string> startParams = this->EngineJSONNRPClient::engineProcStartParams();
 
@@ -100,7 +100,7 @@ const std::vector<std::string> PythonEngineJSONNRPClient::engineProcStartParams(
     startParams.push_back(std::string("--") + EngineJSONConfigConst::EngineServerAddrArg.data() + "=" + server_address);
 
 
-	NRPLogger::debug("{} got the {} start parameters.", __FUNCTION__, startParams.size());
+    NRPLogger::debug("{} got the {} start parameters.", __FUNCTION__, startParams.size());
 
     return startParams;
 }

@@ -43,19 +43,19 @@ class TestGrpcDataPackController
 {
     public:
 
-		TestGrpcDataPackController()
-		    : _data(new Engine::TestPayload())
+        TestGrpcDataPackController()
+            : _data(new Engine::TestPayload())
         { }
 
         virtual void handleDataPackData(const google::protobuf::Message &data) override
-		{
+        {
             // throws bad_cast
             const auto &j = dynamic_cast<const Engine::TestPayload &>(data);
-		    _data->CopyFrom(j);
-		}
+            _data->CopyFrom(j);
+        }
 
         virtual google::protobuf::Message *getDataPackInformation() override
-		{
+        {
             if(this->_returnEmptyDataPack)
                 return nullptr;
             else {
@@ -71,7 +71,7 @@ class TestGrpcDataPackController
             this->_returnEmptyDataPack = value;
         }
 
-	private:
+    private:
         Engine::TestPayload* _data;
         bool _returnEmptyDataPack = false;
 };
@@ -90,17 +90,17 @@ class TestEngineGrpcClient
             : EngineGrpcClient(config, std::move(launcher))
         {}
 
-		void initialize() override
+        void initialize() override
         {
             this->sendInitCommand("test");
         }
 
-		void reset() override
+        void reset() override
         {
             this->sendResetCommand();
         }
 
-		void shutdown() override
+        void shutdown() override
         {
             this->sendShutdownCommand("test");
         }
@@ -441,7 +441,7 @@ TEST(EngineGrpc, SetDataPackData)
 
     std::vector<DataPackInterface*> input_datapacks;
 
-	std::shared_ptr<TestGrpcDataPackController> datapackController(new TestGrpcDataPackController()); // Server side
+    std::shared_ptr<TestGrpcDataPackController> datapackController(new TestGrpcDataPackController()); // Server side
     server.registerDataPack(datapackName, datapackController.get());
 
     std::shared_ptr<DataPack<Engine::TestPayload>> dev1(new DataPack<Engine::TestPayload>(datapackName, engineName)); // Client side
@@ -468,7 +468,7 @@ TEST(EngineGrpc, SetDataPackData)
     client.sendDataPacksToEngine(input_datapacks);
     d = dynamic_cast<Engine::TestPayload *>(datapackController->getDataPackInformation());
 
-	ASSERT_EQ(d->integer(),       111);
+    ASSERT_EQ(d->integer(),       111);
 
     // Test setting data on a datapack that wasn't registered in the engine server
     const std::string datapackName2 = "b";
