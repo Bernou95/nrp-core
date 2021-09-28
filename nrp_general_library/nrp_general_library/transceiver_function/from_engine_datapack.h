@@ -30,19 +30,19 @@
 class FromEngineDataPack
     : public TransceiverDataPackInterface
 {
-	public:
-		FromEngineDataPack(const std::string &keyword, const DataPackIdentifier &datapackID, bool isPreprocessed);
-		virtual ~FromEngineDataPack() override = default;
+    public:
+        FromEngineDataPack(const std::string &keyword, const DataPackIdentifier &datapackID, bool isPreprocessed);
+        virtual ~FromEngineDataPack() override = default;
 
-		EngineClientInterface::datapack_identifiers_set_t getRequestedDataPackIDs() const override;
+        EngineClientInterface::datapack_identifiers_set_t getRequestedDataPackIDs() const override;
 
-		boost::python::object runTf(boost::python::tuple &args, boost::python::dict &kwargs) override;
+        boost::python::object runTf(boost::python::tuple &args, boost::python::dict &kwargs) override;
 
-	private:
+    private:
 
-		std::string      _keyword;
-		DataPackIdentifier _datapackID;
-		bool             _isPreprocessed;
+        std::string      _keyword;
+        DataPackIdentifier _datapackID;
+        bool             _isPreprocessed;
 };
 
 #endif // SINGLE_TRANSCEIVER_DATAPACK_H

@@ -6,7 +6,7 @@
 
 struct ${engine_name}JSONConfigConst
 {
-	static constexpr FixedString EngineType = "${engine_name_lowercase}_json_engine";
+    static constexpr FixedString EngineType = "${engine_name_lowercase}_json_engine";
     static constexpr FixedString EngineSchema = "https://neurorobotics.net/engines/engine_comm_protocols.json#/engine_json";
 };
 

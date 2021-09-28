@@ -36,28 +36,28 @@
 class PythonEngineJSONNRPClient
         : public EngineJSONNRPClient<PythonEngineJSONNRPClient, PythonConfigConst::EngineSchema>
 {
-		/*!
-		 * \brief Time (in seconds) to wait for Python to exit cleanly after first SIGTERM signal. Afterwards, send a SIGKILL
-		 */
-		static constexpr size_t _killWait = 10;
+        /*!
+         * \brief Time (in seconds) to wait for Python to exit cleanly after first SIGTERM signal. Afterwards, send a SIGKILL
+         */
+        static constexpr size_t _killWait = 10;
 
-	public:
-		PythonEngineJSONNRPClient(nlohmann::json &config, ProcessLauncherInterface::unique_ptr &&launcher);
-		virtual ~PythonEngineJSONNRPClient() override;
+    public:
+        PythonEngineJSONNRPClient(nlohmann::json &config, ProcessLauncherInterface::unique_ptr &&launcher);
+        virtual ~PythonEngineJSONNRPClient() override;
 
-		virtual void initialize() override;
+        virtual void initialize() override;
 
-		virtual void reset() override;
+        virtual void reset() override;
 
-		virtual void shutdown() override;
+        virtual void shutdown() override;
 
         virtual const std::vector<std::string> engineProcStartParams() const override;
 
-	private:
-		/*!
-		 * \brief Error message returned by init command
-		 */
-		std::string _initErrMsg = "";
+    private:
+        /*!
+         * \brief Error message returned by init command
+         */
+        std::string _initErrMsg = "";
 };
 
 using PythonEngineJSONLauncher = PythonEngineJSONNRPClient::EngineLauncher<PythonConfigConst::EngineType>;
