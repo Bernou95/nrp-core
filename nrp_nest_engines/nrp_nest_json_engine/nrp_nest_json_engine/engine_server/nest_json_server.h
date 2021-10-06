@@ -24,11 +24,9 @@
 
 #include "nrp_json_engine_protocol/engine_server/engine_json_server.h"
 #include "nrp_general_library/utils/python_interpreter_state.h"
-#include "nrp_nest_json_engine/engine_server/nest_engine_device_controller.h"
+#include "nrp_nest_json_engine/engine_server/nest_engine_datapack_controller.h"
 
-#include "nrp_nest_json_engine/devices/nest_device.h"
-
-#include "nrp_nest_json_engine/python/create_device_class.h"
+#include "nrp_nest_json_engine/python/create_datapack_class.h"
 
 
 #include <boost/python.hpp>
@@ -37,8 +35,8 @@ class NestJSONServer
         : public EngineJSONServer
 {
 	public:
-		NestJSONServer(const std::string &serverAddress, boost::python::dict globals, boost::python::object locals);
-		NestJSONServer(const std::string &serverAddress, const std::string &engineName, const std::string &registrationAddress, boost::python::dict globals, boost::python::object locals);
+		NestJSONServer(const std::string &serverAddress, boost::python::dict globals);
+		NestJSONServer(const std::string &serverAddress, const std::string &engineName, const std::string &registrationAddress, boost::python::dict globals);
 		virtual ~NestJSONServer() override;
 
 		/*!
@@ -54,7 +52,8 @@ class NestJSONServer
 		bool shutdownFlag() const;
 
 		virtual SimulationTime runLoopStep(SimulationTime timeStep) override;
-		virtual nlohmann::json initialize(const nlohmann::json &data, EngineJSONServer::lock_t &deviceLock) override;
+		virtual nlohmann::json initialize(const nlohmann::json &data, EngineJSONServer::lock_t &datapackLock) override;
+		virtual nlohmann::json reset(EngineJSONServer::lock_t &datapackLock) override;
 		virtual nlohmann::json shutdown(const nlohmann::json &data) override;
 
 	private:
@@ -79,11 +78,6 @@ class NestJSONServer
 		boost::python::dict _pyGlobals;
 
 		/*!
-		 * \brief Local Python variables
-		 */
-		boost::python::object _pyLocals;
-
-		/*!
 		 * \brief Nest object
 		 */
 		boost::python::dict _pyNest;
@@ -94,14 +88,14 @@ class NestJSONServer
 		boost::python::dict _pyNRPNest;
 
 		/*!
-		 * \brief NEST Device Mapping (from Device Name to NEST NodeCollection)
+		 * \brief NEST DataPack Mapping (from DataPack Name to NEST NodeCollection)
 		 */
 		boost::python::dict _devMap;
 
 		/*!
-		 * \brief List of device ptrs. Used to manage controller deletion
+		 * \brief List of datapack ptrs. Used to manage controller deletion
 		 */
-		std::list<EngineDeviceControllerInterface<nlohmann::json>::shared_ptr> _deviceControllerPtrs;
+		std::list<std::shared_ptr<DataPackController<nlohmann::json>>> _datapackControllerPtrs;
 
 		/*!
 		 *	\brief GIL Lock state
@@ -129,9 +123,11 @@ class NestJSONServer
 		 */
 		static nlohmann::json formatInitErrorMessage(const std::string &errMsg);
 
-		nlohmann::json getDeviceData(const nlohmann::json &reqData) override;
+		nlohmann::json getDataPackData(const nlohmann::json &reqData) override;
 
-		nlohmann::json setDeviceData(const nlohmann::json &reqData) override;
+		nlohmann::json setDataPackData(const nlohmann::json &reqData) override;
+
+		nlohmann::json _initData;
 };
 
 #endif // NEST_JSON_SERVER_H

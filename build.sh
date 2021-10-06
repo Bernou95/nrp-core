@@ -9,6 +9,6 @@ mkdir -p $NRP_INSTALL_PATH
 
 export C=/usr/bin/gcc-10; export CXX=/usr/bin/g++-10
 cmake .. -DCMAKE_INSTALL_PREFIX=$NRP_INSTALL_PATH
-make -j8
+make -j4
 make install
 

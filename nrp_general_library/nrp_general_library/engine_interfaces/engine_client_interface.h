@@ -22,26 +22,20 @@
 #ifndef ENGINE_CLIENT_INTERFACE_H
 #define ENGINE_CLIENT_INTERFACE_H
 
-#include "nrp_general_library/device_interface/device.h"
 #include "nrp_general_library/process_launchers/process_launcher.h"
 #include "nrp_general_library/utils/fixed_string.h"
 #include "nrp_general_library/utils/ptr_templates.h"
 #include "nrp_general_library/utils/time_utils.h"
 #include "nrp_general_library/utils/json_schema_utils.h"
+#include "nrp_general_library/datapack_interface/datapack_interface.h"
 
-#include <concepts>
 #include <set>
 #include <vector>
+#include <future>
 
 class EngineClientInterface;
 class EngineLauncherInterface;
 
-template<class T>
-concept ENGINE_C = requires (nlohmann::json  &engineConfig, ProcessLauncherInterface::unique_ptr &&launcher) {
-    std::derived_from<T, EngineClientInterface>;
-    //std::constructible_from<T, nlohmann::json&, ProcessLauncherInterface::unique_ptr&&>;
-    //{ T(engineConfig, std::move(launcher)) };
-};
 
 /*!
  * \brief Interface to engines
@@ -49,24 +43,24 @@ concept ENGINE_C = requires (nlohmann::json  &engineConfig, ProcessLauncherInter
 class EngineClientInterface
         : public PtrTemplates<EngineClientInterface>
 {
-		/*! \brief DeviceInterfaceConstSharedPtr comparison. Used for set sorting */
+		/*! \brief DataPackInterfaceConstSharedPtr comparison. Used for set sorting */
 		struct CompareDevInt : public std::less<>
 		{
-			public: bool operator()(const DeviceInterfaceConstSharedPtr &lhs, const DeviceInterfaceConstSharedPtr &rhs) const
+			public: bool operator()(const DataPackInterfaceConstSharedPtr &lhs, const DataPackInterfaceConstSharedPtr &rhs) const
 			{	return lhs->name() < rhs->name();	}
 
-			public: bool operator()(const DeviceInterfaceConstSharedPtr &lhs, const std::string &name) const
+			public: bool operator()(const DataPackInterfaceConstSharedPtr &lhs, const std::string &name) const
 			{	return lhs->name() < name;	}
 
-			public: bool operator()(const std::string &name, const DeviceInterfaceConstSharedPtr &rhs) const
+			public: bool operator()(const std::string &name, const DataPackInterfaceConstSharedPtr &rhs) const
 			{	return name < rhs->name();	}
 		};
 
 	public:
-		using device_identifiers_set_t = std::set<DeviceIdentifier>;
-		using devices_t = std::vector<DeviceInterfaceConstSharedPtr>;
-		using devices_set_t = std::set<DeviceInterfaceConstSharedPtr, CompareDevInt>;
-		using devices_ptr_t = std::vector<DeviceInterface*>;
+		using datapack_identifiers_set_t = std::set<DataPackIdentifier>;
+		using datapacks_t = std::vector<DataPackInterfaceConstSharedPtr>;
+		using datapacks_set_t = std::set<DataPackInterfaceConstSharedPtr, CompareDevInt>;
+		using datapacks_ptr_t = std::vector<DataPackInterface*>;
 
 		explicit EngineClientInterface(ProcessLauncherInterface::unique_ptr &&launcher);
 		virtual ~EngineClientInterface();
@@ -111,6 +105,13 @@ class EngineClientInterface
 		virtual void initialize() = 0;
 
 		/*!
+		 * \brief Reset engine
+		 * \return Returns SUCCESS if no error was encountered
+		 * \throw Throws on error
+		 */
+		virtual void reset() = 0;
+
+		/*!
 		 * \brief Shutdown engine
 		 * \return Return SUCCESS if no error was encountered
 		 * \throw Throws on error
@@ -118,15 +119,14 @@ class EngineClientInterface
 		virtual void shutdown() = 0;
 
 		/*!
-		 * \brief Get engine timestep (in seconds)
+		 * \brief Get engine timestep
 		 * \throw Throws on error
 		 */
 		virtual SimulationTime getEngineTimestep() const = 0;
 
 		/*!
-		 * \brief Get current engine time (in seconds)
+		 * \brief Get current engine time
 		 * \return Returns engine time
-		 * \throw Throws on error
 		 */
 		virtual SimulationTime getEngineTime() const = 0;
 
@@ -138,62 +138,66 @@ class EngineClientInterface
         virtual const std::string engineSchema() const = 0;
 
 		/*!
-		 * \brief Starts a single loop step in a separate thread.
-		 * EngineClientInterface::waitForStepCompletion() can be used to join threads again
-		 * \param timeStep Time (in seconds) of a single step
-		 * \throw Throws on error
-		 */
-		virtual void runLoopStep(SimulationTime timeStep) = 0;
-
-		/*!
-		 * \brief Wait until step has been completed, at most timeOut seconds
-		 * \param timeOut Wait for at most timeOut seconds
-		 * \return Returns SUCCESS if step has completed before timeOut, ERROR otherwise
-		 * \throw Throws on error
-		 */
-		virtual void waitForStepCompletion(float timeOut) = 0;
-
-		/*!
-		 * \brief Gets requested devices from engine and updates _deviceCache with the results
-		 * Uses getDevicesFromEngine override for the actual communication
-		 * \param deviceNames All requested names. NOTE: can also include IDs of other engines. A check must be added that only the corresponding IDs are retrieved
-		 * \return Returns all devices returned by the engine
-		 */
-		const devices_t &updateDevicesFromEngine(const device_identifiers_set_t &deviceIdentifiers);
-
-		/*!
-		 * \brief get cached engine devices
-		 */
-		constexpr const devices_t &getCachedDevices() const
-		{	return this->_deviceCache;	}
-
-		/*!
-		 * \brief Sends devices to engine
-		 * \param devicesArray Array of devices that will be send to the engine
-		 * \return Returns SUCCESS if all devices could be handles, ERROR otherwise
-		 * \throw Throws on error
-		 */
-		virtual void sendDevicesToEngine(const devices_ptr_t &devicesArray) = 0;
-
-		/*!
-		 * \brief Update _deviceCache from devices
+		 * \brief Starts a single loop step in a separate thread
 		 *
-		 * If the device with a particular name is already in the cache, the function will
-		 * replace it. If the device isn't in the cache, the function will insert it.
+		 * The function should be called in tandem with EngineClientInterface::runLoopStepAsyncGet(),
+		 * which will join the worker thread and retrieve the results of the loop step.
 		 *
-		 * \param devs Devices to insert
+		 * \param[in] timeStep Requested duration of the simulation loop step.
 		 */
-		void updateCachedDevices(devices_set_t &&devs);
-
-	protected:
+		virtual void runLoopStepAsync(SimulationTime timeStep) = 0;
 
 		/*!
-		 * \brief Gets requested devices from engine
-		 * \param deviceNames All requested device ids
-		 * \return Returns all requested devices
+		 * \brief Waits and gets the results of the loop step started by EngineClientInterface::runLoopStepAsync()
+		 *
+		 * The function should be called after calling EngineClientInterface::runLoopStepAsync().
+		 * It should join the worker thread and retrieve the results of the loop step.
+		 *
+		 * \param timeOut Timeout of the loop step. If it's less or equal to 0, the function will wait indefinitely.
+		 */
+		virtual void runLoopStepAsyncGet(SimulationTime timeOut) = 0;
+
+		/*!
+		 * \brief Gets requested datapacks from engine and updates _datapackCache with the results
+		 * Uses getDataPacksFromEngine override for the actual communication
+		 * \param datapackNames All requested names. NOTE: can also include IDs of other engines. A check must be added that only the corresponding IDs are retrieved
+		 * \return Returns all datapacks returned by the engine
+		 */
+		const datapacks_t &updateDataPacksFromEngine(const datapack_identifiers_set_t &datapackIdentifiers);
+
+		/*!
+		 * \brief get cached engine datapacks
+		 */
+		constexpr const datapacks_t &getCachedDataPacks() const
+		{	return this->_datapackCache;	}
+
+		/*!
+		 * \brief Sends datapacks to engine
+		 * \param datapacksArray Array of datapacks that will be send to the engine
+		 * \return Returns SUCCESS if all datapacks could be handles, ERROR otherwise
 		 * \throw Throws on error
 		 */
-		virtual devices_set_t getDevicesFromEngine(const device_identifiers_set_t &deviceIdentifiers) = 0;
+		virtual void sendDataPacksToEngine(const datapacks_ptr_t &datapacksArray) = 0;
+
+		/*!
+		 * \brief Update _datapackCache from datapacks
+		 *
+		 * If the datapack with a particular name is already in the cache, the function will
+		 * replace it. If the datapack isn't in the cache, the function will insert it.
+		 *
+		 * \param devs DataPacks to insert
+		 */
+		void updateCachedDataPacks(datapacks_set_t &&devs);
+
+		/*!
+		 * \brief Gets requested datapacks from engine
+		 * \param datapackNames All requested datapack ids
+		 * \return Returns all requested datapacks
+		 * \throw Throws on error
+		 */
+		virtual datapacks_set_t getDataPacksFromEngine(const datapack_identifiers_set_t &datapackIdentifiers) = 0;
+
+protected:
 
 		/*!
 		 * \brief Process Launcher. Will be used to stop process at end
@@ -201,9 +205,9 @@ class EngineClientInterface
 		ProcessLauncherInterface::unique_ptr _process;
 
 		/*!
-		 * \brief Engine device cache. Stores retrieved devices
+		 * \brief Engine datapack cache. Stores retrieved datapacks
 		 */
-		devices_t _deviceCache;
+		datapacks_t _datapackCache;
 };
 
 using EngineClientInterfaceSharedPtr = EngineClientInterface::shared_ptr;
@@ -213,7 +217,7 @@ class EngineLauncherInterface
         : public PtrTemplates<EngineLauncherInterface>
 {
 	public:
-		using engine_type_t = decltype(DeviceIdentifier::Type);
+		using engine_type_t = decltype(DataPackIdentifier::Type);
 
 		EngineLauncherInterface(const engine_type_t &engineType);
 		virtual ~EngineLauncherInterface() = default;
@@ -221,11 +225,6 @@ class EngineLauncherInterface
 		const engine_type_t &engineType() const;
 		virtual EngineClientInterfaceSharedPtr launchEngine(nlohmann::json  &engineConfig, ProcessLauncherInterface::unique_ptr &&launcher) = 0;
 
-		/*!
-		 *	\brief Compare EngineLaunchers according to _engineType
-		 */
-		auto operator<=>(const EngineLauncherInterface&) const = default;
-		bool operator==(const EngineLauncherInterface&) const = default;
 	private:
 		/*!
 		 * \brief Engine Type
@@ -240,7 +239,7 @@ using EngineLauncherInterfaceConstSharedPtr = EngineLauncherInterface::const_sha
  *	\brief Base class for all Engines
  *	\tparam ENGINE Final derived engine class
  */
-template<class ENGINE, FixedString SCHEMA>
+template<class ENGINE, const char *SCHEMA>
 class EngineClient
         : public EngineClientInterface
 {
@@ -251,13 +250,13 @@ class EngineClient
 		 * \brief Class for launching engine
 		 * \tparam ENGINE_TYPE Default engine type
 		 */
-		template<FixedString ENGINE_TYPE>
+		template<const char *ENGINE_TYPE>
 		class EngineLauncher
 		        : public EngineLauncherInterface
 		{
 			public:
 				EngineLauncher()
-				    : EngineLauncherInterface(ENGINE_TYPE.m_data)
+				    : EngineLauncherInterface(ENGINE_TYPE)
 				{}
 
 				EngineLauncher(const engine_type_t &engineType)
@@ -342,9 +341,78 @@ class EngineClient
          * \brief Get json schema for this engine type
          */
         const std::string engineSchema() const override final
-        {   return SCHEMA.m_data;   }
+        { return schema;   }
+
+		/*!
+		 * \brief Returns current engine (simulation) time
+		 *
+		 * The time is updated by EngineClient::runLoopStepAsyncGet() method.
+		 *
+		 * \return Current engine (simulation) time
+		 */
+		SimulationTime getEngineTime() const override
+		{
+			return this->_engineTime;
+		}
+
+		/*!
+		 * \brief Concrete implementation of EngineClientInterface::runLoopStepAsync()
+		 *
+		 * The function starts EngineClient::runLoopStepCallback() asynchronously using std::async.
+		 * The callback function should be provided by concrete engine implementation.
+		 * The result of the callback is going to be retrieved using an std::future object
+		 * in EngineClient::runLoopStepAsyncGet().
+		 *
+		 * \param[in] timeStep Requested duration of the simulation loop step.
+		 * \throw NRPException If the future object is still valid (EngineClient::runLoopStepAsyncGet() was not called)
+		 */
+		void runLoopStepAsync(SimulationTime timeStep) override
+		{
+			if(this->_loopStepThread.valid())
+			{
+				throw NRPException::logCreate("Engine \"" + this->engineName() + "\" runLoopStepAsync has overrun");
+			}
+
+			this->_loopStepThread = std::async(std::launch::async, std::bind(&EngineClient::runLoopStepCallback, this, timeStep));
+		}
+
+		/*!
+		 * \brief Concrete implementation of EngineClientInterface::runLoopStepAsyncGet()
+		 *
+		 * The function should be called after EngineClient::runLoopStepAsync(). It will wait for the
+		 * worker thread to finish and retrieve the results from the future object. The value returned
+		 * by the future should be the simulation (engine) time after running the loop step. It will
+		 * be saved in the engine object, and can be accessed with EngineClient::getEngineTime().
+		 *
+		 * \param[in] timeOut Timeout of the loop step. If it's less or equal to 0, the function will wait indefinitely.
+		 * \throw NRPException On timeout
+		 */
+		void runLoopStepAsyncGet(SimulationTime timeOut) override
+		{
+			NRP_LOGGER_TRACE("{} called", __FUNCTION__);
+
+			// If thread state is invalid, loop thread has completed and runLoopStepAsyncGet was called once before
+			if(!this->_loopStepThread.valid())
+				return;
+
+			// Wait until timeOut has passed
+			if(timeOut > SimulationTime::zero())
+			{
+				if(this->_loopStepThread.wait_for(timeOut) != std::future_status::ready)
+					throw NRPException::logCreate("Engine \"" + this->engineName() + "\" loop is taking too long to complete");
+			}
+
+			// Retrieve the engine time returned from the loop step
+
+			this->_engineTime = this->_loopStepThread.get();
+		}
 
     protected:
+
+		virtual void resetEngineTime()
+		{
+			this->_engineTime = SimulationTime(0);
+		}
 
         /*!
         * \brief Attempts to set a default value for a property in the engine configuration. If the property has been already
@@ -358,9 +426,31 @@ class EngineClient
             json_utils::set_default<T>(this->engineConfig(), key, value);
         }
 
+		/*!
+		 * \brief Executes a single loop step
+		 *
+		 * This function is going to be called by runLoopStep using std::async.
+		 * It will be executed by a worker thread, which allows for runLoopStepFunction
+		 * from multiple engines to run simultaneously.
+		 *
+		 * \param[in] timeStep A time step by which the simulation should be advanced
+		 * \return Engine time after loop step execution
+		 */
+		virtual SimulationTime runLoopStepCallback(SimulationTime timeStep) = 0;
+
     private:
 
         nlohmann::json engineConfig_;
+        std::string schema = std::string(SCHEMA);
+		/*!
+		 * \brief Future of thread running a single loop. Used by runLoopStep and waitForStepCompletion to execute the thread
+		 */
+		std::future<SimulationTime> _loopStepThread;
+
+		/*!
+		 * \brief Engine Time
+		 */
+		SimulationTime _engineTime = SimulationTime::zero();
 };
 
 #endif // ENGINE_CLIENT_INTERFACE_H

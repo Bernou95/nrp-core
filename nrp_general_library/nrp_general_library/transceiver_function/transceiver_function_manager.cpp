@@ -27,12 +27,12 @@
 
 #include <iostream>
 
-EngineClientInterface::device_identifiers_set_t TransceiverFunctionManager::updateRequestedDeviceIDs() const
+EngineClientInterface::datapack_identifiers_set_t TransceiverFunctionManager::updateRequestedDataPackIDs() const
 {
-	return this->_tfInterpreter.updateRequestedDeviceIDs();
+	return this->_tfInterpreter.updateRequestedDataPackIDs();
 }
 
-void TransceiverFunctionManager::loadTF(const nlohmann::json &tfConfig, const bool isPreprocessing)
+void TransceiverFunctionManager::loadTF(const nlohmann::json &tfConfig)
 {
     auto storedConfigIterator = this->_tfSettings.find(tfConfig);
 	std::string tf_name = tfConfig.at("Name");
@@ -42,11 +42,6 @@ void TransceiverFunctionManager::loadTF(const nlohmann::json &tfConfig, const bo
 
 	this->_tfSettings.insert(tfConfig);
 	this->_tfInterpreter.loadTransceiverFunction(tfConfig);
-
-	if(isPreprocessing)
-	{
-		this->_preprocessingNames.emplace(tf_name);
-	}
 }
 
 void TransceiverFunctionManager::updateTF(const nlohmann::json &tfConfig)
@@ -65,12 +60,12 @@ TransceiverFunctionManager::tf_results_t TransceiverFunctionManager::executeActi
 	{
 		if(this->isActive(curTFIt->second.Name) && (curTFIt->second.TransceiverFunction->isPrepocessing() == preprocessing))
 		{
-			// Get device outputs from transceiver function
-			TransceiverFunctionInterpreter::device_list_t pyResult(this->_tfInterpreter.runSingleTransceiverFunction(curTFIt->second.Name));
+			// Get datapack outputs from transceiver function
+			TransceiverFunctionInterpreter::datapack_list_t pyResult(this->_tfInterpreter.runSingleTransceiverFunction(curTFIt->second.Name));
 			TransceiverFunctionInterpreter::TFExecutionResult result(std::move(pyResult));
 
-			// Extract pointers to retrieved devices
-			result.extractDevices();
+			// Extract pointers to retrieved datapacks
+			result.extractDataPacks();
 			tfResults.push_back(result);
 		}
 	}
@@ -97,11 +92,6 @@ bool TransceiverFunctionManager::isActive(const std::string &tfName)
 	}
 
 	return false;
-}
-
-bool TransceiverFunctionManager::isPreprocessing(const std::string &tfName) const
-{
-	return (this->_preprocessingNames.find(tfName) != this->_preprocessingNames.end());
 }
 
 TransceiverFunctionInterpreter &TransceiverFunctionManager::getInterpreter()

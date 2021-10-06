@@ -22,7 +22,6 @@
 #ifndef PY_ENGINE_SCRIPT_H
 #define PY_ENGINE_SCRIPT_H
 
-#include "nrp_python_device/devices/pyobject_device.h"
 #include "nrp_general_library/utils/ptr_templates.h"
 #include "nrp_python_json_engine/engine_server/python_json_server.h"
 
@@ -51,8 +50,8 @@ class PyEngineScript
 		 */
 		inline SimulationTime runLoop(SimulationTime timestep)
 		{
-			this->runLoopFcn(timestep);
 			this->_time += timestep;
+			this->runLoopFcn(timestep);
 
 			return this->_time;
 		}
@@ -67,25 +66,30 @@ class PyEngineScript
 		 */
 		SimulationTime simTime() const;
 
-		/*!
-		 * \brief Register device
-		 * \param deviceName Name of device
-		 */
-		void registerDevice(std::string deviceName);
+        /*!
+         * \brief Get this engine configuration
+         */
+        nlohmann::json engineConfig() const;
 
 		/*!
-		 * \brief Get Device Data
-		 * \param deviceName Name of device
-		 * \return Returns device data
+		 * \brief Register datapack
+		 * \param datapackName Name of datapack
 		 */
-		boost::python::object &getDevice(const std::string &deviceName);
+		void registerDataPack(std::string datapackName);
 
 		/*!
-		 * \brief Set Device Data
-		 * \param deviceName Name of device
-		 * \param data Data to store in device
+		 * \brief Get DataPack Data
+		 * \param datapackName Name of datapack
+		 * \return Returns datapack data
 		 */
-		void setDevice(const std::string &deviceName, boost::python::object data);
+		boost::python::object &getDataPack(const std::string &datapackName);
+
+		/*!
+		 * \brief Set DataPack Data
+		 * \param datapackName Name of datapack
+		 * \param data Data to store in datapack
+		 */
+		void setDataPack(const std::string &datapackName, boost::python::object data);
 
 		/*!
 		 * \brief Save ptr to PythonJSONServer instance that owns this script
@@ -112,14 +116,14 @@ class PyEngineScript
 		PythonJSONServer *_pServer = nullptr;
 
 		/*!
-		 * \brief Device Controllers
+		 * \brief DataPack Controllers
 		 */
-		std::list<EngineJSONDeviceControllerInterface::shared_ptr> _deviceControllers;
+		std::list<std::shared_ptr<PythonEngineJSONDataPackController>> _datapackControllers;
 
 		/*!
-		 * \brief Map from keyword to device data
+		 * \brief Map from keyword to datapack data
 		 */
-		std::map<std::string, boost::python::object*> _nameDeviceMap;
+		std::map<std::string, boost::python::object*> _nameDataPackMap;
 };
 
 using PyEngineScriptSharedPtr = PyEngineScript::shared_ptr;

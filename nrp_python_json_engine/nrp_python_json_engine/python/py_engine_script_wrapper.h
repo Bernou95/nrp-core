@@ -40,6 +40,8 @@ struct PyEngineScriptWrapper
 	void shutdown() override;
 
 	void defaultShutdown();
+
+
 };
 
 #endif // PY_ENGINE_SCRIPT_WRAPPER_H

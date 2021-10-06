@@ -30,11 +30,11 @@
 
 #include "nrp_grpc_engine_protocol/config/engine_grpc_config.h"
 #include "nrp_general_library/engine_interfaces/engine_client_interface.h"
-#include "nrp_grpc_engine_protocol/grpc_server/engine_grpc.grpc.pb.h"
-#include "nrp_general_library/device_interface/data_device.h"
+#include "nrp_protobuf/engine_grpc.grpc.pb.h"
+#include "nrp_general_library/datapack_interface/datapack.h"
 #include "proto_python_bindings/proto_python_bindings.h"
 
-template<class ENGINE, FixedString SCHEMA, PROTO_MSG_C ...MSG_TYPES>
+template<class ENGINE, const char* SCHEMA, class ...MSG_TYPES>
 class EngineGrpcClient
     : public EngineClient<ENGINE, SCHEMA>
 {
@@ -44,7 +44,7 @@ class EngineGrpcClient
         // TODO It happens that gRPC call is performed before the server is fully initialized.
         // This line was supposed to fix it, but it's breaking some of the tests. The issue will be addressed in NRRPLT-8187.
         // context->set_wait_for_ready(true);
-            
+
         // Set RPC timeout (in absolute time), if it has been specified by the user
 
         if(this->_rpcTimeout > SimulationTime::zero())
@@ -58,6 +58,8 @@ class EngineGrpcClient
         EngineGrpcClient(nlohmann::json &config, ProcessLauncherInterface::unique_ptr &&launcher)
             : EngineClient<ENGINE, SCHEMA>(config, std::move(launcher))
         {
+            static_assert((std::is_base_of_v<google::protobuf::Message, MSG_TYPES> && ...), "Parameter MSG_TYPES must derive from protobuf::Message");
+
 		    NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
             std::string serverAddress = this->engineConfig().at("ServerAddress");
@@ -87,7 +89,7 @@ class EngineGrpcClient
         grpc_connectivity_state connect()
         {
 		    NRP_LOGGER_TRACE("{} called", __FUNCTION__);
-            
+
             _channel->GetState(true);
             _channel->WaitForConnected(gpr_time_add(
             gpr_now(GPR_CLOCK_REALTIME), gpr_time_from_seconds(10, GPR_TIMESPAN)));
@@ -97,7 +99,7 @@ class EngineGrpcClient
         void sendInitCommand(const nlohmann::json & data)
         {
 		    NRP_LOGGER_TRACE("{} called", __FUNCTION__);
-
+            sleep(1);
             EngineGrpc::InitRequest  request;
             EngineGrpc::InitReply    reply;
             grpc::ClientContext      context;
@@ -106,11 +108,31 @@ class EngineGrpcClient
 
             request.set_json(data.dump());
 
+            NRPLogger::debug("Sending init command to server [ {} ]", this->engineName());
             grpc::Status status = _stub->init(&context, request, &reply);
 
             if(!status.ok())
             {
                 const auto errMsg = "Engine server initialization failed: " + status.error_message() + " (" + std::to_string(status.error_code()) + ")";
+                throw std::runtime_error(errMsg);
+            }
+        }
+
+        void sendResetCommand()
+        {
+	        NRP_LOGGER_TRACE("{} called", __FUNCTION__);
+            EngineGrpc::ResetRequest  request;
+            EngineGrpc::ResetReply    reply;
+            grpc::ClientContext       context;
+
+            prepareRpcContext(&context);
+
+            NRPLogger::debug("Sending reset command to server [ {} ]", this->engineName());
+            grpc::Status status = _stub->resetHandle(&context, request, &reply);
+
+            if(!status.ok())
+            {
+                const auto errMsg = "Engine server reset failed: " + status.error_message() + " (" + std::to_string(status.error_code()) + ")";
                 throw std::runtime_error(errMsg);
             }
         }
@@ -127,6 +149,7 @@ class EngineGrpcClient
 
             request.set_json(data.dump());
 
+            NRPLogger::debug("Sending shutdown command to server [ {} ]", this->engineName());
             grpc::Status status = _stub->shutdown(&context, request, &reply);
 
             if(!status.ok())
@@ -136,7 +159,7 @@ class EngineGrpcClient
             }
         }
 
-        SimulationTime sendRunLoopStepCommand(const SimulationTime timeStep)
+        SimulationTime runLoopStepCallback(const SimulationTime timeStep) override
         {
 		    NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
@@ -179,66 +202,34 @@ class EngineGrpcClient
             return engineTime;
         }
 
-        SimulationTime getEngineTime() const override
-        {
-            return this->_engineTime;
-        }
-
-        virtual void runLoopStep(SimulationTime timeStep) override
-        {
-            this->_loopStepThread = std::async(std::launch::async, std::bind(&EngineGrpcClient::sendRunLoopStepCommand, this, timeStep));
-        }
-
-        virtual void waitForStepCompletion(float timeOut) override
+		virtual void sendDataPacksToEngine(const typename EngineClientInterface::datapacks_ptr_t &datapacksArray) override
         {
 		    NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
-            // If thread state is invalid, loop thread has completed and waitForStepCompletion was called once before
-            if(!this->_loopStepThread.valid())
-            {
-                return;
-            }
-
-            // Wait until timeOut has passed
-            if(timeOut > 0)
-            {
-                if(this->_loopStepThread.wait_for(std::chrono::duration<double>(timeOut)) != std::future_status::ready)
-					throw NRPException::logCreate("Engine \"" + this->engineName() + "\" loop is taking too long to complete");
-            }
-            else
-                this->_loopStepThread.wait();
-
-            this->_engineTime = this->_loopStepThread.get();
-        }
-
-		virtual void sendDevicesToEngine(const typename EngineClientInterface::devices_ptr_t &devicesArray) override
-        {
-		    NRP_LOGGER_TRACE("{} called", __FUNCTION__);
-
-            EngineGrpc::SetDeviceRequest request;
-            EngineGrpc::SetDeviceReply   reply;
+            EngineGrpc::SetDataPackRequest request;
+            EngineGrpc::SetDataPackReply   reply;
             grpc::ClientContext          context;
 
             prepareRpcContext(&context);
 
-            for(const auto &device : devicesArray)
+            for(const auto &datapack : datapacksArray)
             {
-                if(device->engineName().compare(this->engineName()) == 0)
+                if(datapack->engineName().compare(this->engineName()) == 0)
                 {
-                    if(device->isEmpty())
-                        throw NRPException::logCreate("Attempt to send empty device " + device->name() + " to Engine " + this->engineName());
+                    if(datapack->isEmpty())
+                        throw NRPException::logCreate("Attempt to send empty datapack " + datapack->name() + " to Engine " + this->engineName());
                     else {
                         auto r = request.add_request();
-                        setProtoFromDeviceInterface<MSG_TYPES...>(r, device);
+                        setProtoFromDataPackInterface<MSG_TYPES...>(r, datapack);
                     }
                 }
             }
 
-            grpc::Status status = _stub->setDevice(&context, request, &reply);
+            grpc::Status status = _stub->setDataPack(&context, request, &reply);
 
             if(!status.ok())
             {
-                const auto errMsg = "Engine server sendDevicesToEngine failed: " + status.error_message() + " (" + std::to_string(status.error_code()) + ")";
+                const auto errMsg = "Engine server sendDataPacksToEngine failed: " + status.error_message() + " (" + std::to_string(status.error_code()) + ")";
                 throw std::runtime_error(errMsg);
             }
         }
@@ -251,57 +242,57 @@ class EngineGrpcClient
 
             std::string name = this->engineConfig().at("EngineName");
             startParams.push_back(std::string("--") + EngineGRPCConfigConst::EngineNameArg.data() + "=" + name);
-    
+
             // Add JSON Server address (will be used by EngineGrpcServer)
             std::string address = this->engineConfig().at("ServerAddress");
             startParams.push_back(std::string("--") + EngineGRPCConfigConst::EngineServerAddrArg.data() + "=" + address);
-    
+
             return startParams;
         }
-    
+
         virtual const std::vector<std::string> engineProcEnvParams() const override
         {
             return this->engineConfig().at("EngineEnvParams");
         }
 
         template<class MSG_TYPE, class ...REMAINING_MSG_TYPES>
-        DeviceInterfaceConstSharedPtr getDeviceInterfaceFromProto(EngineGrpc::DeviceMessage &deviceData) const
+        DataPackInterfaceConstSharedPtr getDataPackInterfaceFromProto(Engine::DataPackMessage &datapackData) const
         {
-            const google::protobuf::OneofDescriptor *fieldOne = deviceData.GetDescriptor()->FindOneofByName("data");
-            const google::protobuf::FieldDescriptor *field = deviceData.GetReflection()->GetOneofFieldDescriptor(deviceData,fieldOne);
+            const google::protobuf::OneofDescriptor *fieldOne = datapackData.GetDescriptor()->FindOneofByName("data");
+            const google::protobuf::FieldDescriptor *field = datapackData.GetReflection()->GetOneofFieldDescriptor(datapackData,fieldOne);
             if(field && std::strstr(typeid(MSG_TYPE).name(), field->message_type()->name().data())) {
-                return DeviceInterfaceConstSharedPtr(
-                        new DataDevice<MSG_TYPE>(deviceData.deviceid().devicename(), this->engineName(),
-                                               dynamic_cast<MSG_TYPE *>(deviceData.GetReflection()->ReleaseMessage(&deviceData, field))));
+                return DataPackInterfaceConstSharedPtr(
+                        new DataPack<MSG_TYPE>(datapackData.datapackid().datapackname(), this->engineName(),
+                                               dynamic_cast<MSG_TYPE *>(datapackData.GetReflection()->ReleaseMessage(&datapackData, field))));
             }
-            // There's no data set in the message, so create an empty device with device ID only
+            // There's no data set in the message, so create an empty datapack with datapack ID only
             else if(!field) {
-                // NOTE: deviceData.deviceid().devicetype() becomes useless, it should always be set internally in Device
+                // NOTE: datapackData.datapackid().datapacktype() becomes useless, it should always be set internally in DataPack
                 //  constructor
-                return DeviceInterfaceConstSharedPtr(new DeviceInterface(deviceData.deviceid().devicename(),
-                                                     this->engineName(), deviceData.deviceid().devicetype()));
+                return DataPackInterfaceConstSharedPtr(new DataPackInterface(datapackData.datapackid().datapackname(),
+                                                     this->engineName(), datapackData.datapackid().datapacktype()));
             }
 
             if constexpr (sizeof...(REMAINING_MSG_TYPES) > 0)
-                return getDeviceInterfaceFromProto<REMAINING_MSG_TYPES...>(deviceData);
+                return getDataPackInterfaceFromProto<REMAINING_MSG_TYPES...>(datapackData);
             else
                 throw NRPException::logCreate("Data type: \"" + field->name() + "\" is not supported by engine" +
                 this->engineName());
         }
 
         template<class MSG_TYPE, class ...REMAINING_MSG_TYPES>
-        void setProtoFromDeviceInterface(EngineGrpc::DeviceMessage *deviceData, DeviceInterface* device)
+        void setProtoFromDataPackInterface(Engine::DataPackMessage *datapackData, DataPackInterface* datapack)
         {
-            if(dynamic_cast< DataDevice<MSG_TYPE> *>(device)) {
-                deviceData->mutable_deviceid()->set_devicename(device->name());
-                MSG_TYPE* d = dynamic_cast< DataDevice<MSG_TYPE> *>(device)->releaseData();
-                auto n = deviceData->GetDescriptor()->field_count();
-                auto device_type = d->GetDescriptor()->full_name();
+            if(dynamic_cast< DataPack<MSG_TYPE> *>(datapack)) {
+                datapackData->mutable_datapackid()->set_datapackname(datapack->name());
+                MSG_TYPE* d = dynamic_cast< DataPack<MSG_TYPE> *>(datapack)->releaseData();
+                auto n = datapackData->GetDescriptor()->field_count();
+                auto datapack_type = d->GetDescriptor()->full_name();
                 for(int i=0;i<n;++i) {
-                    auto field_type = deviceData->GetDescriptor()->field(i)->message_type()->full_name();
-                    if (device_type == field_type) {
-                        deviceData->GetReflection()->SetAllocatedMessage(deviceData, d,
-                                                                         deviceData->GetDescriptor()->field(i));
+                    auto field_type = datapackData->GetDescriptor()->field(i)->message_type()->full_name();
+                    if (datapack_type == field_type) {
+                        datapackData->GetReflection()->SetAllocatedMessage(datapackData, d,
+                                                                         datapackData->GetDescriptor()->field(i));
                         return;
                     }
                 }
@@ -311,56 +302,62 @@ class EngineGrpcClient
             }
 
             if constexpr (sizeof...(REMAINING_MSG_TYPES) > 0)
-                return setProtoFromDeviceInterface<REMAINING_MSG_TYPES...>(deviceData, device);
+                return setProtoFromDataPackInterface<REMAINING_MSG_TYPES...>(datapackData, datapack);
             else
-                throw NRPException::logCreate("Device " + device->name() + " is not supported by engine" +
+                throw NRPException::logCreate("DataPack " + datapack->name() + " is not supported by engine" +
                                         this->engineName());
         }
 
-	protected:
-		virtual typename EngineClientInterface::devices_set_t getDevicesFromEngine(const typename EngineClientInterface::device_identifiers_set_t &deviceIdentifiers) override
+
+		virtual typename EngineClientInterface::datapacks_set_t getDataPacksFromEngine(const typename EngineClientInterface::datapack_identifiers_set_t &datapackIdentifiers) override
 		{
 		    NRP_LOGGER_TRACE("{} called", __FUNCTION__);
-            
-			EngineGrpc::GetDeviceRequest request;
-			EngineGrpc::GetDeviceReply   reply;
+
+			EngineGrpc::GetDataPackRequest request;
+			EngineGrpc::GetDataPackReply   reply;
 			grpc::ClientContext          context;
 
-			for(const auto &devID : deviceIdentifiers)
+			for(const auto &devID : datapackIdentifiers)
 			{
 				if(this->engineName().compare(devID.EngineName) == 0)
 				{
-					auto r = request.add_deviceid();
+					auto r = request.add_datapackid();
 
-					r->set_devicename(devID.Name);
-					r->set_devicetype(devID.Type);
+					r->set_datapackname(devID.Name);
+					r->set_datapacktype(devID.Type);
 					r->set_enginename(devID.EngineName);
 				}
 			}
 
-			grpc::Status status = _stub->getDevice(&context, request, &reply);
+			grpc::Status status = _stub->getDataPack(&context, request, &reply);
 
 			if(!status.ok())
 			{
-				const auto errMsg = "Engine client getDevicesFromEngine failed: " + status.error_message() + " (" + std::to_string(status.error_code()) + ")";
+				const auto errMsg = "Engine client getDataPacksFromEngine failed: " + status.error_message() + " (" + std::to_string(status.error_code()) + ")";
 				throw std::runtime_error(errMsg);
 			}
 
-            typename EngineClientInterface::devices_set_t interfaces;
+            typename EngineClientInterface::datapacks_set_t interfaces;
             for(int i = 0; i < reply.reply_size(); i++)
-                interfaces.insert(this->getDeviceInterfaceFromProto<MSG_TYPES...>(*reply.mutable_reply(i)));
+                interfaces.insert(this->getDataPackInterfaceFromProto<MSG_TYPES...>(*reply.mutable_reply(i)));
 
             return interfaces;
 		}
+
+    protected:
+
+        void resetEngineTime() override
+        {
+            EngineClient<ENGINE, SCHEMA>::resetEngineTime();
+            this->_prevEngineTime = SimulationTime::zero();
+        }
 
     private:
 
         std::shared_ptr<grpc::Channel>                       _channel;
         std::unique_ptr<EngineGrpc::EngineGrpcService::Stub> _stub;
 
-        std::future<SimulationTime> _loopStepThread;
         SimulationTime _prevEngineTime = SimulationTime::zero();
-        SimulationTime _engineTime     = SimulationTime::zero();
         SimulationTime _rpcTimeout     = SimulationTime::zero();
 };
 

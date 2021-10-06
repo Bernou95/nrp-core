@@ -26,7 +26,7 @@
 #include "nrp_general_library/utils/python_interpreter_state.h"
 
 #include "nrp_python_json_engine/config/cmake_constants.h"
-#include "nrp_python_json_engine/engine_server/python_engine_json_device_controller.h"
+#include "nrp_python_json_engine/engine_server/python_engine_json_datapack_controller.h"
 #include "nrp_python_json_engine/python/py_engine_script.h"
 
 #include <fstream>
@@ -36,16 +36,14 @@ namespace python = boost::python;
 
 PythonJSONServer *PythonJSONServer::_registrationPyServer = nullptr;
 
-PythonJSONServer::PythonJSONServer(const std::string &serverAddress, python::dict globals, python::object locals)
+PythonJSONServer::PythonJSONServer(const std::string &serverAddress, python::dict globals)
     : EngineJSONServer(serverAddress),
-      _pyGlobals(globals),
-      _pyLocals(locals)
+      _pyGlobals(globals)
 {}
 
-PythonJSONServer::PythonJSONServer(const std::string &serverAddress, const std::string &engineName, const std::string &registrationAddress, python::dict globals, boost::python::object locals)
+PythonJSONServer::PythonJSONServer(const std::string &serverAddress, const std::string &engineName, const std::string &registrationAddress, python::dict globals)
     : EngineJSONServer(serverAddress, engineName, registrationAddress),
-      _pyGlobals(globals),
-      _pyLocals(locals)
+      _pyGlobals(globals)
 {}
 
 bool PythonJSONServer::initRunFlag() const
@@ -79,8 +77,9 @@ SimulationTime PythonJSONServer::runLoopStep(SimulationTime timestep)
 nlohmann::json PythonJSONServer::initialize(const nlohmann::json &data, EngineJSONServer::lock_t&)
 {
 	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
-	
+
 	PythonGILLock lock(this->_pyGILState, true);
+	_initData = data;
 	try
 	{
 		// Load python
@@ -114,7 +113,7 @@ nlohmann::json PythonJSONServer::initialize(const nlohmann::json &data, EngineJS
 	// Read python file
 	try
 	{
-		python::exec_file(fileName.c_str(), this->_pyGlobals, this->_pyLocals);
+		python::exec_file(fileName.c_str(), this->_pyGlobals, this->_pyGlobals);
 	}
 	catch(python::error_already_set &)
 	{
@@ -157,6 +156,34 @@ nlohmann::json PythonJSONServer::initialize(const nlohmann::json &data, EngineJS
 	return nlohmann::json({{PythonConfigConst::InitFileExecStatus, true}});
 }
 
+
+nlohmann::json PythonJSONServer::reset(EngineJSONServer::lock_t &lock)
+{
+	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
+
+	if (!this->initRunFlag())
+	{
+		return nlohmann::json({{PythonConfigConst::ResetExecStatus, false}, {PythonConfigConst::ErrorMsg, "Cannot reset non-initialized instance"}});
+	}
+
+	try
+	{
+		this->shutdown(_initData);
+
+		this->_shutdownFlag = false;
+
+		this->initialize(_initData, lock);
+
+		return nlohmann::json({{PythonConfigConst::ResetExecStatus, true}});
+	}
+	catch (python::error_already_set &)
+	{
+		const auto msg = handle_pyerror();
+		NRPLogger::error("Failed to reset Python Engine instance: {}", msg);
+		return nlohmann::json({{PythonConfigConst::ResetExecStatus, false}, {PythonConfigConst::ErrorMsg, msg}});
+	}
+}
+
 nlohmann::json PythonJSONServer::shutdown(const nlohmann::json &)
 {
 	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
@@ -180,9 +207,9 @@ nlohmann::json PythonJSONServer::shutdown(const nlohmann::json &)
 		}
 	}
 
-	// Remove device controllers
-	this->clearRegisteredDevices();
-	this->_deviceControllerPtrs.clear();
+	// Remove datapack controllers
+	this->clearRegisteredDataPacks();
+	this->_datapackControllerPtrs.clear();
 
 	return nlohmann::json();
 }
@@ -207,17 +234,20 @@ PyEngineScript *PythonJSONServer::registerScript(const boost::python::object &py
 
 nlohmann::json PythonJSONServer::formatInitErrorMessage(const std::string &errMsg)
 {
-	return nlohmann::json({{PythonConfigConst::InitFileExecStatus, 0}, {PythonConfigConst::InitFileErrorMsg, errMsg}});
+	return nlohmann::json({{PythonConfigConst::InitFileExecStatus, 0}, {PythonConfigConst::ErrorMsg, errMsg}});
 }
 
-nlohmann::json PythonJSONServer::getDeviceData(const nlohmann::json &reqData)
+nlohmann::json PythonJSONServer::getDataPackData(const nlohmann::json &reqData)
 {
 	PythonGILLock lock(this->_pyGILState, true);
-	return this->EngineJSONServer::getDeviceData(reqData);
+	return this->EngineJSONServer::getDataPackData(reqData);
 }
 
-nlohmann::json PythonJSONServer::setDeviceData(const nlohmann::json &reqData)
+nlohmann::json PythonJSONServer::setDataPackData(const nlohmann::json &reqData)
 {
 	PythonGILLock lock(this->_pyGILState, true);
-	return this->EngineJSONServer::setDeviceData(reqData);
+	return this->EngineJSONServer::setDataPackData(reqData);
 }
+
+nlohmann::json PythonJSONServer::getEngineConfig() const
+{ return this->_initData; }

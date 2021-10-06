@@ -4,7 +4,7 @@ set(HEADER_DIRECTORY "nrp_nest_json_engine")
 set(NAMESPACE_NAME "${PROJECT_NAME}")
 
 set(LIBRARY_NAME "${PROJECT_NAME}")
-set(PYTHON_MODULE_NAME "NRPNestJSONPythonModule")
+set(PYTHON_MODULE_NAME "nest_json")
 set(EXECUTABLE_NAME "NRPNestJSONExecutable")
 set(TEST_NAME "${PROJECT_NAME}Tests")
 
@@ -20,12 +20,12 @@ include(ExternalProject)
 
 # List library build files
 set(LIB_SRC_FILES
-		nrp_nest_json_engine/config/nest_config.cpp
-	nrp_nest_json_engine/devices/nest_device.cpp
-	nrp_nest_json_engine/engine_server/nest_engine_device_controller.cpp
+	nrp_nest_json_engine/config/nest_config.cpp
+	nrp_nest_json_engine/engine_server/nest_engine_datapack_controller.cpp
+	nrp_nest_json_engine/engine_server/nest_kernel_datapack_controller.cpp
 	nrp_nest_json_engine/engine_server/nest_json_server.cpp
 	nrp_nest_json_engine/nrp_client/nest_engine_json_nrp_client.cpp
-	nrp_nest_json_engine/python/create_device_class.cpp
+	nrp_nest_json_engine/python/create_datapack_class.cpp
 )
 
 # List of python module build files
@@ -65,7 +65,7 @@ configure_file("nrp_nest_json_engine/python/__init__.py.in" "${CMAKE_CURRENT_BIN
 
 
 ##########################################
-# NRPNestDeviceInterface
+# NRPNestDataPackInterface
 add_library("${LIBRARY_NAME}" SHARED ${LIB_SRC_FILES})
 add_library(${NAMESPACE_NAME}::${LIBRARY_NAME} ALIAS ${LIBRARY_NAME})
 target_compile_options(${LIBRARY_NAME} PUBLIC $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:GNU>>:${NRP_COMMON_COMPILATION_FLAGS}>)
@@ -184,13 +184,13 @@ install(DIRECTORY "${HEADER_DIRECTORY}" "${CMAKE_CURRENT_BINARY_DIR}/include/${H
 # Install python module
 if(TARGET ${PYTHON_MODULE_NAME})
 	install(TARGETS ${PYTHON_MODULE_NAME}
-		DESTINATION "${PYTHON_INSTALL_DIR_REL}/${PYTHON_MODULE_NAME}")
+		DESTINATION "${PYTHON_INSTALL_DIR_REL}/${NRP_PYTHON_MODULE_NAME}/engines/${PYTHON_MODULE_NAME}")
 
 	install(FILES "${CMAKE_CURRENT_BINARY_DIR}/src/__init__.py"
-		DESTINATION "${PYTHON_INSTALL_DIR_REL}/${PYTHON_MODULE_NAME}")
+		DESTINATION "${PYTHON_INSTALL_DIR_REL}/${NRP_PYTHON_MODULE_NAME}/engines/${PYTHON_MODULE_NAME}")
 
 	install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/nrp_nest_json_engine/python/numpy_json_serializer.py"
-		DESTINATION "${PYTHON_INSTALL_DIR_REL}/${PYTHON_MODULE_NAME}")
+		DESTINATION "${PYTHON_INSTALL_DIR_REL}/${NRP_PYTHON_MODULE_NAME}/engines/${PYTHON_MODULE_NAME}")
 endif()
 
 # Install executable files

@@ -1,13 +1,13 @@
-from NRPPythonModule import *
-from NRPProtoPythonModule import *
-from NRPNestJSONPythonModule import NestDevice
+from nrp_core import *
+from nrp_core.data.nrp_protobuf import *
+from nrp_core.data.nrp_json import *
 import numpy as np
 from PIL import Image
 import time
 import cv2
 
 
-def detect_red(camDevice):
+def detect_red(camDataPack):
     """
     Performs a very simple image detection as used in the Braitenberg demo.
     Copied and modified from original NRP, see hbp_nrp_cle/hbp_nrp_cle/tf_framework/tf_lib.py
@@ -24,14 +24,14 @@ def detect_red(camDevice):
     The lightest color that is recognized as red is (255,127,127).
     """
     red_left = red_right = green_blue = 0
-    if not camDevice.isEmpty():
+    if not camDataPack.isEmpty():
 
         lower_red = np.array([0, 30, 30])
         upper_red = np.array([0, 255, 255])
 
         # Reshape to proper size
-        d = np.frombuffer(camDevice.data.imageData, np.uint8)
-        cv_image = d.reshape((camDevice.data.imageHeight,camDevice.data.imageWidth,3))
+        d = np.frombuffer(camDataPack.data.imageData, np.uint8)
+        cv_image = d.reshape((camDataPack.data.imageHeight,camDataPack.data.imageWidth,3))
 
         # Transform image to HSV (easier to detect colors).
         hsv_image = cv2.cvtColor(cv_image, cv2.COLOR_RGB2HSV)
@@ -62,15 +62,15 @@ def detect_red(camDevice):
     return __results(red_left, red_right, green_blue)
 
 
-@FromEngineDevice(keyword='camera', id=DeviceIdentifier('husky_camera::camera', 'gazebo'))
-@PreprocessedDevice(keyword='processed', id=DeviceIdentifier('processed', 'gazebo'))
+@FromEngineDataPack(keyword='camera', id=DataPackIdentifier('husky_camera::camera', 'gazebo'))
+@PreprocessedDataPack(keyword='processed', id=DataPackIdentifier('processed', 'gazebo'))
 @TransceiverFunction("nest")
 def transceiver_function(camera, processed):
     #print("Camera Depth: " + str(camera.image_depth))
     
     # Set to True to display camera image data and pause for 10 s
     if False and not camera.isEmpty():
-        img = Image.fromarray(processed.data["grayscale"])
+        img = Image.fromarray(np.array(processed.data["grayscale"]))
         img.show()
         time.sleep(10)
 
@@ -80,13 +80,13 @@ def transceiver_function(camera, processed):
     # print("Right Red: " + str(res.right))
     # print("Go On:     " + str(res.go_on))
 
-    lpg = NestDevice("lpg", "nest")
-    rpg = NestDevice("rpg", "nest")
-    gpg = NestDevice("gpg", "nest")
+    lpg = JsonDataPack("lpg", "nest")
+    rpg = JsonDataPack("rpg", "nest")
+    gpg = JsonDataPack("gpg", "nest")
 
-    lpg.data = {'rate': 2000.0*res.left}
-    rpg.data = {'rate': 2000.0*res.right}
-    gpg.data = {'rate': 75.0*res.go_on}
+    lpg.data['rate'] = 2000.0*res.left
+    rpg.data['rate'] = 2000.0*res.right
+    gpg.data['rate'] = 75.0*res.go_on
 
     return [ lpg, rpg, gpg ]
 

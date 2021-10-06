@@ -1,11 +1,11 @@
-set(PROJECT_NAME "NRPSimulation")
+set(PROJECT_NAME "NRPCoreSim")
 set(HEADER_DIRECTORY "nrp_simulation")
 
 set(NAMESPACE_NAME "${PROJECT_NAME}")
 
-set(LIBRARY_NAME "NRPSimulationLib")
+set(LIBRARY_NAME "NRPCoreSimLib")
 set(PYTHON_MODULE_NAME "Py${PROJECT_NAME}")
-set(EXECUTABLE_NAME "NRPSimulation")
+set(EXECUTABLE_NAME "NRPCoreSim")
 set(TEST_NAME "${PROJECT_NAME}Tests")
 
 set(LIB_EXPORT_NAME "${LIBRARY_NAME}Targets")
@@ -19,8 +19,11 @@ include(GNUInstallDirs)
 
 # List library build files
 set(LIB_SRC_FILES
-	nrp_simulation/simulation/simulation_loop.cpp
+	nrp_simulation/simulation/nrp_core_server.cpp
+	nrp_simulation/simulation/fti_loop.cpp
 	nrp_simulation/simulation/simulation_manager.cpp
+		nrp_simulation/datapack_handle/datapack_handle.cpp
+		nrp_simulation/datapack_handle/tf_manager_handle.cpp
 )
 
 # List of python module build files
@@ -34,7 +37,7 @@ set(EXEC_SRC_FILES
 
 # List testing build files
 set(TEST_SRC_FILES
-    tests/simulation_loop.cpp
+    tests/fti_loop.cpp
 	tests/simulation_manager.cpp
 )
 
@@ -46,6 +49,10 @@ set(TEST_SRC_FILES
 find_package(PkgConfig)
 pkg_check_modules(Pistache REQUIRED IMPORTED_TARGET libpistache)
 
+pkg_check_modules(PROTOBUF REQUIRED protobuf)
+pkg_check_modules(GRPC REQUIRED grpc++)
+
+
 ##########################################
 ## Header configuration
 
@@ -55,9 +62,8 @@ list(JOIN NRP_SIMULATION_DEFAULT_ENGINE_LAUNCHERS "\", \"" NRP_SIMULATION_DEFAUL
 # General Header defines
 configure_file("nrp_simulation/config/cmake_conf.h.in" "${CMAKE_CURRENT_BINARY_DIR}/include/${HEADER_DIRECTORY}/config/cmake_conf.h" @ONLY)
 
-
 ##########################################
-# NRPSimulation
+# NRPCoreSim
 add_library(${LIBRARY_NAME} SHARED ${LIB_SRC_FILES})
 add_library(${NAMESPACE_NAME}::${LIBRARY_NAME} ALIAS ${LIBRARY_NAME})
 target_compile_options(${LIBRARY_NAME} PUBLIC $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:GNU>>:${NRP_COMMON_COMPILATION_FLAGS}>)
@@ -65,6 +71,9 @@ target_compile_options(${LIBRARY_NAME} PUBLIC $<$<OR:$<CXX_COMPILER_ID:Clang>,$<
 target_link_libraries(${LIBRARY_NAME}
 	PUBLIC
 	${NRP_GEN_LIB_TARGET}
+	${NRP_PROTO_LIB_TARGET}
+	${PROTOBUF_LIBRARIES}
+	${GRPC_LIBRARIES}
 )
 
 target_include_directories(${LIBRARY_NAME} BEFORE
@@ -139,6 +148,17 @@ if(ENABLE_GAZEBO STREQUAL FULL AND ENABLE_NEST STREQUAL FULL AND ${ENABLE_TESTIN
 	gtest_discover_tests(${TEST_NAME}
 		WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/tests"
 		EXTRA_ARGS -VV)
+
+	# Add python tests for NRP Server
+	find_package(Python3 COMPONENTS Interpreter)
+	if(Python3_Interpreter_FOUND)
+		add_test(NAME NrpServer COMMAND py.test --junitxml "${CMAKE_BINARY_DIR}/xml/NrpServer.xml" server.py "${CMAKE_SOURCE_DIR}/examples/tf_exchange" WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests)
+		set_property(TEST NrpServer PROPERTY ENVIRONMENT
+			"PYTHONPATH=${PYTHONPATH}:${CMAKE_INSTALL_PREFIX}/${PYTHON_INSTALL_DIR_REL}/${PYTHON_MODULE_NAME}:${CMAKE_INSTALL_PREFIX}/${PYTHON_INSTALL_DIR_REL}")
+	endif()
+
+	# Add tests based on running example experiments
+	add_test(NAME LoopSync COMMAND NRPCoreSim -c simulation_config.json -p "NRPNestJSONEngine.so" WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/examples/loop_sync_test)
 endif()
 
 
@@ -181,11 +201,15 @@ install(DIRECTORY "${HEADER_DIRECTORY}" "${CMAKE_CURRENT_BINARY_DIR}/include/${H
 # Install python module
 if(TARGET ${PYTHON_MODULE_NAME})
 	install(TARGETS ${PYTHON_MODULE_NAME}
-		DESTINATION "${PYTHON_INSTALL_DIR_REL}/${PYTHON_MODULE_NAME}")
+		DESTINATION "${PYTHON_INSTALL_DIR_REL}/${NRP_PYTHON_MODULE_NAME}")
 
 	install(FILES "${CMAKE_CURRENT_BINARY_DIR}/src/__init__.py"
-		DESTINATION "${PYTHON_INSTALL_DIR_REL}/${PYTHON_MODULE_NAME}")
+		DESTINATION "${PYTHON_INSTALL_DIR_REL}/${NRP_PYTHON_MODULE_NAME}")
 endif()
+
+# Install python module with the NRP client
+install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/nrp_simulation/python/client.py"
+	DESTINATION "${PYTHON_INSTALL_DIR_REL}/${NRP_PYTHON_MODULE_NAME}")
 
 # Install executable files
 if(TARGET ${EXECUTABLE_NAME})

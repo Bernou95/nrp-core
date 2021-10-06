@@ -50,7 +50,11 @@ cxxopts::Options SimulationParams::createStartParamParser()
 	        (SimulationParams::ParamFileLogLevelLong.data(), SimulationParams::ParamFileLogLevelDesc.data(),
 	         cxxopts::value<SimulationParams::ParamFileLogLevelT>()->default_value("off"))
 	        (SimulationParams::ParamLogDirLong.data(), SimulationParams::ParamLogDirDesc.data(),
-	         cxxopts::value<SimulationParams::ParamLogDirT>()->default_value("logs"));
+	         cxxopts::value<SimulationParams::ParamLogDirT>()->default_value("logs"))
+		(SimulationParams::ParamModeLong.data(), SimulationParams::ParamModeDesc.data(),
+	         cxxopts::value<SimulationParams::ParamModeT>()->default_value("standalone"))
+	        (SimulationParams::ParamServerAddressLong.data(), SimulationParams::ParamServerAddressDesc.data(),
+	         cxxopts::value<SimulationParams::ParamServerAddressT>()->default_value(""));
 
 	return opts;
 }
@@ -105,26 +109,15 @@ SimulationManager::~SimulationManager()
 {
 	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
-	// Stop running threads
-	this->shutdownLoop(this->acquireSimLock()); //TODO Refactor: why twice shutdownLoop?
-
-	// Prevent future sim initialization or loop execution
-	this->_internalLock.lock();
-	auto simLock = this->acquireSimLock(); //TODO Refactor: review locks usage
-
-	// Ensure that any potentially created loops are stopped
-	this->shutdownLoop(simLock);
-
-	// Keep locked until everything is destructed
-	simLock.release();
+	this->shutdownLoop();
 }
 
 
-SimulationManager SimulationManager::createFromParams(const cxxopts::ParseResult &args)
+jsonSharedPtr SimulationManager::configFromParams(const cxxopts::ParseResult &args)
 {
 	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
-    jsonSharedPtr simConfig = nullptr;
+	jsonSharedPtr simConfig = nullptr;
 
 	// Get file names from start params
 	std::string simCfgFileName;
@@ -175,36 +168,32 @@ SimulationManager SimulationManager::createFromParams(const cxxopts::ParseResult
 	{
 		// If no simulation file name is present, return empty config
 		NRPLogger::debug("Couldn't get configuration file from parameters, returning empty config");
-		return SimulationManager(simConfig);
+		return simConfig;
 	}
-
-	NRPLogger::info("Working directory: [ {} ]", std::filesystem::current_path().c_str());
-	NRPLogger::info("Configuration file: [ {} ]", simCfgFileName);
 
 	simConfig.reset(new nlohmann::json(SimulationParams::parseJSONFile(simCfgFileName)));
 
-	json_utils::validate_json(*simConfig, "https://neurorobotics.net/simulation.json#Simulation");
+	return simConfig;
+}
+
+
+SimulationManager SimulationManager::createFromConfig(jsonSharedPtr &config)
+{
+	json_utils::validate_json(*config, "https://neurorobotics.net/simulation.json#Simulation");
 
 	// Set default values
 
-	json_utils::set_default<std::vector<std::string>>(*simConfig, "TransceiverFunctionConfigs", std::vector<std::string>());
-    json_utils::set_default<std::vector<std::string>>(*simConfig, "PreprocessingFunctionConfigs", std::vector<std::string>());
+	json_utils::set_default<std::vector<std::string>>(*config, "DataPackProcessingFunctions", std::vector<std::string>());
 
-	return SimulationManager(simConfig);
+	return SimulationManager(config);
 }
 
-SimulationLoopConstSharedPtr SimulationManager::simulationLoop() const
+FTILoopConstSharedPtr SimulationManager::simulationLoop() const
 {
 	return this->_loop;
 }
 
-SimulationManager::sim_lock_t SimulationManager::acquireSimLock()
-{
-	auto retval = sim_lock_t(this->_simulationLock);
-	return retval;
-}
-
-jsonSharedPtr SimulationManager::simulationConfig(const sim_lock_t&)
+jsonSharedPtr SimulationManager::simulationConfig()
 {
 	return this->_simConfig;
 }
@@ -214,114 +203,104 @@ jsonConstSharedPtr SimulationManager::simulationConfig() const
 	return this->_simConfig;
 }
 
-void SimulationManager::initSimulationLoop(const EngineLauncherManagerConstSharedPtr &engineLauncherManager,
-                                                                    const MainProcessLauncherManager::const_shared_ptr &processLauncherManager,
-                                                                    sim_lock_t &simLock)
+void SimulationManager::initFTILoop(const EngineLauncherManagerConstSharedPtr &engineLauncherManager,
+                                           const MainProcessLauncherManager::const_shared_ptr &processLauncherManager)
 {
 	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
-
-	// Make sure initLock is retrieved before simLock
-	if(simLock.owns_lock())
-		simLock.unlock();
-
-	sim_lock_t initLock(this->_internalLock);
-
-	simLock.lock();
 
 	// Create and initialize loop
 	NRPLogger::info("Initializing simulation loop");
 
-	this->_loop.reset(new SimulationLoop(this->createSimLoop(engineLauncherManager, processLauncherManager)));
-
-	//sleep(10);
+	if(this->_loop == nullptr)
+	{
+		this->_loop.reset(new FTILoop(this->createSimLoop(engineLauncherManager, processLauncherManager)));
+	}
+	else
+	{
+		throw NRPException::logCreate("Simulation already initialized");
+	}
 
 	this->_loop->initLoop();
 }
 
-bool SimulationManager::isRunning() const
-{
-	return this->_loop != nullptr && this->_runningSimulation;
-}
-
-void SimulationManager::stopSimulation(const sim_lock_t&)
+bool SimulationManager::runSimulationUntilTimeout(int frac)
 {
 	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
-	this->_runningSimulation = false;
-}
 
-bool SimulationManager::runSimulationUntilTimeout(sim_lock_t &simLock)
-{
-	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
-	
 	if(this->_loop == nullptr)
 		return false;
-
-	// Lock and unlock mutex before/after every timestep. This allows server threads to execute
-	this->_runningSimulation = true;
-	simLock.unlock();
-
-	sim_lock_t internalLock(this->_internalLock);
 
 	bool hasTimedOut = false;
 
 	while(1)
 	{
-		// Check whether the simLoop was stopped by any server threads
-		simLock.lock();
+		hasTimedOut = hasSimTimedOut(this->_loop->getSimTime(), toSimulationTime<unsigned, std::ratio<1>>(frac * int(this->_simConfig->at("SimulationTimeout"))));
 
-		hasTimedOut = hasSimTimedOut(this->_loop->getSimTime(), toSimulationTime<unsigned, std::ratio<1>>(this->_simConfig->at("SimulationTimeout")));
-
-		if(!this->isRunning() || hasTimedOut)
+		if(hasTimedOut)
 			break;
 
 		SimulationTime timeStep = toSimulationTime<float, std::ratio<1>>(this->_simConfig->at("SimulationTimestep"));
 
 		this->_loop->runLoop(timeStep);
-
-		simLock.unlock();
-		std::this_thread::yield();			// Give any server threads that may wish to lock the simulation a chance to execute TODO: Use better command than sched_yield, which slows down execution significantly
 	}
-
-	this->_runningSimulation = false;
 
 	return hasTimedOut;
 }
 
-bool SimulationManager::runSimulation(const SimulationTime secs, sim_lock_t &simLock)
+bool SimulationManager::resetSimulation()
 {
-	NRP_LOGGER_TRACE("{} called [ secs: {} ]", __FUNCTION__, secs.count());
+	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
-	if(this->_loop == nullptr)
+	NRPLogger::info("SimulationManager: resetting simulation...");
+
+/*	if (this->isRunning()){
+		NRPLogger::error("Cannot reset the running simulation");
 		return false;
+	}
+	if(simLock.owns_lock())
+		simLock.unlock();*/
 
-	this->_runningSimulation = true;
-	simLock.unlock();
+	//sim_lock_t internalLock(this->_internalLock);
 
-	sim_lock_t internalLock(this->_internalLock);
+	try{
+		if(this->_loop != nullptr) {
+			//simLock.lock();
 
-	this->_runningSimulation = true;
-	const auto endTime = this->_loop->getSimTime() + secs;
-	while(1)
-	{
-		simLock.lock();
+			this->_loop->resetLoop();
 
-		if(!this->isRunning() || endTime < this->_loop->getSimTime())
-			break;
-
-		SimulationTime timeStep = toSimulationTime<float, std::ratio<1>>(this->_simConfig->at("SimulationTimestep"));
-
-		this->_loop->runLoop(timeStep);
-
-		simLock.unlock();
-		std::this_thread::yield();			// Give any server threads that may wish to lock the simulation a chance to execute TODO: Use better command than sched_yield, which slows down execution significantly
+			//simLock.unlock();
+			//std::this_thread::yield();
+		}
+		else{
+			throw NRPException::logCreate("SimulationManager: cannot reset the loop, the loop doesn't exist");
+		}
+	}
+	catch(NRPException &e) {
+		throw NRPException::logCreate(e, "SimulationManager: Loop reset has FAILED");
 	}
 
-	this->_runningSimulation = false;
-
-	return endTime <= this->_loop->getSimTime();
+	NRPLogger::info("SimulationManager: simulation is reset.");
+	return true;
 }
 
-void SimulationManager::shutdownLoop(const SimulationManager::sim_lock_t&)
+void SimulationManager::runSimulation(unsigned numIterations)
+{
+	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
+
+	if(this->_loop == nullptr)
+		throw NRPException::logCreate("Simulation must be initialized before calling runLoop");
+
+	const SimulationTime timeStep = toSimulationTime<float, std::ratio<1>>(this->_simConfig->at("SimulationTimestep"));
+
+	unsigned iteration = 0;
+
+	while(iteration++ < numIterations)
+	{
+		this->_loop->runLoop(timeStep);
+	}
+}
+
+void SimulationManager::shutdownLoop()
 {
 	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
@@ -330,7 +309,6 @@ void SimulationManager::shutdownLoop(const SimulationManager::sim_lock_t&)
 			this->_loop->shutdownLoop();
 
 			this->_loop = nullptr;
-			this->_runningSimulation = false;
 		}
 	}
 	catch(NRPException &e) {
@@ -339,22 +317,11 @@ void SimulationManager::shutdownLoop(const SimulationManager::sim_lock_t&)
 
 }
 
-bool SimulationManager::isSimInitializing()
+FTILoop SimulationManager::createSimLoop(const EngineLauncherManagerConstSharedPtr &engineManager, const MainProcessLauncherManager::const_shared_ptr &processLauncherManager)
 {
 	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
-	if(this->_loop != nullptr)
-		return false;
-
-	sim_lock_t lock(this->_internalLock, std::defer_lock);
-	return lock.try_lock();
-}
-
-SimulationLoop SimulationManager::createSimLoop(const EngineLauncherManagerConstSharedPtr &engineManager, const MainProcessLauncherManager::const_shared_ptr &processLauncherManager)
-{
-	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
-
-	SimulationLoop::engine_interfaces_t engines;
+	DataPackHandle::engine_interfaces_t engines;
 	auto &engineConfigs = this->_simConfig->at("EngineConfigs");
 
 	// Create all engines required by simConfig
@@ -383,5 +350,5 @@ SimulationLoop SimulationManager::createSimLoop(const EngineLauncherManagerConst
 		}
 	}
 
-	return SimulationLoop(this->_simConfig, engines);
+	return FTILoop(this->_simConfig, engines);
 }

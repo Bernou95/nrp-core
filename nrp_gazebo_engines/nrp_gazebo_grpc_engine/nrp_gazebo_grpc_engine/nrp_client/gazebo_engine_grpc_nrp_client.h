@@ -25,7 +25,7 @@
 #include "nrp_grpc_engine_protocol/engine_client/engine_grpc_client.h"
 #include "nrp_general_library/engine_interfaces/engine_client_interface.h"
 #include "nrp_general_library/plugin_system/plugin.h"
-#include "nrp_grpc_engine_protocol/grpc_server/engine_grpc.grpc.pb.h"
+#include "nrp_protobuf/engine_grpc.grpc.pb.h"
 
 #include "nrp_gazebo_grpc_engine/config/gazebo_grpc_config.h"
 
@@ -33,16 +33,18 @@
 
 
 /*!
- *  \brief NRP - Gazebo Communicator on the NRP side. Converts DeviceInterface classes from/to JSON objects
+ *  \brief NRP - Gazebo Communicator on the NRP side. Converts DataPackInterface classes from/to JSON objects
  */
 class GazeboEngineGrpcNRPClient
-: public EngineGrpcClient<GazeboEngineGrpcNRPClient, GazeboGrpcConfigConst::EngineSchema, EngineGrpc::GazeboCamera, EngineGrpc::GazeboJoint, EngineGrpc::GazeboLink>
+: public EngineGrpcClient<GazeboEngineGrpcNRPClient, GazeboGrpcConfigConst::EngineSchema, Gazebo::Camera, Gazebo::Joint, Gazebo::Link>
 {
 	public:
 		GazeboEngineGrpcNRPClient(nlohmann::json &config, ProcessLauncherInterface::unique_ptr &&launcher);
 		virtual ~GazeboEngineGrpcNRPClient() override = default;
 
 		virtual void initialize() override;
+
+		virtual void reset() override;
 
 		virtual void shutdown() override;
 

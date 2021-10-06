@@ -28,12 +28,13 @@
 #include "nrp_general_library/utils/restclient_setup.h"
 #include "nrp_simulation/config/cmake_conf.h"
 #include "nrp_simulation/simulation/simulation_manager.h"
-#include "nrp_general_library/utils/nrp_logger.h"
+#include "nrp_simulation/simulation/nrp_core_server.h"
 
 #include <stdlib.h>
 #include <string.h>
 
-void loadPlugins(const char *libName, PluginManager &pluginManager, const EngineLauncherManagerSharedPtr &engines)
+
+static void loadPlugins(const char *libName, PluginManager &pluginManager, const EngineLauncherManagerSharedPtr &engines)
 {
 	NRP_LOGGER_TRACE("{} called [ libName: {} ]", __FUNCTION__, libName);
 
@@ -50,6 +51,89 @@ void loadPlugins(const char *libName, PluginManager &pluginManager, const Engine
 	NRPLogger::debug("Engine launcher ({}) is registered", libName);
 }
 
+
+static void loadEngines(PluginManager & pluginManager,
+                        EngineLauncherManagerSharedPtr & engines,
+                        const cxxopts::ParseResult & startParams)
+{
+	// Add plugin path to LD_LIBRARY_PATH
+	pluginManager.addPluginPath(NRP_PLUGIN_INSTALL_DIR);
+
+	// Iterate over default plugin libs, separated by ' '
+	const auto defaultLaunchers = NRP_SIMULATION_DEFAULT_ENGINE_LAUNCHERS;
+	for(const auto &libName : defaultLaunchers)
+		loadPlugins(libName, pluginManager, engines);
+
+	auto pluginsParam = startParams[SimulationParams::ParamPlugins.data()].as<SimulationParams::ParamPluginsT>();
+	for(const auto &libName : pluginsParam)
+		loadPlugins(libName.c_str(), pluginManager, engines);
+}
+
+
+static void runServerMode(EngineLauncherManagerSharedPtr & engines,
+						  MainProcessLauncherManager::shared_ptr & processLaunchers,
+						  SimulationManager & manager,
+						  const std::string & address)
+{
+	NrpCoreServer server(address);
+
+	bool isShutdown = false;
+
+	while(true)
+	{
+		server.waitForRequest();
+
+		// Check the request type and handle it accordingly
+
+		try
+		{
+			switch(server.getRequestType())
+			{
+				case NrpCoreServer::RequestType::Init:
+					manager.initFTILoop(engines, processLaunchers);
+					break;
+				case NrpCoreServer::RequestType::RunLoop:
+					manager.runSimulation(server.getNumIterations());
+					break;
+				case NrpCoreServer::RequestType::Shutdown:
+					isShutdown = true;
+					// manager.shutdownLoop() will be called on SimulationManager destruction
+					break;
+				default:
+					throw NRPException::logCreate("Unknown request received");
+			}
+		}
+		catch(std::exception &e)
+		{
+			server.markRequestAsFailed(e.what());
+		}
+
+		server.markRequestAsProcessed();
+
+		// Break out of the loop, if shutdown was requested
+
+		if(isShutdown)
+		{
+			break;
+		}
+	};
+}
+
+
+static void runStandaloneMode(EngineLauncherManagerSharedPtr & engines,
+							  MainProcessLauncherManager::shared_ptr & processLaunchers,
+							  SimulationManager & manager)
+{
+	NRPLogger::info("Config file specified, launching...\n");
+
+	manager.initFTILoop(engines, processLaunchers);
+	manager.runSimulationUntilTimeout();
+	// NRRPLT-8246: uncomment to test reset
+	// manager.resetSimulation();
+	// manager.runSimulationUntilTimeout();
+}
+
+
 int main(int argc, char *argv[])
 {
 	RestClientSetup::ensureInstance();
@@ -64,9 +148,9 @@ int main(int argc, char *argv[])
 	catch(cxxopts::OptionParseException &e)
 	{
 		// If options aren't well formed, output help and exit
-		std::cout << e.what() << std::endl;
-		std::cout << optParser.help();
-		return 0;
+		std::cerr << e.what() << std::endl;
+		std::cerr << optParser.help();
+		return 1;
 	}
 
 	auto &startParams = *startParamPtr;
@@ -77,6 +161,9 @@ int main(int argc, char *argv[])
 		std::cout << optParser.help();
 		return 0;
 	}
+
+	// Setup working directory and get config based on start pars
+	jsonSharedPtr simConfig = SimulationManager::configFromParams(startParams);
 
 	// Create default logger for the launcher
 	auto logger = NRPLogger
@@ -92,6 +179,8 @@ int main(int argc, char *argv[])
 		true
 	);
 
+	NRPLogger::info("Working directory: [ {} ]", std::filesystem::current_path().c_str());
+
 	// Setup Python
 	PythonInterpreterState pythonInterp(argc, argv);
 
@@ -102,36 +191,45 @@ int main(int argc, char *argv[])
 	PluginManager pluginManager;
 	EngineLauncherManagerSharedPtr engines(new EngineLauncherManager());
 
-
-	// Load engine launchers from default plugins
-	{
-		// Add plugin path to LD_LIBRARY_PATH
-		pluginManager.addPluginPath(NRP_PLUGIN_INSTALL_DIR);
-
-		// Iterate over default plugin libs, separated by ' '
-		const auto defaultLaunchers = NRP_SIMULATION_DEFAULT_ENGINE_LAUNCHERS;
-		for(const auto &libName : defaultLaunchers)
-			loadPlugins(libName, pluginManager, engines);
-
-		auto pluginsParam = startParams[SimulationParams::ParamPlugins.data()].as<SimulationParams::ParamPluginsT>();
-		for(const auto &libName : pluginsParam)
-			loadPlugins(libName.c_str(), pluginManager, engines);
-	}
+	loadEngines(pluginManager, engines, startParams);
 
 	// Load simulation
-	SimulationManager manager = SimulationManager::createFromParams(startParams);
 
-	// Check if configuration file was specified
-	if(manager.simulationConfig() != nullptr)
+	SimulationManager manager = SimulationManager::createFromConfig(simConfig);
+
+	if(manager.simulationConfig() == nullptr)
 	{
-		NRPLogger::info("Config file specified, launching...");
-
-		auto simLock = manager.acquireSimLock();
-		manager.initSimulationLoop(engines, processLaunchers, simLock);
-
-		manager.runSimulationUntilTimeout(simLock);
+		NRPLogger::error("Simulation configuration file not specified");
+		return 1;
 	}
 
+	// Run the simulation in the specified mode
+
+	const auto mode = startParams[SimulationParams::ParamMode.data()].as<std::string>();
+
+	if(mode == "server")
+	{
+		const std::string serverAddress = startParams[SimulationParams::ParamServerAddressLong.data()].as<std::string>();
+
+		if(serverAddress.empty())
+		{
+			NRPLogger::error("Server address not specified");
+			return 1;
+		}
+
+		runServerMode(engines, processLaunchers, manager, serverAddress);
+	}
+	else if(mode == "standalone")
+	{
+		runStandaloneMode(engines, processLaunchers, manager);
+	}
+	else
+	{
+		NRPLogger::error("Unknown operational mode '" + mode + "'");
+		return 1;
+	}
+
+	NRPLogger::info("Exiting Simulation Manager");
 	return 0;
 }
 

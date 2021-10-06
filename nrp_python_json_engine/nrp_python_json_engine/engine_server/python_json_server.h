@@ -22,12 +22,11 @@
 #ifndef PYTHON_JSON_SERVER_H
 #define PYTHON_JSON_SERVER_H
 
-#include "nrp_python_device/devices/pyobject_device.h"
 #include "nrp_json_engine_protocol/engine_server/engine_json_server.h"
 #include "nrp_general_library/utils/python_interpreter_state.h"
 
 #include "nrp_python_json_engine/config/python_config.h"
-#include "nrp_python_json_engine/engine_server/python_engine_json_device_controller.h"
+#include "nrp_python_json_engine/engine_server/python_engine_json_datapack_controller.h"
 
 #include <boost/python.hpp>
 
@@ -37,8 +36,8 @@ class PythonJSONServer
         : public EngineJSONServer
 {
 	public:
-		PythonJSONServer(const std::string &serverAddress, boost::python::dict globals, boost::python::object locals);
-		PythonJSONServer(const std::string &serverAddress, const std::string &engineName, const std::string &registrationAddress, boost::python::dict globals, boost::python::object locals);
+		PythonJSONServer(const std::string &serverAddress, boost::python::dict globals);
+		PythonJSONServer(const std::string &serverAddress, const std::string &engineName, const std::string &registrationAddress, boost::python::dict globals);
 		virtual ~PythonJSONServer() override = default;
 
 		/*!
@@ -54,7 +53,8 @@ class PythonJSONServer
 		bool shutdownFlag() const;
 
 		virtual SimulationTime runLoopStep(SimulationTime timeStep) override;
-		virtual nlohmann::json initialize(const nlohmann::json &data, EngineJSONServer::lock_t &deviceLock) override;
+		virtual nlohmann::json initialize(const nlohmann::json &data, EngineJSONServer::lock_t &datapackLock) override;
+		virtual nlohmann::json reset(EngineJSONServer::lock_t &datapackLock) override;
 		virtual nlohmann::json shutdown(const nlohmann::json &data) override;
 
 		/*!
@@ -63,6 +63,12 @@ class PythonJSONServer
 		 * \return Returns ptr to PyEngineScript of pythonScript
 		 */
 		static PyEngineScript *registerScript(const boost::python::object &pythonScript);
+
+        /*!
+         * \brief Returns this Engine configuration
+         * \return Returns this Engine configuration
+         */
+        nlohmann::json getEngineConfig() const;
 
 	private:
 		/*!
@@ -87,19 +93,14 @@ class PythonJSONServer
 		boost::python::dict _pyGlobals;
 
 		/*!
-		 * \brief Local Python variables
-		 */
-		boost::python::object _pyLocals;
-
-		/*!
 		 * \brief Python script to execute
 		 */
 		boost::python::object _pyEngineScript;
 
 		/*!
-		 * \brief List of device ptrs. Used to manage controller deletion
+		 * \brief List of datapack ptrs. Used to manage controller deletion
 		 */
-		std::list<EngineDeviceControllerInterface<nlohmann::json>::shared_ptr> _deviceControllerPtrs;
+		std::list<std::shared_ptr<DataPackController<nlohmann::json>>> _datapackControllerPtrs;
 
 		/*!
 		 *	\brief GIL Lock state
@@ -113,9 +114,11 @@ class PythonJSONServer
 		 */
 		static nlohmann::json formatInitErrorMessage(const std::string &errMsg);
 
-		nlohmann::json getDeviceData(const nlohmann::json &reqData) override;
+		nlohmann::json getDataPackData(const nlohmann::json &reqData) override;
 
-		nlohmann::json setDeviceData(const nlohmann::json &reqData) override;
+		nlohmann::json setDataPackData(const nlohmann::json &reqData) override;
+
+		nlohmann::json _initData;
 
 };
 

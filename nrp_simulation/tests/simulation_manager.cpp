@@ -100,9 +100,8 @@ TEST(SimulationManagerTest, SetupExperimentConfig)
 
 	{
 		auto startParamVals(optParser.parse(argc, argv));
-		SimulationManager manager = SimulationManager::createFromParams(startParamVals);
 
-		ASSERT_EQ(manager.simulationConfig(), nullptr);
+		ASSERT_EQ(SimulationManager::configFromParams(startParamVals), nullptr);
 	}
 
 	// Test non-existent file
@@ -115,7 +114,7 @@ TEST(SimulationManagerTest, SetupExperimentConfig)
 
 	{
 		auto startParamVals(optParser.parse(argc, argv));
-		ASSERT_THROW(SimulationManager manager = SimulationManager::createFromParams(startParamVals), std::invalid_argument);
+		ASSERT_THROW(SimulationManager::configFromParams(startParamVals), std::invalid_argument);
 	}
 
 	// Test invalid JSON config file
@@ -128,7 +127,7 @@ TEST(SimulationManagerTest, SetupExperimentConfig)
 
 	{
 		auto startParamVals(optParser.parse(argc, argv));
-		ASSERT_THROW(SimulationManager manager = SimulationManager::createFromParams(startParamVals), std::invalid_argument);
+		ASSERT_THROW(SimulationManager::configFromParams(startParamVals), std::invalid_argument);
 	}
 
 	// Test valid JSON config file
@@ -141,9 +140,8 @@ TEST(SimulationManagerTest, SetupExperimentConfig)
 
 	{
 		auto startParamVals(optParser.parse(argc, argv));
-		SimulationManager manager = SimulationManager::createFromParams(startParamVals);
 
-		ASSERT_NE(manager.simulationConfig(), nullptr);
+		ASSERT_NE(SimulationManager::configFromParams(startParamVals), nullptr);
 	}
 }
 
@@ -161,7 +159,7 @@ TEST(SimulationManagerTest, SetupExperimentDirectory)
 
 	{
 		auto startParamVals(optParser.parse(argc, argv));
-		ASSERT_THROW(SimulationManager manager = SimulationManager::createFromParams(startParamVals), std::invalid_argument);
+		ASSERT_THROW(SimulationManager::configFromParams(startParamVals), std::invalid_argument);
 	}
 
 	// Test valid example directory
@@ -174,7 +172,7 @@ TEST(SimulationManagerTest, SetupExperimentDirectory)
 
 	{
 		auto startParamVals(optParser.parse(argc, argv));
-		ASSERT_NO_THROW(SimulationManager manager = SimulationManager::createFromParams(startParamVals));
+		ASSERT_NO_THROW(SimulationManager::configFromParams(startParamVals));
 	}
 
 	// Test valid JSON config file and valid example directory
@@ -188,9 +186,8 @@ TEST(SimulationManagerTest, SetupExperimentDirectory)
 
 	{
 		auto startParamVals(optParser.parse(argc, argv));
-		SimulationManager manager = SimulationManager::createFromParams(startParamVals);
 
-		ASSERT_NE(manager.simulationConfig(), nullptr);
+		ASSERT_NE(SimulationManager::configFromParams(startParamVals), nullptr);
 	}
 
 	// Test valid JSON config file with absolute path
@@ -203,9 +200,8 @@ TEST(SimulationManagerTest, SetupExperimentDirectory)
 
 	{
 		auto startParamVals(optParser.parse(argc, argv));
-		SimulationManager manager = SimulationManager::createFromParams(startParamVals);
 
-		ASSERT_NE(manager.simulationConfig(), nullptr);
+		ASSERT_NE(SimulationManager::configFromParams(startParamVals), nullptr);
 	}
 
 	// Test invalid JSON config file and valid example directory
@@ -219,7 +215,7 @@ TEST(SimulationManagerTest, SetupExperimentDirectory)
 
 	{
 		auto startParamVals(optParser.parse(argc, argv));
-		ASSERT_THROW(SimulationManager manager = SimulationManager::createFromParams(startParamVals), std::invalid_argument);
+		ASSERT_THROW(SimulationManager::configFromParams(startParamVals), std::invalid_argument);
 	}
 }
 
@@ -238,7 +234,8 @@ TEST(SimulationManagerTest, SimulationManagerLoop)
 	auto argv = const_cast<char**>(startParams.data());
 
 	auto startParamVals(optParser.parse(argc, argv));
-	SimulationManager manager = SimulationManager::createFromParams(startParamVals);
+	jsonSharedPtr simConfig = SimulationManager::configFromParams(startParamVals);
+	SimulationManager manager = SimulationManager::createFromConfig(simConfig);
 
 	EngineLauncherManagerSharedPtr engines(new EngineLauncherManager());
 	MainProcessLauncherManagerSharedPtr processManager(new MainProcessLauncherManager());
@@ -246,14 +243,50 @@ TEST(SimulationManagerTest, SimulationManagerLoop)
 	// Create brain and physics managers
 
 	// Exception if required brain/physics engine launcher is not added
-	auto simLock = manager.acquireSimLock();
-	ASSERT_THROW(manager.initSimulationLoop(engines, processManager, simLock), std::invalid_argument);
+	ASSERT_THROW(manager.initFTILoop(engines, processManager), std::invalid_argument);
 
 	// Add launchers
 	engines->registerLauncher(EngineLauncherInterfaceSharedPtr(new GazeboEngineGrpcLauncher()));
 	engines->registerLauncher(EngineLauncherInterfaceSharedPtr(new NestEngineJSONLauncher()));
 
-	manager.initSimulationLoop(engines, processManager, simLock);
+	manager.initFTILoop(engines, processManager);
 
-	ASSERT_TRUE(manager.runSimulation(SimulationTime(1000000), simLock));
+	ASSERT_NO_THROW(manager.runSimulation(1));
+}
+
+TEST(SimulationManagerTest, SimulationManagerLoopReset)
+{
+	auto optParser(SimulationParams::createStartParamParser());
+
+	const char *pPyArgv = "simtest";
+	PythonInterpreterState pyInterp(1, const_cast<char**>(&pPyArgv));
+
+	std::vector<std::string> startParamDat = {"nrp_server",
+	                                          std::string("-") + SimulationParams::ParamSimCfgFile.data(), TEST_SIM_CONFIG_FILE};
+	std::vector<const char*> startParams = createStartParamPtr(startParamDat);
+
+	auto argc = static_cast<int>(startParams.size());
+	auto argv = const_cast<char**>(startParams.data());
+
+	auto startParamVals(optParser.parse(argc, argv));
+	jsonSharedPtr simConfig = SimulationManager::configFromParams(startParamVals);
+	SimulationManager manager = SimulationManager::createFromConfig(simConfig);
+
+	EngineLauncherManagerSharedPtr engines(new EngineLauncherManager());
+	MainProcessLauncherManagerSharedPtr processManager(new MainProcessLauncherManager());
+
+	// Create brain and physics managers
+
+	// Exception if required brain/physics engine launcher is not added
+	ASSERT_THROW(manager.initFTILoop(engines, processManager), std::invalid_argument);
+
+	// Add launchers
+	engines->registerLauncher(EngineLauncherInterfaceSharedPtr(new GazeboEngineGrpcLauncher()));
+	engines->registerLauncher(EngineLauncherInterfaceSharedPtr(new NestEngineJSONLauncher()));
+
+	manager.initFTILoop(engines, processManager);
+
+	ASSERT_NO_THROW(manager.runSimulation(1));
+	ASSERT_TRUE(manager.resetSimulation());
+	ASSERT_NO_THROW(manager.runSimulation(1));
 }

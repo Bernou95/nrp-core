@@ -26,13 +26,11 @@
 #include "nrp_general_library/engine_interfaces/engine_client_interface.h"
 #include "nrp_general_library/plugin_system/plugin.h"
 
-#include "nrp_nest_server_engine/devices/nest_server_device.h"
-
 #include <future>
 #include <unistd.h>
 
 /*!
- * \brief NRP - Nest Communicator on the NRP side. Converts DeviceInterface classes from/to JSON objects
+ * \brief NRP - Nest Communicator on the NRP side. Converts DataPackInterface classes from/to JSON objects
  */
 class NestEngineServerNRPClient
         : public EngineClient<NestEngineServerNRPClient, NestServerConfigConst::EngineSchema>
@@ -52,14 +50,12 @@ class NestEngineServerNRPClient
 		virtual ~NestEngineServerNRPClient() override;
 
 		virtual void initialize() override;
+		virtual void reset() override;
 		virtual void shutdown() override;
 
-		virtual SimulationTime getEngineTime() const override;
+		SimulationTime runLoopStepCallback(SimulationTime timeStep) override;
 
-		virtual void runLoopStep(SimulationTime timeStep) override;
-		virtual void waitForStepCompletion(float timeOut) override;
-
-		virtual void sendDevicesToEngine(const devices_ptr_t &devicesArray) override;
+		virtual void sendDataPacksToEngine(const datapacks_ptr_t &datapacksArray) override;
 
         virtual const std::vector<std::string> engineProcStartParams() const override;
 
@@ -67,8 +63,8 @@ class NestEngineServerNRPClient
 
 		using population_mapping_t = std::map<std::string, std::string>;
 
-	protected:
-		virtual devices_set_t getDevicesFromEngine(const device_identifiers_set_t &deviceIdentifiers) override;
+
+		virtual datapacks_set_t getDataPacksFromEngine(const datapack_identifiers_set_t &datapackIdentifiers) override;
 
 	private:
 
@@ -108,12 +104,12 @@ class NestEngineServerNRPClient
 		std::string serverAddress() const;
 
 		/*!
-		 * \brief Returns a JSON array of device IDs mapped to specified device name
+		 * \brief Returns a JSON array of datapack IDs mapped to specified datapack name
 		 *
-		 * \param deviceName Name of the device
-		 * \return Reference to JSON array of device IDs, as string
+		 * \param datapackName Name of the datapack
+		 * \return Reference to JSON array of datapack IDs, as string
 		 */
-		const std::string & getDeviceIdList(const std::string & deviceName) const;
+		const std::string & getDataPackIdList(const std::string & datapackName) const;
 };
 
 using NestEngineServerNRPClientLauncher = NestEngineServerNRPClient::EngineLauncher<NestServerConfigConst::EngineType>;

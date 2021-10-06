@@ -1,9 +1,7 @@
 #ifndef EXAMPLE_ENGINE_SERVER_H
 #define EXAMPLE_ENGINE_SERVER_H
 
-//#include "nrp_example_engine/config/example_config.h"
-#include "nrp_example_engine/devices/example_device.h"
-#include "nrp_example_engine/engine_server/example_engine_device_controller.h"
+#include "nrp_json_engine_protocol/datapack_interfaces/json_datapack.h"
 
 class ExampleEngineServer
 {

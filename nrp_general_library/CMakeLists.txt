@@ -4,7 +4,7 @@ set(HEADER_DIRECTORY "nrp_general_library")
 set(NAMESPACE_NAME "${PROJECT_NAME}")
 
 set(LIBRARY_NAME "${PROJECT_NAME}")
-set(PYTHON_MODULE_NAME "NRPPythonModule")
+set(PYTHON_MODULE_NAME "nrp_core")
 set(EXECUTABLE_NAME "${PROJECT_NAME}Main")
 set(TEST_NAME "${PROJECT_NAME}Tests")
 
@@ -19,19 +19,9 @@ include(GNUInstallDirs)
 
 # List library build files
 set(LIB_SRC_FILES
-	nrp_general_library/property_template/property_template.cpp
-	nrp_general_library/property_template/serializers/json_property_serializer.cpp
-	nrp_general_library/property_template/serializers/property_serializer.cpp
-	nrp_general_library/property_template/serializers/property_serializer_general.cpp
-	nrp_general_library/property_template/serializers/python_dict_property_serializer.cpp
-	nrp_general_library/device_interface/device_interface.cpp
-	nrp_general_library/device_interface/data_device.cpp
-	nrp_general_library/device_interface/device.cpp
-	nrp_general_library/device_interface/device_serializer_methods.cpp
-	nrp_python_device/devices/pyobject_device.cpp
-	nrp_general_library/device_interface/device_python_wrappers.cpp
-	nrp_general_library/engine_interfaces/data_device_controller.cpp
-	nrp_general_library/engine_interfaces/engine_device_controller.cpp
+	nrp_general_library/datapack_interface/datapack_interface.cpp
+	nrp_general_library/datapack_interface/datapack.cpp
+	nrp_general_library/engine_interfaces/datapack_controller.cpp
 	nrp_general_library/engine_interfaces/engine_client_interface.cpp
 	nrp_general_library/engine_interfaces/engine_launcher_manager.cpp
 	nrp_general_library/plugin_system/plugin.cpp
@@ -41,19 +31,18 @@ set(LIB_SRC_FILES
 	nrp_general_library/process_launchers/process_launcher.cpp
 	nrp_general_library/process_launchers/process_launcher_basic.cpp
 	nrp_general_library/process_launchers/process_launcher_manager.cpp
-	nrp_general_library/transceiver_function/from_engine_device.cpp
+	nrp_general_library/transceiver_function/from_engine_datapack.cpp
 	nrp_general_library/transceiver_function/transceiver_function.cpp
-	nrp_general_library/transceiver_function/transceiver_device_interface.cpp
+	nrp_general_library/transceiver_function/transceiver_datapack_interface.cpp
 	nrp_general_library/transceiver_function/transceiver_function_interpreter.cpp
 	nrp_general_library/transceiver_function/transceiver_function_manager.cpp
 	nrp_general_library/transceiver_function/transceiver_function_sorted_results.cpp
-	nrp_general_library/utils/concepts.cpp
 	nrp_general_library/utils/file_finder.cpp
 	nrp_general_library/utils/fixed_string.cpp
+	nrp_general_library/utils/json_converter.cpp
 	nrp_general_library/utils/nrp_exceptions.cpp
 	nrp_general_library/utils/nrp_logger.cpp
 	nrp_general_library/utils/ptr_templates.cpp
-	nrp_general_library/utils/python_array_converter.cpp
 	nrp_general_library/utils/python_error_handler.cpp
 	nrp_general_library/utils/python_interpreter_state.cpp
 	nrp_general_library/utils/restclient_setup.cpp
@@ -65,7 +54,7 @@ set(LIB_SRC_FILES
 
 # List of python module build files
 set(PYTHON_MODULE_SRC_FILES
-	nrp_python_device/python/python_module.cpp
+	nrp_general_library/python/python_module.cpp
 )
 
 # List executable build files
@@ -74,13 +63,10 @@ set(EXEC_SRC_FILES
 
 # List testing build files
 set(TEST_SRC_FILES
-	tests/device_interface.cpp
-	tests/device_data.cpp
+	tests/datapack_interface.cpp
+	tests/datapack.cpp
 	tests/engine_launcher_manager.cpp
-	tests/json_property_serializer.cpp
 	tests/plugin_manager.cpp
-	tests/property_template.cpp
-	tests/python_dict_property_serializer.cpp
 	tests/test_process_launcher_basic.cpp
 	tests/transceiver_function_interpreter.cpp
 )
@@ -180,7 +166,7 @@ set(NRP_CONFIG_DIR "config_schemas")
 configure_file("nrp_general_library/config/cmake_constants.h.in" "${CMAKE_CURRENT_BINARY_DIR}/include/${HEADER_DIRECTORY}/config/cmake_constants.h" @ONLY)
 
 # Python Module defines
-configure_file("nrp_python_device/python/__init__.py.in" "${CMAKE_CURRENT_BINARY_DIR}/src/__init__.py" @ONLY)
+configure_file("nrp_general_library/python/__init__.py.in" "${CMAKE_CURRENT_BINARY_DIR}/src/__init__.py" @ONLY)
 
 # Process startup script
 configure_file("cmake/set_env_exec.sh.in" "${CMAKE_CURRENT_BINARY_DIR}/set_env_exec.sh" @ONLY)
@@ -224,6 +210,8 @@ target_include_directories(${LIBRARY_NAME} BEFORE
 
 ##########################################
 ## NRPGeneralPythonModule
+set(NRP_PYTHON_MODULE_NAME "${PYTHON_MODULE_NAME}" CACHE INTERNAL "NRP Python module name")
+
 if(NOT ${PYTHON_MODULE_SRC_FILES} STREQUAL "")
 	add_library(${PYTHON_MODULE_NAME} SHARED ${PYTHON_MODULE_SRC_FILES})
 	add_library(${NAMESPACE_NAME}::${PYTHON_MODULE_NAME} ALIAS ${PYTHON_MODULE_NAME})

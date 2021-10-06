@@ -40,16 +40,16 @@ TEST(TestNestJSONServer, DISABLED_TestFunc)
 	PythonInterpreterState pyState(1, &argv);
 
 	python::dict pyGlobals = python::dict(python::import("__main__").attr("__dict__"));
-	python::object pyLocals;
+
 
     nlohmann::json config;
     config["EngineName"] = "engine";
     config["EngineType"] = "test_engine_nest";
-    config["NestInitFileName"] = TEST_NEST_DEVICE_FILE_NAME;
+    config["NestInitFileName"] = TEST_NEST_DATAPACK_FILE_NAME;
     std::string server_address = "localhost:5434";
     config["ServerAddress"] = server_address;
 
-	NestJSONServer server(server_address, pyGlobals, pyLocals);
+	NestJSONServer server(server_address, pyGlobals);
 
 	// Test Init
 	pyState.allowThreads();
@@ -66,28 +66,18 @@ TEST(TestNestJSONServer, DISABLED_TestFunc)
 	SimulationTime timeStep = toSimulationTime<int, std::milli>(1);
 	ASSERT_EQ(server.runLoopStep(timeStep).count(), timeStep.count());
 
-	// Test getDevice REST call EngineServerGetDevicesRoute
+	// Test getDataPack REST call EngineServerGetDataPacksRoute
 	server.startServerAsync();
 
 	auto req = nlohmann::json({{"voltmeter", 0}});
-	auto resp = RestClient::post(server_address + "/" + EngineJSONConfigConst::EngineServerGetDevicesRoute.data(), EngineJSONConfigConst::EngineServerContentType.data(), req.dump());
+	auto resp = RestClient::post(server_address + "/" + EngineJSONConfigConst::EngineServerGetDataPacksRoute.data(), EngineJSONConfigConst::EngineServerContentType.data(), req.dump());
 	respParse = nlohmann::json::parse(resp.body);
 
-	const std::string jsonDat = respParse["voltmeter"][PyObjectDeviceConst::Object.m_data]["element_type"].get<std::string>();
-	ASSERT_STREQ(jsonDat.data(), "recorder");
+	// TODO The test is disabled, not sure what the correct behaviour should be
+	/*const std::string jsonDat = respParse["voltmeter"][PyObjectDataPackConst::Object.m_data]["element_type"].get<std::string>();
+	ASSERT_STREQ(jsonDat.data(), "recorder");*/
 
 	pyState.endAllowThreads();
-
-	// Test Nest Device data deserialization
-	auto devid = DeviceSerializerMethods<nlohmann::json>::deserializeID(respParse.begin());
-	NestDevice dev = DeviceSerializerMethods<nlohmann::json>::deserialize<NestDevice>(std::move(devid), respParse.begin());
-
-	//dev.data() = python::dict(dev.PyObjectDevice::data().deserialize(""));
-
-	// TODO: Test Sending data
-
-	ASSERT_EQ(respParse["voltmeter"][PyObjectDeviceConst::Object.m_data].size(), python::len(dev.data()));
-	ASSERT_EQ(jsonDat, std::string(python::extract<std::string>(dev.data()["element_type"])));
 
 	server.shutdownServer();
 }
@@ -99,7 +89,7 @@ TEST(TestNestJSONServer, TestInitError)
 	PythonInterpreterState pyState(1, &argv);
 
 	auto pyGlobals = python::dict(python::import("__main__").attr("__dict__"));
-	python::object pyLocals;
+
 
     nlohmann::json config;
     config["EngineName"] = "engine";
@@ -108,7 +98,7 @@ TEST(TestNestJSONServer, TestInitError)
     std::string server_address = "localhost:5434";
     config["ServerAddress"] = server_address;
 
-	NestJSONServer server(server_address, pyGlobals, pyLocals);
+	NestJSONServer server(server_address, pyGlobals);
 
 	pyState.allowThreads();
 

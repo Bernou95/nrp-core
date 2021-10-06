@@ -4,7 +4,7 @@ set(HEADER_DIRECTORY "nrp_example_engine")
 set(NAMESPACE_NAME "${PROJECT_NAME}")
 
 set(LIBRARY_NAME "${PROJECT_NAME}")
-set(PYTHON_MODULE_NAME "NRPExamplePythonModule")
+set(PYTHON_MODULE_NAME "example_engine")
 set(EXECUTABLE_NAME "NRPExampleServerExecutable")
 set(TEST_NAME "${PROJECT_NAME}Tests")
 
@@ -20,8 +20,6 @@ include(ExternalProject)
 
 # List library build files
 set(LIB_SRC_FILES
-	nrp_example_engine/devices/example_device.cpp
-	nrp_example_engine/engine_server/example_engine_device_controller.cpp
 	nrp_example_engine/engine_server/example_engine_server.cpp
 	nrp_example_engine/nrp_client/example_engine_client.cpp
 )
@@ -85,7 +83,7 @@ target_include_directories(${LIBRARY_NAME} BEFORE
 
 
 ##########################################
-## NRPExamplePythonModule
+## example_engine
 if(NOT ${PYTHON_MODULE_SRC_FILES} STREQUAL "")
 	add_library(${PYTHON_MODULE_NAME} SHARED ${PYTHON_MODULE_SRC_FILES})
 	add_library(${NAMESPACE_NAME}::${PYTHON_MODULE_NAME} ALIAS ${PYTHON_MODULE_NAME})
@@ -177,10 +175,10 @@ install(DIRECTORY "${HEADER_DIRECTORY}" "${CMAKE_CURRENT_BINARY_DIR}/include/${H
 # Install Python module
 if(TARGET ${PYTHON_MODULE_NAME})
 	install(TARGETS ${PYTHON_MODULE_NAME}
-		DESTINATION "${PYTHON_INSTALL_DIR_REL}/${PYTHON_MODULE_NAME}")
+		DESTINATION "${PYTHON_INSTALL_DIR_REL}/${NRP_PYTHON_MODULE_NAME}/engines/${PYTHON_MODULE_NAME}")
 
 	install(FILES "${CMAKE_CURRENT_BINARY_DIR}/src/__init__.py"
-		DESTINATION "${PYTHON_INSTALL_DIR_REL}/${PYTHON_MODULE_NAME}")
+		DESTINATION "${PYTHON_INSTALL_DIR_REL}/${NRP_PYTHON_MODULE_NAME}/engines/${PYTHON_MODULE_NAME}")
 endif()
 
 # Install executable files

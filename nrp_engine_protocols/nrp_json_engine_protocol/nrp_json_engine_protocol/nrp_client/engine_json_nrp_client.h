@@ -22,11 +22,10 @@
 #ifndef ENGINE_JSON_NRP_CLIENT_H
 #define ENGINE_JSON_NRP_CLIENT_H
 
-#include "nrp_general_library/device_interface/device.h"
 #include "nrp_general_library/engine_interfaces/engine_client_interface.h"
 #include "nrp_json_engine_protocol/config/engine_json_config.h"
-#include "nrp_json_engine_protocol/device_interfaces/json_device_serializer.h"
 #include "nrp_json_engine_protocol/nrp_client/engine_json_registration_server.h"
+#include "nrp_json_engine_protocol/datapack_interfaces/json_datapack.h"
 #include "nrp_general_library/utils/nrp_exceptions.h"
 #include "nrp_general_library/utils/restclient_setup.h"
 
@@ -34,17 +33,15 @@
 #include <list>
 
 #include <chrono>
-#include <future>
 
 #include <iostream>
 #include <restclient-cpp/restclient.h>
 
 /*!
- *  \brief NRP - Gazebo Communicator on the NRP side. Converts DeviceInterface classes from/to JSON objects
+ *  \brief NRP - Gazebo Communicator on the NRP side. Converts DataPackInterface classes from/to JSON objects
  *  \tparam ENGINE_INTERFACE Class derived from GeneralInterface. Currently either PhysicsInterface or BrainInterface
- *  \tparam DEVICES Classes derived from DeviceInterface that should be communicated to/from the engine.
  */
-template<class ENGINE, FixedString SCHEMA, DEVICE_C ...DEVICES>
+template<class ENGINE, const char* SCHEMA>
 class EngineJSONNRPClient
         : public EngineClient<ENGINE, SCHEMA>
 {
@@ -56,8 +53,7 @@ class EngineJSONNRPClient
 		 */
 		EngineJSONNRPClient(nlohmann::json &config, ProcessLauncherInterface::unique_ptr &&launcher)
 		    : EngineClient<ENGINE, SCHEMA>(config, std::move(launcher)),
-		      _serverAddress(this->engineConfig().at("ServerAddress")),
-			  _engineTime(0)
+		      _serverAddress(this->engineConfig().at("ServerAddress"))
 		{
 			NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
@@ -72,8 +68,7 @@ class EngineJSONNRPClient
 		 */
 		EngineJSONNRPClient(const std::string &serverAddress, nlohmann::json &config, ProcessLauncherInterface::unique_ptr &&launcher)
 		    : EngineClient<ENGINE, SCHEMA>(config, std::move(launcher)),
-		      _serverAddress(serverAddress),
-			  _engineTime(0)
+		      _serverAddress(serverAddress)
 		{
 			NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
@@ -105,52 +100,45 @@ class EngineJSONNRPClient
 			return enginePID;
 		}
 
-		virtual void sendDevicesToEngine(const typename EngineClientInterface::devices_ptr_t &devicesArray) override
+		virtual void sendDataPacksToEngine(const typename EngineClientInterface::datapacks_ptr_t &datapacksArray) override
 		{
 			NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
-			// Convert devices to JSON format
+			// Convert datapacks to JSON format
 			nlohmann::json request;
-			for(const auto &curDevice : devicesArray)
+			for(const auto &curDataPack : datapacksArray)
 			{
-				if(curDevice->engineName().compare(this->engineName()) == 0)
-					request.update(this->getJSONFromSingleDeviceInterface<DEVICES...>(*curDevice));
+				if(curDataPack->engineName().compare(this->engineName()) == 0)
+				{
+					if(curDataPack->type() != JsonDataPack::getType())
+					{
+						throw NRPException::logCreate("Engine \"" +
+													this->engineName() +
+													"\" cannot handle datapack type '" +
+													curDataPack->type() + "'");
+					}
+
+					// We get ownership of the datapack's data
+					// We'll have to delete the object after we're done
+
+					nlohmann::json * data = (dynamic_cast<JsonDataPack *>(curDataPack))->releaseData();
+
+					const auto & name = curDataPack->name();
+
+					request[name]["engine_name"] = curDataPack->engineName();
+					request[name]["type"]        = curDataPack->type();
+					request[name]["data"].swap(*data);
+
+					delete data;
+				}
 			}
 
-			// Send updated devices to Engine JSON server
-			EngineJSONNRPClient::sendRequest(this->_serverAddress + "/" + EngineJSONConfigConst::EngineServerSetDevicesRoute.data(),
+			// Send updated datapacks to Engine JSON server
+			EngineJSONNRPClient::sendRequest(this->_serverAddress + "/" + EngineJSONConfigConst::EngineServerSetDataPacksRoute.data(),
 			                                 EngineJSONConfigConst::EngineServerContentType.data(), request.dump(),
-			                                 "Engine server \"" + this->engineName() + "\" failed during device handling");
+			                                 "Engine server \"" + this->engineName() + "\" failed during datapack handling");
 
-			// TODO: Check if engine has processed all sent devices
-		}
-
-		SimulationTime getEngineTime() const override
-		{	return this->_engineTime;	}
-
-		virtual void runLoopStep(SimulationTime timeStep) override
-		{
-			this->_loopStepThread = std::async(std::launch::async, std::bind(&EngineJSONNRPClient::loopFcn, this, timeStep));
-		}
-
-		virtual void waitForStepCompletion(float timeOut) override
-		{
-			NRP_LOGGER_TRACE("{} called", __FUNCTION__);
-
-			// If thread state is invalid, loop thread has completed and waitForStepCompletion was called once before
-			if(!this->_loopStepThread.valid())
-				return;
-
-			// Wait until timeOut has passed
-			if(timeOut > 0)
-			{
-				if(this->_loopStepThread.wait_for(std::chrono::duration<double>(timeOut)) != std::future_status::ready)
-					throw NRPException::logCreate("Engine \"" + this->engineName() + "\" loop is taking too long to complete");
-			}
-			else
-				this->_loopStepThread.wait();
-
-			this->_engineTime = this->_loopStepThread.get();
+			// TODO: Check if engine has processed all sent datapacks
 		}
 
         virtual const std::vector<std::string> engineProcStartParams() const override
@@ -179,23 +167,26 @@ class EngineJSONNRPClient
         }
 
 	protected:
-		virtual typename EngineClientInterface::devices_set_t getDevicesFromEngine(const typename EngineClientInterface::device_identifiers_set_t &deviceIdentifiers) override
+		virtual typename EngineClientInterface::datapacks_set_t getDataPacksFromEngine(const typename EngineClientInterface::datapack_identifiers_set_t &datapackIdentifiers) override
 		{
 			NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
 			nlohmann::json request;
-			for(const auto &devID : deviceIdentifiers)
+			for(const auto &devID : datapackIdentifiers)
 			{
 				if(this->engineName().compare(devID.EngineName) == 0)
-					request.update(JSONDeviceSerializerMethods::serializeID(devID));
+				{
+					request[devID.Name] = {{"engine_name", devID.EngineName}, {"type", devID.Type}};
+				}
+
 			}
 
 			// Post request to Engine JSON server
-			const auto resp(EngineJSONNRPClient::sendRequest(this->_serverAddress + "/" + EngineJSONConfigConst::EngineServerGetDevicesRoute.data(),
+			const auto resp(EngineJSONNRPClient::sendRequest(this->_serverAddress + "/" + EngineJSONConfigConst::EngineServerGetDataPacksRoute.data(),
 			                                                 EngineJSONConfigConst::EngineServerContentType.data(), request.dump(),
-			                                                 "Engine server \"" + this->engineName() + "\" failed during device retrieval"));
+			                                                 "Engine server \"" + this->engineName() + "\" failed during datapack retrieval"));
 
-			return this->getDeviceInterfacesFromJSON(resp);
+			return this->getDataPackInterfacesFromJSON(resp);
 		}
 
 		/*!
@@ -213,6 +204,23 @@ class EngineJSONNRPClient
 			return sendRequest(this->_serverAddress + "/" + EngineJSONConfigConst::EngineServerInitializeRoute.data(),
 			                   EngineJSONConfigConst::EngineServerContentType.data(), data.dump(),
 			                   "Engine server \"" + this->engineName() + "\" failed during initialization");
+		}
+
+		/*!
+		 * \brief Send a reset command
+		 * \param data Data that should be passed to the engine
+		 * \return Returns reset data from engine
+		 */
+		nlohmann::json sendResetCommand(const nlohmann::json &data)
+		{
+			NRP_LOGGER_TRACE("{} called", __FUNCTION__);
+			
+			NRPLogger::debug("EngineJSONNRPClient::sendResetCommand [ data: {} ]", data.dump());
+
+			// Post reset request to Engine JSON server
+			return sendRequest(this->_serverAddress + "/" + EngineJSONConfigConst::EngineServerResetRoute.data(),
+			                   EngineJSONConfigConst::EngineServerContentType.data(), data.dump(),
+			                   "Engine server \"" + this->engineName() + "\" failed during reset");
 		}
 
 		/*!
@@ -268,20 +276,11 @@ class EngineJSONNRPClient
 		}
 
 	private:
-		/*!
-		 * \brief Future of thread running a single loop. Used by runLoopStep and waitForStepCompletion to execute the thread
-		 */
-		std::future<SimulationTime> _loopStepThread;
 
 		/*!
 		 * \brief Server Address to send requests to
 		 */
 		std::string _serverAddress;
-
-		/*!
-		 * \brief Engine Time
-		 */
-		SimulationTime _engineTime;
 
 		/*!
 		 * \brief Send a request to the Server
@@ -315,7 +314,7 @@ class EngineJSONNRPClient
 		 * \param timeStep Time (in seconds) to execute the engine
 		 * \return Returns current time of engine
 		 */
-		SimulationTime loopFcn(SimulationTime timeStep)
+		SimulationTime runLoopStepCallback(SimulationTime timeStep) override
 		{
 			nlohmann::json request;
 			request[EngineJSONConfigConst::EngineTimeStepName.data()] = timeStep.count();
@@ -343,28 +342,31 @@ class EngineJSONNRPClient
 		}
 
 		/*!
-		 * \brief Extracts devices from given JSON
-		 * \param devices JSON data of devices
-		 * \return Returns list of devices
+		 * \brief Extracts datapacks from given JSON
+		 * \param datapacks JSON data of datapacks
+		 * \return Returns list of datapacks
 		 */
-		typename EngineClientInterface::devices_set_t getDeviceInterfacesFromJSON(const nlohmann::json &devices) const
+		typename EngineClientInterface::datapacks_set_t getDataPackInterfacesFromJSON(const nlohmann::json &datapacks) const
 		{
 			NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
-			typename EngineClientInterface::devices_set_t interfaces;
+			typename EngineClientInterface::datapacks_set_t interfaces;
 
-			for(auto curDeviceIterator = devices.begin(); curDeviceIterator != devices.end(); ++curDeviceIterator)
+			for(auto curDataPackIterator = datapacks.begin(); curDataPackIterator != datapacks.end(); ++curDataPackIterator)
 			{
 				try
 				{
-					auto deviceID = JSONDeviceSerializerMethods::deserializeID(curDeviceIterator);
-					deviceID.EngineName = this->engineName();
-					interfaces.insert(this->getSingleDeviceInterfaceFromJSON<DEVICES...>(curDeviceIterator, deviceID));
+					DataPackIdentifier datapackID(curDataPackIterator.key(),
+											  (*curDataPackIterator)["engine_name"],
+											  (*curDataPackIterator)["type"]);
+
+					datapackID.EngineName = this->engineName();
+					interfaces.insert(this->getSingleDataPackInterfaceFromJSON(curDataPackIterator, datapackID));
 				}
 				catch(std::exception &e)
 				{
-					// TODO: Handle json device parsing error
-					throw NRPException::logCreate(e, "Failed to parse JSON Device Interface");
+					// TODO: Handle json datapack parsing error
+					throw NRPException::logCreate(e, "Failed to parse JSON DataPack Interface");
 				}
 			}
 
@@ -372,60 +374,41 @@ class EngineJSONNRPClient
 		}
 
 		/*!
-		 * \brief Go through given DEVICES and try to create a DeviceInterface from the JSON object
-		 * \tparam DEVICE DeviceInterface Class to check
-		 * \tparam REMAINING_DEVICES Remaining DeviceInterface Classes to check
-		 * \param deviceData Device data as JSON object
-		 * \param deviceID ID of device
-		 * \return Returns pointer to created device
+		 * \brief Go through given DATAPACKS and try to create a DataPackInterface from the JSON object
+		 * \tparam DATAPACK DataPackInterface Class to check
+		 * \tparam REMAINING_DATAPACKS Remaining DataPackInterface Classes to check
+		 * \param datapackData DataPack data as JSON object
+		 * \param datapackID ID of datapack
+		 * \return Returns pointer to created datapack
 		 */
-		template<class DEVICE, class ...REMAINING_DEVICES>
-		inline DeviceInterfaceConstSharedPtr getSingleDeviceInterfaceFromJSON(const nlohmann::json::const_iterator &deviceData, DeviceIdentifier &deviceID) const
+
+		inline DataPackInterfaceConstSharedPtr getSingleDataPackInterfaceFromJSON(const nlohmann::json::const_iterator &datapackData, DataPackIdentifier &datapackID) const
 		{
 			NRP_LOGGER_TRACE("{} called", __FUNCTION__);
-			
-            if(DEVICE::TypeName.compare(deviceID.Type) == 0)
+
+            if(datapackID.Type == JsonDataPack::getType())
             {
-				// Check whether the requested device has new data
-				// A device that has no data will contain two JSON objects with "engine_name" and "type" keys (parts of device ID)
+				// Check whether the requested datapack has new data
+				// A datapack that has no data will contain two JSON objects with "engine_name" and "type" keys (parts of datapack ID)
 
-				if(deviceData->size() == 2)
+				if(datapackData->size() == 2)
 				{
-					// There's no meaningful data in the device, so create an empty device with device ID only
+					// There's no meaningful data in the datapack, so create an empty datapack with datapack ID only
 
-					return DeviceInterfaceSharedPtr(new DeviceInterface(std::move(deviceID)));
+					return DataPackInterfaceSharedPtr(new DataPackInterface(std::move(datapackID)));
 				}
 
-                DeviceInterfaceSharedPtr newDevice(new DEVICE(JSONDeviceSerializerMethods::template deserialize<DEVICE>(std::move(deviceID), deviceData)));
-                newDevice->setEngineName(this->engineName());
-                return newDevice;
+                nlohmann::json * data = new nlohmann::json(std::move((*datapackData)["data"]));
+
+                DataPackInterfaceSharedPtr newDataPack(new JsonDataPack(datapackID.Name, datapackID.EngineName, data));
+                newDataPack->setEngineName(this->engineName());
+
+                return newDataPack;
             }
-
-			// If device classess are left to check, go through them. If all device classes have been checked without proper result, throw an error
-			if constexpr (sizeof...(REMAINING_DEVICES) > 0)
-			{	return this->getSingleDeviceInterfaceFromJSON<REMAINING_DEVICES...>(deviceData, deviceID);	}
 			else
-			{	throw NRPException::logCreate("Could not deserialize given device of type \"" + deviceID.Type + "\"");	}
-		}
-
-		/*!
-		 * \brief Go through given DEVICES and try to create a JSON object from the device interface
-		 * \tparam DEVICE DeviceInterface Class to check
-		 * \tparam REMAINING_DEVICES Remaining DeviceInterface Classes to check
-		 * \param device Device data
-		 * \return Returns JSON object with device data
-		 */
-		template<class DEVICE, class ...REMAINING_DEVICES>
-		inline nlohmann::json getJSONFromSingleDeviceInterface(const DeviceInterface &device) const
-		{
-            if(DEVICE::TypeName.compare(device.type()) == 0)
-                return JSONDeviceSerializerMethods::template serialize<DEVICE>(dynamic_cast<const DEVICE&>(device));
-
-			// If device classess are left to check, go through them. If all device classes have been checked without proper result, throw an error
-			if constexpr (sizeof...(REMAINING_DEVICES) > 0)
-			{	return this->getJSONFromSingleDeviceInterface<REMAINING_DEVICES...>(device);	}
-			else
-			{	throw NRPException::logCreate("Could not serialize given device of type \"" + device.type() + "\"");	}
+			{
+				throw NRPException::logCreate("DataPack type \"" + datapackID.Type + "\" cannot be handled by the \"" + this->engineName() + "\" engine");
+			}
 		}
 };
 

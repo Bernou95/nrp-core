@@ -19,4 +19,4 @@
 # Agreement No. 945539 (Human Brain Project SGA3).
 
 from .@PYTHON_MODULE_NAME@ import *
-from .TOpenAIGym import *
+from .OpenAIGymLib import *

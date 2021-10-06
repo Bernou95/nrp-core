@@ -26,7 +26,7 @@
 #include "nrp_general_library/engine_interfaces/engine_launcher_manager.h"
 #include "nrp_general_library/plugin_system/plugin_manager.h"
 #include "nrp_general_library/process_launchers/process_launcher_manager.h"
-#include "nrp_simulation/simulation/simulation_loop.h"
+#include "nrp_simulation/simulation/fti_loop.h"
 
 #include <mutex>
 #include <cxxopts.hpp>
@@ -37,7 +37,7 @@
  */
 struct SimulationParams
 {
-	static constexpr std::string_view NRPProgramName = "NRPSimulation";
+	static constexpr std::string_view NRPProgramName = "NRPCoreSim";
 	static constexpr std::string_view ProgramDescription = "Brain and physics simulator";
 
 	// Simulation Executable parameters
@@ -73,6 +73,15 @@ struct SimulationParams
 	static constexpr std::string_view ParamLogDirLong = "logdir";
 	static constexpr std::string_view ParamLogDirDesc = "Directory for the file logs";
 	using ParamLogDirT = std::string;
+
+	static constexpr std::string_view ParamMode = "m";
+	static constexpr std::string_view ParamModeLong = "m,mode";
+	static constexpr std::string_view ParamModeDesc = "Operational mode, standalone or server";
+	using ParamModeT = std::string;
+
+	static constexpr std::string_view ParamServerAddressLong = "server_address";
+	static constexpr std::string_view ParamServerAddressDesc = "Desired address of the server in server operational mode";
+	using ParamServerAddressT = std::string;
 
 	/*!
 	 * \brief Create a parser for start parameters
@@ -123,29 +132,31 @@ class SimulationManager
 		~SimulationManager();
 
 		/*!
-		 * \brief Create SimulationManager from start parameters
+		 * \brief Get the config from start parameters
 		 * \param args Parsed start parameters
+		 * \return Returns instance of simulation config
+		 */
+		static jsonSharedPtr configFromParams(const cxxopts::ParseResult &args);
+
+		/*!
+		 * \brief Create SimulationManager from pointer to config
+		 * \param config Pointer to a config
 		 * \return Returns instance of SimulationManager
 		 */
-		static SimulationManager createFromParams(const cxxopts::ParseResult &args);
+		static SimulationManager createFromConfig(jsonSharedPtr &config);
 
 		/*!
 		 * \brief Get simulation loop
 		 * \return Returns pointer to simulation loop. If no loop is loaded, return nullptr
 		 */
-		SimulationLoopConstSharedPtr simulationLoop() const;
-
-		/*!
-		 * \brief Acquire Simulation Lock. Prevents other threads from manipulating simulation
-		 */
-		sim_lock_t acquireSimLock();
+		FTILoopConstSharedPtr simulationLoop() const;
 
 		/*!
 		 * \brief Get simulation config
 		 * \param simLock Pass simulation lock if already owned
 		 * \return Returns pointer to simulation config as well as simulation lock. If no config is loaded, return nullptr
 		 */
-        jsonSharedPtr simulationConfig(const sim_lock_t &simLock);
+        jsonSharedPtr simulationConfig();
 
 		/*!
 		 * \brief Get simulation config
@@ -160,63 +171,35 @@ class SimulationManager
 		 * \param simLock Simulation lock
 		 * \exception Throws an exception when the initialization fails
 		 */
-		void initSimulationLoop(const EngineLauncherManagerConstSharedPtr &engineLauncherManager,
-		                        const MainProcessLauncherManager::const_shared_ptr &processLauncherManager,
-		                        sim_lock_t &simLock);
+		void initFTILoop(const EngineLauncherManagerConstSharedPtr &engineLauncherManager,
+		                        const MainProcessLauncherManager::const_shared_ptr &processLauncherManager);
 
 		/*!
-		 * \brief Returns true if simulation is running, false otherwise
-		 */
-		bool isRunning() const;
-
-		/*!
-		 * \brief Stop any currently running sim threads
+		 * \brief Reset the currently running simulation
 		 * \param lock Simulation lock
 		 */
-		void stopSimulation(const sim_lock_t &lock);
+		bool resetSimulation();
 
 		/*!
 		 * \brief Runs the simulation until a separate thread stops it or simTimeout (defined in SimulationConfig) is reached. If simTimeout is zero or negative, ignore it
 		 * \param simLock Pass simulation lock if already owned
 		 * \return Returns true if no error was encountered, false otherwise
 		 */
-		bool runSimulationUntilTimeout(sim_lock_t &simLock);
+		bool runSimulationUntilTimeout(int frac = 1);
 
 		/*!
 		 * \brief Run the Simulation for specified amount of time
 		 * \param secs Time (in seconds) to run simulation
-		 * \param simLock Pass simulation lock if already owned
 		 * \return Returns true if no error was encountered, false otherwise
 		 */
-		bool runSimulation(const SimulationTime secs, sim_lock_t &simLock);
+		void runSimulation(unsigned numIterations);
 
 		/*!
 		 * \brief Shuts down simulation loop. Will shutdown any running engines and transceiver functions after any currently running steps are completed
-		 * \param simLock Pass simulation lock if already owned
 		 */
-		void shutdownLoop(const sim_lock_t &simLock);
-
-		/*!
-		 * \brief Returns true if simulation/engines are currently being initialized, false otherwise
-		 */
-		bool isSimInitializing();
+		void shutdownLoop();
 
 	private:
-		/*!
-		 * \brief Lock that prevents simulation changes during execution cycle. Will be locked during a step/change of the sim parameters, unlocked otherwise
-		 */
-		sim_mutex_t _simulationLock;
-
-		/*!
-		 * \brief Lock for internal use. Either indicates that the sim is currently being initialized, or that the simulation is running.
-		 * If used with _simulationLock, make sure that _internalLock is locked first
-		 */
-		sim_mutex_t _internalLock;
-
-		/*!
-		 * \brief True if simulation running, false otherwise
-		 */
-		bool _runningSimulation = false;
 
 		/*!
 		 * \brief Simulation Configuration
@@ -226,14 +209,14 @@ class SimulationManager
 		/*!
 		 * \brief Simulation loop
 		 */
-		SimulationLoopSharedPtr _loop;
+		FTILoopSharedPtr _loop;
 
 		/*!
 		 * \brief Creates a simulation loop using the engines specified in the config file
 		 * \param engineManager Manager for all available engine launchers and interfaces
 		 * \return Returns simulation loop
 		 */
-		SimulationLoop createSimLoop(const EngineLauncherManagerConstSharedPtr &engineManager, const MainProcessLauncherManager::const_shared_ptr &processLauncherManager);
+		FTILoop createSimLoop(const EngineLauncherManagerConstSharedPtr &engineManager, const MainProcessLauncherManager::const_shared_ptr &processLauncherManager);
 
 		/*!
 		 * \brief Checks whether simulation has timed out. If simTimeout <= 0, continue running indefinitely

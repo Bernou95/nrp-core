@@ -21,6 +21,7 @@
 //
 
 #include "nrp_nest_server_engine/nrp_client/nest_engine_server_nrp_client.h"
+#include "nrp_json_engine_protocol/datapack_interfaces/json_datapack.h"
 
 #include "nrp_general_library/utils/nrp_exceptions.h"
 #include "nrp_general_library/utils/restclient_setup.h"
@@ -78,22 +79,21 @@ namespace
 	}
 
 	/*!
-	 * \brief Checks if device can be processed by the engine
+	 * \brief Checks if datapack can be processed by the engine
 	 *
-	 * \param[in] device     Device ID structure to be verified
+	 * \param[in] datapack     DataPack ID structure to be verified
 	 * \param[in] engineName Name of the current engine
 	 *
-	 * \return True if device may be processed by the engine, false otherwise
+	 * \return True if datapack may be processed by the engine, false otherwise
 	 */
-	bool isDeviceTypeValid(const DeviceIdentifier & device, const std::string & engineName)
+	bool isDataPackTypeValid(const DataPackIdentifier & datapack, const std::string & engineName)
 	{
-		// Check if type matches the NestServerDevice type
+		// Check if type matches the NestServerDataPack type
 		// Skip the check if type was not set
 
-		const bool isTypeValid = (device.Type.empty() ||
-								device.Type == NestServerDevice::TypeName.m_data);
+		const bool isTypeValid = (datapack.Type.empty() || datapack.Type == JsonDataPack::getType());
 
-		return (isTypeValid && device.EngineName == engineName);
+		return (isTypeValid && datapack.EngineName == engineName);
 	}
 
 	/*!
@@ -119,7 +119,7 @@ namespace
 	 * \brief Extracts populations from NEST server response to brain file execution
 	 *
 	 * The NEST server is supposed to return a dictionary names 'populations'. The dictionary
-	 * should contain a mapping of population (device) names to lists of IDs.
+	 * should contain a mapping of population (datapack) names to lists of IDs.
 	 *
 	 * This is a helper function of initialize().
 	 *
@@ -180,6 +180,16 @@ namespace
 	}
 
     /*!
+     * \brief Sends ResetKernel request to NEST server
+     *
+     * \param serverAddress Address of the NEST server
+     */
+    void nestResetKernel(const std::string & serverAddress)
+    {
+        nestGenericCall(serverAddress + "/api/ResetKernel", "text/plain", "");
+    }
+
+    /*!
      * \brief Sends Run request to NEST server
      *
      * \param serverAddress Address of the NEST server
@@ -217,7 +227,15 @@ namespace
 NestEngineServerNRPClient::NestEngineServerNRPClient(nlohmann::json &config, ProcessLauncherInterface::unique_ptr &&launcher)
     : EngineClient(config, std::move(launcher))
 {
-    setDefaultProperty<std::string>("EngineProcCmd", NRP_NEST_SERVER_EXECUTABLE_PATH);
+    int n_mpi = this->engineConfig().at("MPIProcs").get<int>();
+    if(n_mpi <= 1)
+        setDefaultProperty<std::string>("EngineProcCmd", NRP_NEST_SERVER_EXECUTABLE_PATH);
+    else {
+        std::string mpi_cmd = "mpirun -np " + std::to_string(n_mpi) + " " + NRP_NEST_SERVER_MPI_EXECUTABLE_PATH;
+        setDefaultProperty<std::string>("EngineProcCmd", mpi_cmd);
+    }
+
+
     if(!this->engineConfig().contains("NestServerPort"))
         setDefaultProperty<int>("NestServerPort", findUnboundPort(this->PortSearchStart));
 
@@ -295,115 +313,99 @@ void NestEngineServerNRPClient::initialize()
 	NRPLogger::debug("NestEngineServerNRPClient::initialize(...) completed with no errors.");
 }
 
+void NestEngineServerNRPClient::reset(){
+
+	try
+	{
+		nestResetKernel(this->serverAddress());
+	}
+	catch (std::exception &e)
+	{
+		throw NRPException::logCreate(e, "Failed to execute NEST ResetKernel at reset");
+	}
+
+	this->_populations.clear();
+
+	try
+	{
+		this->initialize();
+	}
+	catch (std::exception &e)
+	{
+		throw NRPException::logCreate(e, "Failed re-initialize NEST during reset");
+	}
+}
+
 void NestEngineServerNRPClient::shutdown()
 {
 	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 	// Empty
 }
 
-SimulationTime NestEngineServerNRPClient::getEngineTime() const
-{
-	return toSimulationTime<float, std::milli>(std::stof(nestGetKernelStatus(this->serverAddress(), "[\"time\"]")));
-}
-
-void NestEngineServerNRPClient::runLoopStep(SimulationTime timeStep)
+const std::string & NestEngineServerNRPClient::getDataPackIdList(const std::string & datapackName) const
 {
 	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
-	this->_runStepThread = std::async(std::launch::async, &NestEngineServerNRPClient::runStepFcn, this, timeStep);
+	// Check if the datapack is in the populations map
+
+	if(this->_populations.count(datapackName) == 0)
+	{
+		throw NRPException::logCreate("DataPack \"" + datapackName + "\" not in populations map");
+	}
+
+	// Get list of datapack IDs mapped to this datapack name
+
+	return this->_populations.at(datapackName);
 }
 
-void NestEngineServerNRPClient::waitForStepCompletion(float timeOut)
+EngineClientInterface::datapacks_set_t NestEngineServerNRPClient::getDataPacksFromEngine(const datapack_identifiers_set_t &datapackIdentifiers)
 {
 	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
-	// If thread state is invalid, loop thread has completed and waitForStepCompletion was called once before
-	if(!this->_runStepThread.valid())
-		return;
+	EngineClientInterface::datapacks_set_t retVals;
 
-	if(timeOut > 0)
+	for(const auto &devID : datapackIdentifiers)
 	{
-		if(this->_runStepThread.wait_for(std::chrono::duration<double>(timeOut)) != std::future_status::ready)
-			throw NRPException::logCreate("Nest loop still running after timeout reached");
-	}
-	else
-	{
-		this->_runStepThread.wait();
-	}
-
-	// runStepFcn doesn't return engine time, like in other engines. Only status of REST call is returned
-
-	if(!this->_runStepThread.get())
-	{
-		throw NRPException::logCreate("Nest loop failed unexpectedly");
-	}
-}
-
-const std::string & NestEngineServerNRPClient::getDeviceIdList(const std::string & deviceName) const
-{
-	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
-
-	// Check if the device is in the populations map
-
-	if(this->_populations.count(deviceName) == 0)
-	{
-		throw NRPException::logCreate("Device \"" + deviceName + "\" not in populations map");
-	}
-
-	// Get list of device IDs mapped to this device name
-
-	return this->_populations.at(deviceName);
-}
-
-EngineClientInterface::devices_set_t NestEngineServerNRPClient::getDevicesFromEngine(const device_identifiers_set_t &deviceIdentifiers)
-{
-	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
-
-	EngineClientInterface::devices_set_t retVals;
-
-	for(const auto &devID : deviceIdentifiers)
-	{
-		if(isDeviceTypeValid(devID, this->engineName()))
+		if(isDataPackTypeValid(devID, this->engineName()))
 		{
-			const auto deviceName = devID.Name;
+			const auto datapackName = devID.Name;
 			std::string response;
 
 			// Request status of the IDs from the list
 
 			try
 			{
-				response = nestGetStatus(this->serverAddress(), "{\"nodes\":" + getDeviceIdList(deviceName) + "}");
+				response = nestGetStatus(this->serverAddress(), "{\"nodes\":" + getDataPackIdList(datapackName) + "}");
 			}
 			catch(std::exception& e)
 			{
-				throw NRPException::logCreate(e, "Failed to get NEST status for device \"" + deviceName + "\"");
+				throw NRPException::logCreate(e, "Failed to get NEST status for datapack \"" + datapackName + "\"");
 			}
 
-			// Extract device details from the body
-			// Response from GetStatus is an array of JSON objects, which contains device parameters
+			// Extract datapack details from the body
+			// Response from GetStatus is an array of JSON objects, which contains datapack parameters
 
-			const auto respJson = nlohmann::json::parse(response);
-			retVals.emplace(new NestServerDevice(DeviceIdentifier(devID), respJson.dump()));
+			retVals.emplace(new JsonDataPack(devID.Name, devID.EngineName, new nlohmann::json(nlohmann::json::parse(response))));
 		}
 	}
 
 	return retVals;
 }
 
-void NestEngineServerNRPClient::sendDevicesToEngine(const devices_ptr_t &devicesArray)
+void NestEngineServerNRPClient::sendDataPacksToEngine(const datapacks_ptr_t &datapacksArray)
 {
 	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
-	for(DeviceInterface * const device : devicesArray)
+	for(DataPackInterface * const datapack : datapacksArray)
 	{
-		if(isDeviceTypeValid(device->id(), this->engineName()))
+		if(isDataPackTypeValid(datapack->id(), this->engineName()))
 		{
 			// Send command along with parameters to nest
 
-			const auto deviceName = device->name();
+			const auto datapackName = datapack->name();
 
-			std::string setStatusStr = "{\"nodes\":" + getDeviceIdList(deviceName) + ","
-			                           "\"params\":" + ((NestServerDevice const *)device)->data().serialize() + "}";
+			std::string setStatusStr = "{\"nodes\":" + getDataPackIdList(datapackName) + ","
+			                           "\"params\":" + ((JsonDataPack const *)datapack)->getData().dump() + "}";
 
 			try
 			{
@@ -411,28 +413,20 @@ void NestEngineServerNRPClient::sendDevicesToEngine(const devices_ptr_t &devices
 			}
 			catch(std::exception& e)
 			{
-				throw NRPException::logCreate(e, "Failed to set NEST status for device\"" + deviceName + "\"");
+				throw NRPException::logCreate(e, "Failed to set NEST status for datapack\"" + datapackName + "\"");
 			}
 		}
 	}
 }
 
-bool NestEngineServerNRPClient::runStepFcn(SimulationTime timeStep)
+SimulationTime NestEngineServerNRPClient::runLoopStepCallback(SimulationTime timeStep)
 {
 	// According to the NEST API documentation, Run accepts time to simulate in milliseconds and floating-point format
-
 	const double runTimeMsRounded = getRoundedRunTimeMs(timeStep, this->_simulationResolution);
 
-	try
-	{
-		nestSimulate(this->serverAddress(), runTimeMsRounded);
-	}
-	catch(const std::exception& e)
-	{
-		return false;
-	}
+	nestSimulate(this->serverAddress(), runTimeMsRounded);
 
-	return true;
+	return toSimulationTime<float, std::milli>(std::stof(nestGetKernelStatus(this->serverAddress(), "[\"biological_time\"]")));
 }
 
 std::string NestEngineServerNRPClient::serverAddress() const
@@ -463,10 +457,23 @@ const std::vector<std::string> NestEngineServerNRPClient::engineProcStartParams(
 
     // Add Server address
     int port = this->engineConfig().at("NestServerPort");
-    startParams.push_back("start");
-    startParams.push_back("-o");
-    startParams.push_back("-h"); startParams.push_back(this->engineConfig().at("NestServerHost"));
-    startParams.push_back("-p"); startParams.push_back(std::to_string(port));
+    int n_mpi = this->engineConfig().at("MPIProcs").get<int>();
+    if(n_mpi <= 1) {
+        startParams.push_back("start");
+        startParams.push_back("-o");
+        startParams.push_back("-h");
+        startParams.push_back(this->engineConfig().at("NestServerHost"));
+        startParams.push_back("-p");
+        startParams.push_back(std::to_string(port));
+        startParams.push_back("-P");
+        startParams.push_back("python3");
+    }
+    else {
+        startParams.push_back("--host");
+        startParams.push_back(this->engineConfig().at("NestServerHost"));
+        startParams.push_back("--port");
+        startParams.push_back(std::to_string(port));
+    }
 
     return startParams;
 }

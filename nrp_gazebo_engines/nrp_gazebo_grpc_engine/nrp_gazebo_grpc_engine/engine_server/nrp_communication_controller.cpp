@@ -53,7 +53,7 @@ NRPCommunicationController &NRPCommunicationController::resetInstance(const std:
 
 void NRPCommunicationController::registerStepController(GazeboStepController *stepController)
 {
-    lock_t lock(this->_deviceLock);
+    lock_t lock(this->_datapackLock);
 	this->_stepController = stepController;
 }
 
@@ -62,21 +62,19 @@ SimulationTime NRPCommunicationController::runLoopStep(SimulationTime timeStep)
 	if(this->_stepController == nullptr)
 	{
 		auto err = std::out_of_range("Tried to run loop while the controller has not yet been initialized");
-		std::cerr << err.what();
+		NRPLogger::error(err.what());
 
 		throw err;
 	}
 
 	try
 	{
-		// Execute loop step (Note: The _deviceLock mutex has already been set by EngineJSONServer::runLoopStepHandler, so no calls to reading/writing from/to devices is possible at this moment)
+		// Execute loop step (Note: The _datapackLock mutex has already been set by EngineJSONServer::runLoopStepHandler, so no calls to reading/writing from/to datapacks is possible at this moment)
 		return this->_stepController->runLoopStep(timeStep);
 	}
 	catch(const std::exception &e)
 	{
-		std::cerr << "Error during Gazebo stepping\n";
-		std::cerr << e.what();
-
+		NRPLogger::error("Error during Gazebo stepping: [ {} ]",  e.what());
 		throw;
 	}
 }
@@ -87,7 +85,7 @@ void NRPCommunicationController::initialize(const json &data, lock_t &lock)
 	if(waitTime <= 0)
 		waitTime = std::numeric_limits<double>::max();
 
-	// Allow devices to register
+	// Allow datapacks to register
 	lock.unlock();
 
 	// Wait until world plugin loads and forces a load of all other plugins
@@ -109,15 +107,37 @@ void NRPCommunicationController::initialize(const json &data, lock_t &lock)
 	lock.lock();
 }
 
+void NRPCommunicationController::reset()
+{
+	NRP_LOGGER_TRACE("{} called", __FUNCTION__);
+
+	try{
+		// Is it enough to reset just the world?
+		this->_stepController->resetWorld();
+		for (size_t i = 0; i < this->_sensorPlugins.size(); i++){
+			this->_sensorPlugins[i]->Reset();
+		}
+		for (size_t i = 0; i < this->_modelPlugins.size(); i++){
+			this->_modelPlugins[i]->Reset();
+		}
+	}
+	catch(const std::exception &e)
+	{
+		NRPLogger::error("NRPCommunicationController::reset: failed to resetWorld()");
+
+		throw;
+	}
+}
+
 void NRPCommunicationController::shutdown(const json&)
 {
 	// Do nothing
 }
 
 NRPCommunicationController::NRPCommunicationController(const std::string &address)
-    : EngineGrpcServer<EngineGrpc::GazeboCamera, EngineGrpc::GazeboJoint, EngineGrpc::GazeboLink>(address)
+    : EngineGrpcServer<Gazebo::Camera, Gazebo::Joint, Gazebo::Link>(address)
 {}
 
 NRPCommunicationController::NRPCommunicationController(const std::string &serverURL, const std::string &engineName, const std::string &registrationURL)
-    : EngineGrpcServer<EngineGrpc::GazeboCamera, EngineGrpc::GazeboJoint, EngineGrpc::GazeboLink>(serverURL, engineName, registrationURL)
+    : EngineGrpcServer<Gazebo::Camera, Gazebo::Joint, Gazebo::Link>(serverURL, engineName, registrationURL)
 {}

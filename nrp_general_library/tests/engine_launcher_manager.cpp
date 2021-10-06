@@ -29,8 +29,8 @@ using namespace testing;
 
 struct TestEngineConfigConst
 {
-    static constexpr FixedString EngineType = "test_engine";
-    static constexpr FixedString EngineSchema = "https://neurorobotics.net/engines/engine_base.json#EngineBase";
+    static constexpr char EngineType[] = "test_engine";
+    static constexpr char EngineSchema[] = "https://neurorobotics.net/engines/engine_base.json#EngineBase";
 };
 
 class TestEngine
@@ -44,6 +44,9 @@ public:
     virtual void initialize() override
     {}
 
+    virtual void reset() override
+    {}
+
     virtual void shutdown() override
     {}
 
@@ -53,25 +56,21 @@ public:
     virtual const std::vector<std::string> engineProcEnvParams() const override
     { return std::vector<std::string>(); }
 
-    virtual SimulationTime getEngineTime() const override
-    {	return SimulationTime::zero();	}
-
-    virtual void runLoopStep(SimulationTime) override
+    virtual void sendDataPacksToEngine(const datapacks_ptr_t &) override
     {}
 
-    virtual void waitForStepCompletion(float) override
-    {}
-
-    virtual void sendDevicesToEngine(const devices_ptr_t &) override
-    {}
-
-protected:
-    virtual devices_set_t getDevicesFromEngine(const device_identifiers_set_t &deviceIdentifiers) override
+    virtual SimulationTime runLoopStepCallback(SimulationTime) override
     {
-        devices_set_t retVal;
-        for(const auto &devID : deviceIdentifiers)
+        return SimulationTime::zero();
+    }
+
+
+    virtual datapacks_set_t getDataPacksFromEngine(const datapack_identifiers_set_t &datapackIdentifiers) override
+    {
+        datapacks_set_t retVal;
+        for(const auto &devID : datapackIdentifiers)
         {
-            retVal.emplace(new DeviceInterface(devID));
+            retVal.emplace(new DataPackInterface(devID));
         }
 
         return retVal;
@@ -114,7 +113,7 @@ struct TestLauncher2
 	}
 };
 
-TEST(EngineLauncherManagerTest, RegisterDevice)
+TEST(EngineLauncherManagerTest, RegisterDataPack)
 {
 	auto test1Launcher = EngineLauncherInterfaceSharedPtr(new TestLauncher1());
 	EngineLauncherManager engines;

@@ -38,7 +38,7 @@
  * \brief Manages communication with the NRP. Uses a REST server to send/receive data. Singleton class.
  */
 class NRPCommunicationController
-        : public EngineGrpcServer<EngineGrpc::GazeboCamera, EngineGrpc::GazeboJoint, EngineGrpc::GazeboLink>
+        : public EngineGrpcServer<Gazebo::Camera, Gazebo::Joint, Gazebo::Link>
 {
 	public:
 
@@ -86,14 +86,32 @@ class NRPCommunicationController
 		void registerStepController(GazeboStepController *stepController);
 
 		/*!
-		 * \brief Create device name from the given plugin and sensor/joint/link
+		 * \brief Register a sensor plugin
+		 * \param sensorPlugin Pointer to sensor plugin
+		 */
+		void registerSensorPlugin(gazebo::SensorPlugin *sensorPlugin)
+		{
+			this->_sensorPlugins.push_back(sensorPlugin);
+		};
+
+		/*!
+		 * \brief Register a model plugin
+		 * \param sensorPlugin Pointer to model plugin
+		 */
+		void registerModelPlugin(gazebo::ModelPlugin *modelPlugin)
+		{
+			this->_modelPlugins.push_back(modelPlugin);
+		};
+
+		/*!
+		 * \brief Create datapack name from the given plugin and sensor/joint/link
 		 * \tparam T Plugin Type
 		 * \param plugin Controller Plugin
 		 * \param objectName Name of the controlled object (sensor, joint, link, ...)
-		 * \return Returns device name
+		 * \return Returns datapack name
 		 */
 		template<class T>
-		static std::string createDeviceName(const gazebo::PluginT<T> &plugin, const std::string &objectName)
+		static std::string createDataPackName(const gazebo::PluginT<T> &plugin, const std::string &objectName)
 		{	return plugin.GetHandle() + "::" + objectName;	}
 
 	private:
@@ -108,9 +126,25 @@ class NRPCommunicationController
 		 */
 		GazeboStepController *_stepController = nullptr;
 
+		/*!
+		 * \brief Vector of registered SensorPlugin's.
+		 * They are kept in order to be available for function calls, like Reset
+		 * Because the world->Reset doesn't call plugins' corresponding functions.
+		 */
+		std::vector< gazebo::SensorPlugin* >  _sensorPlugins;
+
+		/*!
+		 * \brief Vector of registered ModelPlugin's
+		 * They are kept in order to be available for function calls, like Reset
+		 * Because the world->Reset doesn't call plugins' corresponding functions.
+		 */
+		std::vector< gazebo::ModelPlugin* >  _modelPlugins;
+
 		virtual SimulationTime runLoopStep(SimulationTime timeStep) override;
 
-		virtual void initialize(const nlohmann::json &data, lock_t &deviceLock) override;
+		virtual void initialize(const nlohmann::json &data, lock_t &datapackLock) override;
+
+		virtual void reset() override;
 
 		virtual void shutdown(const nlohmann::json &data) override;
 

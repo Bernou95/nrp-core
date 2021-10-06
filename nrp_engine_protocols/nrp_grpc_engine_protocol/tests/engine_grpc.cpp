@@ -28,7 +28,7 @@
 #include "nrp_grpc_engine_protocol/config/engine_grpc_config.h"
 #include "nrp_grpc_engine_protocol/engine_server/engine_grpc_server.h"
 #include "nrp_grpc_engine_protocol/engine_client/engine_grpc_client.h"
-#include "nrp_grpc_engine_protocol/grpc_server/engine_grpc.grpc.pb.h"
+#include "nrp_protobuf/engine_grpc.grpc.pb.h"
 
 
 void testSleep(unsigned sleepMs)
@@ -38,52 +38,52 @@ void testSleep(unsigned sleepMs)
 }
 
 
-class TestGrpcDeviceController
-        : public DataDeviceController<google::protobuf::Message>
+class TestGrpcDataPackController
+        : public DataPackController<google::protobuf::Message>
 {
     public:
 
-		TestGrpcDeviceController()
-		    : _data(new EngineGrpc::TestPayload())
+		TestGrpcDataPackController()
+		    : _data(new Engine::TestPayload())
         { }
 
-        virtual void handleDeviceData(const google::protobuf::Message &data) override
+        virtual void handleDataPackData(const google::protobuf::Message &data) override
 		{
             // throws bad_cast
-            const auto &j = dynamic_cast<const EngineGrpc::TestPayload &>(data);
+            const auto &j = dynamic_cast<const Engine::TestPayload &>(data);
 		    _data->CopyFrom(j);
 		}
 
-        virtual google::protobuf::Message *getDeviceInformation() override
+        virtual google::protobuf::Message *getDataPackInformation() override
 		{
-            if(this->_returnEmptyDevice)
+            if(this->_returnEmptyDataPack)
                 return nullptr;
             else {
                 auto old_data = _data;
-                _data = new EngineGrpc::TestPayload();
+                _data = new Engine::TestPayload();
                 _data->CopyFrom(*old_data);
                 return old_data;
             }
         }
 
-        void triggerEmptyDeviceReturn(bool value)
+        void triggerEmptyDataPackReturn(bool value)
         {
-            this->_returnEmptyDevice = value;
+            this->_returnEmptyDataPack = value;
         }
 
 	private:
-        EngineGrpc::TestPayload* _data;
-        bool _returnEmptyDevice = false;
+        Engine::TestPayload* _data;
+        bool _returnEmptyDataPack = false;
 };
 
 struct TestEngineGRPCConfigConst
 {
-    static constexpr FixedString EngineType = "test_engine";
-    static constexpr FixedString EngineSchema = "https://neurorobotics.net/engines/engine_comm_protocols.json#/engine_grpc";
+    static constexpr char EngineType[] = "test_engine";
+    static constexpr char EngineSchema[] = "https://neurorobotics.net/engines/engine_comm_protocols.json#/engine_grpc";
 };
 
 class TestEngineGrpcClient
-: public EngineGrpcClient<TestEngineGrpcClient, TestEngineGRPCConfigConst::EngineSchema, EngineGrpc::TestPayload>
+: public EngineGrpcClient<TestEngineGrpcClient, TestEngineGRPCConfigConst::EngineSchema, Engine::TestPayload>
 {
     public:
         TestEngineGrpcClient(nlohmann::json &config, ProcessLauncherInterface::unique_ptr &&launcher)
@@ -95,6 +95,11 @@ class TestEngineGrpcClient
             this->sendInitCommand("test");
         }
 
+		void reset() override
+        {
+            this->sendResetCommand();
+        }
+
 		void shutdown() override
         {
             this->sendShutdownCommand("test");
@@ -102,7 +107,7 @@ class TestEngineGrpcClient
 };
 
 class TestEngineGrpcServer
-    : public EngineGrpcServer<EngineGrpc::TestPayload>
+    : public EngineGrpcServer<Engine::TestPayload>
 {
     public:
 
@@ -122,6 +127,13 @@ class TestEngineGrpcServer
             {
                 throw std::runtime_error("Init failed");
             }
+        }
+
+        void reset() override
+        {
+            specialBehaviour();
+
+            this->resetEngineTime();
         }
 
         void shutdown(const nlohmann::json &data) override
@@ -151,6 +163,11 @@ class TestEngineGrpcServer
         void resetEngineTime()
         {
             this->_time = SimulationTime::zero();
+        }
+
+        SimulationTime getEngineTime()
+        {
+            return this->_time;
         }
 
     private:
@@ -306,7 +323,7 @@ TEST(EngineGrpc, RunLoopStepCommand)
     // The gRPC server isn't running, so the runLoopStep command should fail
 
     SimulationTime timeStep = floatToSimulationTime(0.1f);
-    ASSERT_THROW(client.sendRunLoopStepCommand(timeStep), std::runtime_error);
+    ASSERT_THROW(client.runLoopStepCallback(timeStep), std::runtime_error);
 
     server.startServer();
 
@@ -314,21 +331,21 @@ TEST(EngineGrpc, RunLoopStepCommand)
 
     server.resetEngineTime();
     timeStep = floatToSimulationTime(-0.1f);
-    ASSERT_THROW(client.sendRunLoopStepCommand(timeStep), std::runtime_error);
+    ASSERT_THROW(client.runLoopStepCallback(timeStep), std::runtime_error);
 
     // Normal loop execution, the command should return engine time
 
     server.resetEngineTime();
     timeStep = floatToSimulationTime(1.0f);
-    ASSERT_NEAR(client.sendRunLoopStepCommand(timeStep).count(), timeStep.count(), 0.0001);
+    ASSERT_NEAR(client.runLoopStepCallback(timeStep).count(), timeStep.count(), 0.0001);
 
     // Try to go back in time. The client should raise an error when engine time is decreasing
 
     server.resetEngineTime();
     timeStep = floatToSimulationTime(2.0f);
-    ASSERT_NO_THROW(client.sendRunLoopStepCommand(timeStep));
+    ASSERT_NO_THROW(client.runLoopStepCallback(timeStep));
     timeStep = floatToSimulationTime(-1.0f);
-    ASSERT_THROW(client.sendRunLoopStepCommand(timeStep), std::runtime_error);
+    ASSERT_THROW(client.runLoopStepCallback(timeStep), std::runtime_error);
 
     // TODO Add test for failure on server side
 }
@@ -348,22 +365,71 @@ TEST(EngineGrpc, runLoopStepCommandTimeout)
     server.startServer();
     server.timeoutOnNextCommand();
     SimulationTime timeStep = floatToSimulationTime(2.0f);
-    ASSERT_THROW(client.sendRunLoopStepCommand(timeStep), std::runtime_error);
+    ASSERT_THROW(client.runLoopStepCallback(timeStep), std::runtime_error);
 }
 
-TEST(EngineGrpc, RegisterDevices)
+TEST(EngineGrpc, ResetCommand)
+{
+    nlohmann::json config;
+    config["EngineName"] = "engine";
+    config["EngineType"] = "test_engine_grpc";
+
+    TestEngineGrpcServer server("localhost:9004");
+    TestEngineGrpcClient client(config, ProcessLauncherInterface::unique_ptr(new ProcessLauncherBasic()));
+
+    nlohmann::json jsonMessage;
+    jsonMessage["init"]    = true;
+    jsonMessage["throw"]   = false;
+
+    // The gRPC server isn't running, so the reset command should fail
+
+    ASSERT_THROW(client.sendResetCommand(), std::runtime_error);
+
+    // Start the server and send the reset command. It should succeed
+
+    server.startServer();
+    // TODO Investigate why this is needed. It seems to be caused by the previous call to sendInitCommand function
+    testSleep(1500);
+    ASSERT_NO_THROW(client.sendResetCommand());
+
+    // Normal loop execution, the reset should return time to zero
+
+    SimulationTime timeStep = floatToSimulationTime(0.1f);
+    ASSERT_NO_THROW(client.runLoopStepCallback(timeStep));
+    ASSERT_NO_THROW(client.sendResetCommand());
+    ASSERT_EQ(client.getEngineTime().count(), 0);
+}
+
+TEST(EngineGrpc, ResetCommandTimeout)
+{
+    nlohmann::json config;
+    config["EngineName"] = "engine";
+    config["EngineType"] = "test_engine_grpc";
+    config["EngineCommandTimeout"] = 1;
+
+    TestEngineGrpcServer server("localhost:9004");
+    TestEngineGrpcClient client(config, ProcessLauncherInterface::unique_ptr(new ProcessLauncherBasic()));
+
+    // Test runLoopStep command timeout
+
+    server.startServer();
+    server.timeoutOnNextCommand();
+    ASSERT_THROW(client.sendResetCommand(), std::runtime_error);
+}
+
+TEST(EngineGrpc, RegisterDataPacks)
 {
     TestEngineGrpcServer server("localhost:9004");
-    TestGrpcDeviceController *dev1 = nullptr;
+    TestGrpcDataPackController *dev1 = nullptr;
 
-    ASSERT_EQ(server.getNumRegisteredDevices(), 0);
-    server.registerDevice("dev1", dev1);
-    ASSERT_EQ(server.getNumRegisteredDevices(), 1);
+    ASSERT_EQ(server.getNumRegisteredDataPacks(), 0);
+    server.registerDataPack("dev1", dev1);
+    ASSERT_EQ(server.getNumRegisteredDataPacks(), 1);
 }
 
-TEST(EngineGrpc, SetDeviceData)
+TEST(EngineGrpc, SetDataPackData)
 {
-    const std::string deviceName = "a";
+    const std::string datapackName = "a";
     const std::string engineName = "c";
 
     nlohmann::json config;
@@ -373,52 +439,52 @@ TEST(EngineGrpc, SetDeviceData)
     TestEngineGrpcServer server("localhost:9004");
     TestEngineGrpcClient client(config, ProcessLauncherInterface::unique_ptr(new ProcessLauncherBasic()));
 
-    std::vector<DeviceInterface*> input_devices;
+    std::vector<DataPackInterface*> input_datapacks;
 
-	std::shared_ptr<TestGrpcDeviceController> deviceController(new TestGrpcDeviceController()); // Server side
-    server.registerDevice(deviceName, deviceController.get());
+	std::shared_ptr<TestGrpcDataPackController> datapackController(new TestGrpcDataPackController()); // Server side
+    server.registerDataPack(datapackName, datapackController.get());
 
-    std::shared_ptr<DataDevice<EngineGrpc::TestPayload>> dev1(new DataDevice<EngineGrpc::TestPayload>(deviceName, engineName)); // Client side
-    input_devices.push_back(dev1.get());
+    std::shared_ptr<DataPack<Engine::TestPayload>> dev1(new DataPack<Engine::TestPayload>(datapackName, engineName)); // Client side
+    input_datapacks.push_back(dev1.get());
 
-    // The gRPC server isn't running, so the sendDevicesToEngine command should fail
-    ASSERT_THROW(client.sendDevicesToEngine(input_devices), std::runtime_error);
+    // The gRPC server isn't running, so the sendDataPacksToEngine command should fail
+    ASSERT_THROW(client.sendDataPacksToEngine(input_datapacks), std::runtime_error);
 
     // Starts the Engine
     server.startServer();
     testSleep(1500);
 
-    // After sending a device it becomes empty and sendDevicesToEngine command should fail
+    // After sending a datapack it becomes empty and sendDataPacksToEngine command should fail
     ASSERT_TRUE(dev1->isEmpty());
-    ASSERT_THROW(client.sendDevicesToEngine(input_devices), NRPException::exception);
+    ASSERT_THROW(client.sendDataPacksToEngine(input_datapacks), NRPException::exception);
 
-    input_devices.clear();
-    auto d = new EngineGrpc::TestPayload();
+    input_datapacks.clear();
+    auto d = new Engine::TestPayload();
     d->set_integer(111);
-    dev1.reset(new DataDevice<EngineGrpc::TestPayload>(deviceName, engineName, d));
-    input_devices.push_back(dev1.get());
+    dev1.reset(new DataPack<Engine::TestPayload>(datapackName, engineName, d));
+    input_datapacks.push_back(dev1.get());
 
     // Normal command execution
-    client.sendDevicesToEngine(input_devices);
-    d = dynamic_cast<EngineGrpc::TestPayload *>(deviceController->getDeviceInformation());
+    client.sendDataPacksToEngine(input_datapacks);
+    d = dynamic_cast<Engine::TestPayload *>(datapackController->getDataPackInformation());
 
 	ASSERT_EQ(d->integer(),       111);
 
-    // Test setting data on a device that wasn't registered in the engine server
-    const std::string deviceName2 = "b";
-    DataDevice<EngineGrpc::TestPayload> dev2(deviceName2, engineName);
-    input_devices.clear();
-    input_devices.push_back(&dev2);
+    // Test setting data on a datapack that wasn't registered in the engine server
+    const std::string datapackName2 = "b";
+    DataPack<Engine::TestPayload> dev2(datapackName2, engineName);
+    input_datapacks.clear();
+    input_datapacks.push_back(&dev2);
 
-    ASSERT_THROW(client.sendDevicesToEngine(input_devices), std::runtime_error);
+    ASSERT_THROW(client.sendDataPacksToEngine(input_datapacks), std::runtime_error);
 
     // TODO Add test for setData timeout
 }
 
-TEST(EngineGrpc, GetDeviceData)
+TEST(EngineGrpc, GetDataPackData)
 {
-    const std::string deviceName = "a";
-    const std::string deviceType = "b";
+    const std::string datapackName = "a";
+    const std::string datapackType = "b";
     const std::string engineName = "c";
 
     nlohmann::json config;
@@ -430,84 +496,84 @@ TEST(EngineGrpc, GetDeviceData)
 
     // Client sends a request to the server
 
-    std::vector<DeviceInterface*> input_devices;
+    std::vector<DataPackInterface*> input_datapacks;
 
-    DeviceIdentifier         devId(deviceName, engineName, deviceType);
-    DataDevice<EngineGrpc::TestPayload> dev1(deviceName, engineName); // Client side
-    std::shared_ptr<TestGrpcDeviceController> deviceController(new TestGrpcDeviceController()); // Server side
+    DataPackIdentifier         devId(datapackName, engineName, datapackType);
+    DataPack<Engine::TestPayload> dev1(datapackName, engineName); // Client side
+    std::shared_ptr<TestGrpcDataPackController> datapackController(new TestGrpcDataPackController()); // Server side
 
-    server.registerDevice(deviceName, deviceController.get());
+    server.registerDataPack(datapackName, datapackController.get());
 
-    input_devices.push_back(&dev1);
+    input_datapacks.push_back(&dev1);
 
-    EngineClientInterface::device_identifiers_set_t deviceIdentifiers;
-    deviceIdentifiers.insert(devId);
+    EngineClientInterface::datapack_identifiers_set_t datapackIdentifiers;
+    datapackIdentifiers.insert(devId);
 
-    // The gRPC server isn't running, so the updateDevicesFromEngine command should fail
+    // The gRPC server isn't running, so the updateDataPacksFromEngine command should fail
 
-    ASSERT_THROW(client.updateDevicesFromEngine(deviceIdentifiers), std::runtime_error);
+    ASSERT_THROW(client.updateDataPacksFromEngine(datapackIdentifiers), std::runtime_error);
 
     server.startServer();
     testSleep(1500);
-    client.sendDevicesToEngine(input_devices);
+    client.sendDataPacksToEngine(input_datapacks);
 
-    // Return an empty device from the server
+    // Return an empty datapack from the server
     // It should be inserted into the engines cache, but should be marked as empty
 
-    deviceController->triggerEmptyDeviceReturn(true);
+    datapackController->triggerEmptyDataPackReturn(true);
 
-    auto output = client.updateDevicesFromEngine(deviceIdentifiers);
+    auto output = client.updateDataPacksFromEngine(datapackIdentifiers);
 
     ASSERT_EQ(output.size(), 1);
-    ASSERT_EQ(output.at(0)->name(),       deviceName);
+    ASSERT_EQ(output.at(0)->name(),       datapackName);
     ASSERT_EQ(output.at(0)->engineName(), engineName);
     ASSERT_EQ(output.at(0)->isEmpty(),    true);
 
-    deviceController->triggerEmptyDeviceReturn(false);
+    datapackController->triggerEmptyDataPackReturn(false);
 
     // Normal command execution
-    // Engine cache should be updated with a non-empty device
+    // Engine cache should be updated with a non-empty datapack
 
-    output = client.updateDevicesFromEngine(deviceIdentifiers);
+    output = client.updateDataPacksFromEngine(datapackIdentifiers);
 
     ASSERT_EQ(output.size(), 1);
-    ASSERT_EQ(output.at(0)->name(),       deviceName);
+    ASSERT_EQ(output.at(0)->name(),       datapackName);
     ASSERT_EQ(output.at(0)->type(),  dev1.type());
     ASSERT_EQ(output.at(0)->engineName(), engineName);
     ASSERT_EQ(output.at(0)->isEmpty(),    false);
 
-    // Trigger return of an empty device again
+    // Trigger return of an empty datapack again
     // Check that it doesn't overwrite the cache
 
-    deviceController->triggerEmptyDeviceReturn(true);
+    datapackController->triggerEmptyDataPackReturn(true);
 
-    output = client.updateDevicesFromEngine(deviceIdentifiers);
+    output = client.updateDataPacksFromEngine(datapackIdentifiers);
 
     ASSERT_EQ(output.size(), 1);
     ASSERT_EQ(output.at(0)->isEmpty(), false);
 
-    deviceController->triggerEmptyDeviceReturn(false);
+    datapackController->triggerEmptyDataPackReturn(false);
 
-    // Test requesting a device that wasn't registered in the engine server
+    // Test requesting a datapack that wasn't registered in the engine server
 
-    const std::string deviceName2 = "b";
+    const std::string datapackName2 = "b";
 
-    DeviceIdentifier         devId2(deviceName2, engineName, deviceType);
-    deviceIdentifiers.insert(devId2);
+    DataPackIdentifier         devId2(datapackName2, engineName, datapackType);
+    datapackIdentifiers.insert(devId2);
 
-    ASSERT_THROW(client.updateDevicesFromEngine(deviceIdentifiers), std::runtime_error);
+    ASSERT_THROW(client.updateDataPacksFromEngine(datapackIdentifiers), std::runtime_error);
 
     // TODO Add test for getData timeout
 }
 
-TEST(EngineGrpc, GetDeviceData2)
+TEST(EngineGrpc, GetDataPackData2)
 {
     const std::string engineName = "c";
 
-    const std::string deviceName1 = "a";
-    const std::string deviceType1 = "test_type1";
-    const std::string deviceName2 = "b";
-    const std::string deviceType2 = "test_type2";
+    const std::string datapackName1 = "a";
+    const std::string datapackType1 = "test_type1";
+    const std::string datapackName2 = "b";
+    const std::string datapackType2 = "test_type2";
 
     nlohmann::json config;
     config["EngineName"] = engineName;
@@ -518,29 +584,29 @@ TEST(EngineGrpc, GetDeviceData2)
 
     // Client sends a request to the server
 
-    std::vector<DeviceInterface*> input_devices;
+    std::vector<DataPackInterface*> input_datapacks;
 
-    DeviceIdentifier         devId1(deviceName1, engineName, deviceType1);
-    DeviceIdentifier         devId2(deviceName2, engineName, deviceType2);
-    DataDevice<EngineGrpc::TestPayload> dev1(deviceName1, engineName); // Client side
-    DataDevice<EngineGrpc::TestPayload> dev2(deviceName2, engineName); // Client side
-    std::shared_ptr<TestGrpcDeviceController> deviceController1(new TestGrpcDeviceController()); // Server side
-    std::shared_ptr<TestGrpcDeviceController> deviceController2(new TestGrpcDeviceController()); // Server side
+    DataPackIdentifier         devId1(datapackName1, engineName, datapackType1);
+    DataPackIdentifier         devId2(datapackName2, engineName, datapackType2);
+    DataPack<Engine::TestPayload> dev1(datapackName1, engineName); // Client side
+    DataPack<Engine::TestPayload> dev2(datapackName2, engineName); // Client side
+    std::shared_ptr<TestGrpcDataPackController> datapackController1(new TestGrpcDataPackController()); // Server side
+    std::shared_ptr<TestGrpcDataPackController> datapackController2(new TestGrpcDataPackController()); // Server side
 
-    server.registerDevice(deviceName1, deviceController1.get());
-    server.registerDevice(deviceName2, deviceController2.get());
+    server.registerDataPack(datapackName1, datapackController1.get());
+    server.registerDataPack(datapackName2, datapackController2.get());
 
-    input_devices.push_back(&dev1);
-    input_devices.push_back(&dev2);
+    input_datapacks.push_back(&dev1);
+    input_datapacks.push_back(&dev2);
 
     server.startServer();
-    client.sendDevicesToEngine(input_devices);
+    client.sendDataPacksToEngine(input_datapacks);
 
-    EngineClientInterface::device_identifiers_set_t deviceIdentifiers;
-    deviceIdentifiers.insert(devId1);
-    deviceIdentifiers.insert(devId2);
+    EngineClientInterface::datapack_identifiers_set_t datapackIdentifiers;
+    datapackIdentifiers.insert(devId1);
+    datapackIdentifiers.insert(devId2);
 
-    const auto output = client.updateDevicesFromEngine(deviceIdentifiers);
+    const auto output = client.updateDataPacksFromEngine(datapackIdentifiers);
 
     ASSERT_EQ(output.size(), 2);
     ASSERT_EQ(output.at(0)->engineName(), engineName);
@@ -548,15 +614,15 @@ TEST(EngineGrpc, GetDeviceData2)
     ASSERT_EQ(output.at(0)->type(), dev1.type());
     ASSERT_EQ(output.at(1)->type(), dev1.type());
 
-    if(output.at(0)->name().compare(deviceName1) == 0)
+    if(output.at(0)->name().compare(datapackName1) == 0)
     {
-        ASSERT_EQ(output.at(0)->name(), deviceName1);
-        ASSERT_EQ(output.at(1)->name(), deviceName2);
+        ASSERT_EQ(output.at(0)->name(), datapackName1);
+        ASSERT_EQ(output.at(1)->name(), datapackName2);
     }
     else
     {
-        ASSERT_EQ(output.at(0)->name(), deviceName2);
-        ASSERT_EQ(output.at(1)->name(), deviceName1);
+        ASSERT_EQ(output.at(0)->name(), datapackName2);
+        ASSERT_EQ(output.at(1)->name(), datapackName1);
     }
 }
 
