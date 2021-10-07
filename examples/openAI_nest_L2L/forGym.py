@@ -24,7 +24,7 @@ class Script(EngineScript):
         theAction = self._getDataPack("action").get('action')
         self.endFlag = self.tGym.run_action_step(theAction)
         self.stepCount = self.stepCount + 1
-        tData = list(self.tGym.getObservation())
+        tData = self.tGym.getObservation()
         self._setDataPack("observation", { "observation" : tData})
         if tData[0] > self.maxP:
             self.maxP=tData[0]
@@ -34,7 +34,7 @@ class Script(EngineScript):
             self.maxP = 0
             self.stepCount = 0
             self.tGym.env.reset()
-            tData = list(self.tGym.getObservation())
+            tData = self.tGym.getObservation()
         self._setDataPack("observation", { "observation" : tData})
 
     def shutdown(self):

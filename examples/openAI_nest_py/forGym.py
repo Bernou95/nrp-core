@@ -26,7 +26,7 @@ class Script(EngineScript):
         theAction = self._getDataPack("action").get('action')
         self.endFlag = self.tGym.run_action_step(theAction)
         self.stepCount = self.stepCount + 1
-        tData = list(self.tGym.getObservation())
+        tData = self.tGym.getObservation()
         self._setDataPack("observation", { "observation" : tData})
 
         #self._setDevice("opFlag", { "opFlag" : 1-theOperation})
