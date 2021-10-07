@@ -1,0 +1,32 @@
+{
+	"SimulationName": "tf_exchange",
+	"SimulationDescription": "Launch two python engines. Engine1 will offer the current time as a device. tf_1 will request said device and send it to Engine2. Engine2 will receive the time and display it",
+	"SimulationTimeout": 10,
+	"SimulationTimestep":0.01,
+	"EngineConfigs": 
+	[
+		{
+			"EngineType": "nest_json",
+			"EngineName": "nest",
+			"EngineTimestep":0.01,
+			"NestInitFileName": "forNest.py"
+		},
+		{
+			"EngineType": "python_json",
+			"EngineName": "gym",
+			"EngineTimestep":0.01,
+			"PythonFileName": "forGym.py"
+		}
+	],
+	"DataPackProcessingFunctions":
+	[
+		{
+			"Name": "fromNest",
+			"FileName": "fromNest.py"
+		},
+		{
+			"Name": "fromGym",
+			"FileName": "fromGym.py"
+		}
+	]
+}

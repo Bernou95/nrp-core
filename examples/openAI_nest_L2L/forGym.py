@@ -16,23 +16,26 @@ class Script(EngineScript):
         self.stepCount = 0
 
         self._registerDataPack("action")
-        self._setDataPack("action", { "action" : 1})
-
+        self.maxP = -1
 
     def runLoop(self, timestep) :
         """Update device1 at every timestep"""
         #from test import test_1 
-
         theAction = self._getDataPack("action").get('action')
         self.endFlag = self.tGym.run_action_step(theAction)
         self.stepCount = self.stepCount + 1
         tData = list(self.tGym.getObservation())
         self._setDataPack("observation", { "observation" : tData})
-
-        #self._setDevice("opFlag", { "opFlag" : 1-theOperation})
-        if self.endFlag:
-            self.endFlag = False
+        if tData[0] > self.maxP:
+            self.maxP=tData[0]
+            #print(self.maxP)
+        if tData[0] >= 0.48:
+            print(self.stepCount, " -- ", self.maxP)
+            self.maxP = 0
             self.stepCount = 0
+            self.tGym.env.reset()
+            tData = list(self.tGym.getObservation())
+        self._setDataPack("observation", { "observation" : tData})
 
     def shutdown(self):
         self.tGym.shutdown()

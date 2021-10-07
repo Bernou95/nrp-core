@@ -17,9 +17,6 @@ nest.Connect(dcl, neurons[0], 'all_to_all',
 nest.Connect(dcr, neurons[1], 'all_to_all',
                     {'weight': 500., 'delay': 1.0})
 
-for i in range(60):
-    dc_name = "dc_"+ str(i)
-
 spikerecorderr = nest.Create("spike_recorder")
 spikerecorderl = nest.Create("spike_recorder")
 RegisterDataPack('spikerecorderr', spikerecorderr)
