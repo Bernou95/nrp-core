@@ -1,0 +1,4 @@
+NRP_PATH=/NRP/nrp
+export PYTHONPATH=$NRP_PATH/lib/python3.8/site-packages:$PYTHONPATH
+export LD_LIBRARY_PATH=$NRP_PATH/lib:$LD_LIBRARY_PATH
+export PATH=$NRP_PATH/bin:$PATH

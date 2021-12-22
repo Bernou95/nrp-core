@@ -1,0 +1,3 @@
+OPENSIM_PATH=/Opensim/OpenSim
+export LD_LIBRARY_PATH=$OPENSIM_PATH/lib:$LD_LIBRARY_PATH
+export PYTHONPATH=$OPENSIM_PATH/lib/python3.8/site-packages:$PYTHONPATH
