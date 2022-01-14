@@ -20,3 +20,5 @@ tools/build_grpc_engine/
 tools/build_json_engine/
 reports
 .paho
+.ci/nrp-jsproto/nrp-jsproto.js
+.ci/nrp-jsproto/.npmrc

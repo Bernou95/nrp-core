@@ -204,6 +204,30 @@ function(GENERATE_GRPC_PYTHON PROTO_FILE_NAME PROTO_PYTHON_FILES_VAR)
 
 endfunction()
 
+# Generates JS proto code from file PROTO_FILE_NAME. The js lib is generated, using PROTO_JS_LIBNAME
+function(GENERATE_PROTO_JS PROTO_FILE_NAME PROTO_JS_LIBNAME PROTO_JS_FILES_VAR)
+    # List of protobuf proto files
+    get_filename_component(hw_proto "${PROTO_FILE_NAME}" ABSOLUTE)
+
+    # Generated sources
+    set(js_lib_path "${CMAKE_CURRENT_BINARY_DIR}/js-dist/${PROTO_JS_LIBNAME}")
+    set(proto_js "${js_lib_path}/${PROTO_JS_LIBNAME}.js")
+
+    # Generate
+    add_custom_command(
+            OUTPUT "${proto_js}"
+            COMMAND "mkdir" ARGS -p "${js_lib_path}"
+            COMMAND ${PROTOC}
+            ARGS --js_out "library=${PROTO_JS_LIBNAME},binary:${js_lib_path}"
+            --proto_path "${CMAKE_CURRENT_SOURCE_DIR}/nrp_proto_defs"
+            --proto_path "${CMAKE_CURRENT_SOURCE_DIR}/engine_proto_defs"
+            "${hw_proto}"
+            DEPENDS "${hw_proto}")
+
+    set(${PROTO_JS_FILES_VAR} ${${PROTO_JS_FILES_VAR}} ${proto_js} PARENT_SCOPE)
+
+endfunction()
+
 ##########################################
 ## Protobuf code generation
 
@@ -220,6 +244,7 @@ endforeach()
 # Proto generation
 set(PROTO_SRC_FILES "")
 set(PROTO_PYTHON_FILES "")
+set(PROTO_JS_FILES "")
 
 foreach(PROTO_FILE ${ENGINE_PROTO_FILES})
     generate_proto_cpp("${PROTO_FILE}" PROTO_SRC_FILES)
@@ -255,6 +280,15 @@ foreach(LINE IN LISTS DATAPACK_MSG_FILE)
     endif()
 endforeach()
 string(REGEX REPLACE ",$" "" DATAPACK_MSG_TYPES "${DATAPACK_MSG_TYPES}")
+generate_proto_js("${CMAKE_CURRENT_SOURCE_DIR}/engine_proto_defs/dump_msgs.proto" "nrp-jsproto" PROTO_JS_FILES)
+
+# js protobuf package generation
+add_custom_target(
+    nrp_protobuf_js
+    ALL
+    COMMAND bash -c "echo \"Generating proto JS files\""
+    DEPENDS ${PROTO_JS_FILES}
+)
 
 # Forces the generation of proto and grpc python code
 add_custom_target(
