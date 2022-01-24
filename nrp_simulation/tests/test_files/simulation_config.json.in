@@ -1,0 +1,16 @@
+{
+	"SimulationName": "test_sim",
+	"EngineConfigs": [
+		{
+		    "EngineType": "gazebo_grpc",
+			"EngineName": "gazebo",
+			"GazeboWorldFile": "@GAZEBO_WORLD_FILE@"
+		},
+		{
+			"EngineType": "nest_json",
+			"EngineName": "nest",
+			"NestInitFileName": "@CMAKE_CURRENT_SOURCE_DIR@/tests/test_files/nest_simple.py"
+		}
+	],
+	"DataPackProcessingFunctions" : []
+}

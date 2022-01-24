@@ -1,0 +1,10 @@
+{
+	"SimulationName": "test_sim",
+	"EngineConfigs" : [
+		{
+			"EngineType": "test_engine",
+			"EngineName": "test"
+		}
+	],
+	"DataPackProcessingFunctions" : []
+}

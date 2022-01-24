@@ -1,0 +1,54 @@
+{"docker_base" : {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Docker Server Engine Base",
+    "description": "Docker Server Engine Base Configuration",
+    "$id": "#DockerServerEngineBase",
+    "allOf": [
+      { "$ref": "https://neurorobotics.net/engines/engine_comm_protocols.json#/engine_json" },
+      {
+        "properties": {
+
+          "IPHost": {
+            "type": "string",
+            "description": "The IP address to connect"
+          },
+          "Port": {
+            "type": "integer",
+            "description": "The port of the IP address"
+          }
+        },
+        "required": ["IPHost", "Port"]
+      }
+    ]
+  },
+  "docker_sim" : {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Docker Simulation Engine",
+    "description": "Docker Simulation Engine Configuration",
+    "$id": "#DockerSimEngine",
+    "allOf": [
+      { "$ref": "#/docker_base" },
+      {
+        "properties": {
+          "EngineType": {
+            "enum": ["docker_sim"]
+          },
+          "Simulator": {
+            "type": "string",
+            "description": "The simulator container will be used"
+          },
+          "WorldFileName": {
+            "type": "string",
+            "description": "Path to the file of simulation world"
+          },
+          "Visualizer": {
+            "type": "boolean",
+            "default": false,
+            "description": "To show the simulation in visualizer or not"
+          }
+        },
+        "required": ["Simulator", "WorldFileName"]
+      }
+    ]
+  }
+}

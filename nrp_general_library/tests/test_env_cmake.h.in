@@ -1,0 +1,57 @@
+/* * NRP Core - Backend infrastructure to synchronize simulations
+ *
+ * Copyright 2020-2021 NRP Team
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * This project has received funding from the European Union’s Horizon 2020
+ * Framework Programme for Research and Innovation under the Specific Grant
+ * Agreement No. 945539 (Human Brain Project SGA3).
+ */
+
+#ifndef TEST_ENV_CMAKE_H
+#define TEST_ENV_CMAKE_H
+
+//#include "nrp_general_library/datapack_interface/datapack.h"
+
+#define TEST_TRANSCEIVER_FCN_FILE_NAME "@CMAKE_CURRENT_SOURCE_DIR@/tests/test_files/transceiver_function.py"
+#define TEST_TRANSCEIVER_FCN2_FILE_NAME "@CMAKE_CURRENT_SOURCE_DIR@/tests/test_files/transceiver_function2.py"
+#define TEST_PREPROCESSING_FCN_FILE_NAME "@CMAKE_CURRENT_SOURCE_DIR@/tests/test_files/preprocessing_function.py"
+#define TEST_PREPROCESSING_FCN2_FILE_NAME "@CMAKE_CURRENT_SOURCE_DIR@/tests/test_files/preprocessing_function2.py"
+#define TEST_INVALID_INPUT_PREPROCESSING_FCN_FILE_NAME "@CMAKE_CURRENT_SOURCE_DIR@/tests/test_files/preprocessing_function_wrong_input.py"
+#define TEST_INVALID_OUTPUT_PREPROCESSING_FCN_FILE_NAME "@CMAKE_CURRENT_SOURCE_DIR@/tests/test_files/preprocessing_function_wrong_output.py"
+#define TEST_INVALID_TRANSCEIVER_FCN_FILE_NAME "@CMAKE_CURRENT_SOURCE_DIR@/tests/test_files/invalid_transceiver_function.py"
+#define TEST_SIMPLE_TRANSCEIVER_FCN_MODULE_PATH "@CMAKE_CURRENT_SOURCE_DIR@/tests/test_files"
+
+#define TEST_PLUGIN_DIR "@CMAKE_CURRENT_BINARY_DIR@"
+#define TEST_NRP_PLUGIN "@TEST_NRP_PLUGIN@.so"
+
+#define TEST_PYTHON_MODULE_NAME @TEST_PYTHON_MODULE_NAME@
+#define TEST_PYTHON_MODULE_NAME_STR "@TEST_PYTHON_MODULE_NAME@"
+#define TEST_PYTHON_MODULE_PATH "@CMAKE_CURRENT_BINARY_DIR@"
+
+#define TEST_NRP_PROCESS_EXEC "@CMAKE_CURRENT_BINARY_DIR@/@TEST_NRP_PROCESS_EXEC@"
+
+#define TEST_PROC_STR_START   "start"
+#define TEST_PROC_STR_SIGTERM "sigterm"
+#define TEST_PROC_STR_FAIL    "fails"
+
+#define TEST_PROC_ENV_VAR_NAME "TEST_VAR"
+#define TEST_PROC_ENV_VAR_VAL "test_var"
+
+#define TEST_MPI_COMMUNICATION_PROC "@CMAKE_CURRENT_BINARY_DIR@/@TEST_MPI_COMMUNICATION@"
+#define TEST_MPI_COMM_STR "teststr"
+#define TEST_MPI_COMM_DEVID DataPackIdentifier("name", "engine", "type")
+#define TEST_MPI_COMM_DEV1 TestDataPack1(3, "ret", boost::python::dict())
+
+#endif // TEST_ENV_CMAKE_H
