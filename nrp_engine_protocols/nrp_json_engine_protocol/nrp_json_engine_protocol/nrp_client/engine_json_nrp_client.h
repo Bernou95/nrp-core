@@ -87,7 +87,13 @@ class EngineJSONNRPClient
             auto enginePID = this->EngineClientInterface::launchEngine();
 
             // Wait for engine to register itself if process launching has succeeded
-            if(enginePID > 0 && !this->engineConfig().at("RegistrationServerAddress").empty())
+            if(enginePID > 0 && this->engineConfig().contains("IPHost")){
+                const auto serverAddr = this->EngineClientInterface::_process
+                    ->launchCommand()->hostIP;
+                this->engineConfig()["ServerAddress"] = serverAddr;
+                this->_serverAddress = serverAddr;
+            }
+            else if(enginePID > 0 && !this->engineConfig().at("RegistrationServerAddress").empty())
             {
                 const auto serverAddr = this->waitForRegistration(20, 1);
                 if(serverAddr.empty())
@@ -276,13 +282,6 @@ protected:
             return engineAddr;
         }
 
-    private:
-
-        /*!
-         * \brief Server Address to send requests to
-         */
-        std::string _serverAddress;
-
         /*!
          * \brief Send a request to the Server
          * \param serverName Name of the server
@@ -309,6 +308,13 @@ protected:
                 throw NRPException::logCreate(e, "Communication with engine server failed");
             }
         }
+
+    private:
+
+        /*!
+         * \brief Server Address to send requests to
+         */
+        std::string _serverAddress;
 
         /*!
          * \brief Thread function that executes the loop and waits for a result from the engine

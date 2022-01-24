@@ -33,6 +33,7 @@ class LaunchCommandInterface
         : public PtrTemplates<LaunchCommandInterface>
 {
     public:
+        std::string hostIP = "";
         /*!
          * \brief Engine Process status
          */

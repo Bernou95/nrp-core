@@ -26,6 +26,8 @@
 #include "nrp_general_library/process_launchers/process_launcher_basic.h"
 #include "nrp_general_library/utils/nrp_exceptions.h"
 
+#include "nrp_general_library/process_launchers/process_launcher_docker.h"
+
 #include <iostream>
 #include <map>
 
@@ -101,7 +103,7 @@ class ProcessLauncherManager
 /*!
  * \brief Type to manage all available process launchers
  */
-using MainProcessLauncherManager = ProcessLauncherManager<ProcessLauncherBasic>;
+using MainProcessLauncherManager = ProcessLauncherManager<ProcessLauncherBasic, ProcessLauncherDocker>;
 
 using MainProcessLauncherManagerSharedPtr = MainProcessLauncherManager::shared_ptr;
 using MainProcessLauncherManagerConstSharedPtr = MainProcessLauncherManager::const_shared_ptr;

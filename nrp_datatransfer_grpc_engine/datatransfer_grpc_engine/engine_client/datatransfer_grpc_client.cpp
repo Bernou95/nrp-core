@@ -20,4 +20,28 @@
 // Agreement No. 945539 (Human Brain Project SGA3).
 //
 
-#include "nrp_docker_sim_engine/nrp_client/docker_sim_nrp_client.h"
+#include "datatransfer_grpc_engine/engine_client/datatransfer_grpc_client.h"
+#include "datatransfer_grpc_engine/config/cmake_constants.h"
+
+DataTransferEngineGrpcClient::DataTransferEngineGrpcClient(nlohmann::json &config, ProcessLauncherInterface::unique_ptr &&launcher)
+    : EngineGrpcClient(config, std::move(launcher))
+{
+    setDefaultProperty<std::string>("EngineProcCmd", DATATRANSFER_GRPC_ENGINE_EXECUTABLE_PATH);
+}
+
+void DataTransferEngineGrpcClient::initialize()
+{
+    this->sendInitCommand(this->engineConfig());
+}
+
+void DataTransferEngineGrpcClient::shutdown()
+{
+    this->sendShutdownCommand(nlohmann::json());
+}
+
+void DataTransferEngineGrpcClient::reset()
+{
+    this->sendResetCommand();
+}
+
+// EOF

@@ -345,7 +345,14 @@ FTILoop SimulationManager::createSimLoop(const EngineLauncherManagerConstSharedP
         // Create and launch engine
         try
         {
-            engines.push_back(engineLauncher->launchEngine(engineConfig, processLauncherManager->createProcessLauncher(this->_simConfig->at("ProcessLauncherType"))));
+            if(engineConfig.at("EngineLaunchCommand")=="DockerFork"){
+                engines.push_back(engineLauncher->launchEngine(engineConfig,
+                    processLauncherManager->createProcessLauncher("Docker")));
+            }else{
+                engines.push_back(engineLauncher->launchEngine(engineConfig, 
+                    processLauncherManager->createProcessLauncher(
+                        this->_simConfig->at("ProcessLauncherType"))));   
+            }
         }
         catch(std::exception &e)
         {

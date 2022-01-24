@@ -45,10 +45,7 @@ pid_t BasicFork::launchEngineProcess(const nlohmann::json &engineConfig, const s
                                      const std::vector<std::string> &startParams, bool appendParentEnv)
 {
     NRP_LOGGER_TRACE("{} called", __FUNCTION__);
-    std::string engineProcCmd = engineConfig.at("EngineProcCmd");
-    std::string checkStr = "NONE";
-    if (engineProcCmd == checkStr)  return -1;
-    
+
     // Parent PID
     const auto ppid = getpid();
 

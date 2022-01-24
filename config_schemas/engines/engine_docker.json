@@ -7,17 +7,12 @@
       { "$ref": "https://neurorobotics.net/engines/engine_comm_protocols.json#/engine_json" },
       {
         "properties": {
-
           "IPHost": {
             "type": "string",
             "description": "The IP address to connect"
-          },
-          "Port": {
-            "type": "integer",
-            "description": "The port of the IP address"
           }
         },
-        "required": ["IPHost", "Port"]
+        "required": ["IPHost"]
       }
     ]
   },
@@ -35,6 +30,12 @@
           },
           "Simulator": {
             "type": "string",
+            "default":"opensim",
+            "description": "The simulator container will be used"
+          },
+          "ContainerName":{
+            "type": "string",
+            "default":"NONE",
             "description": "The simulator container will be used"
           },
           "WorldFileName": {

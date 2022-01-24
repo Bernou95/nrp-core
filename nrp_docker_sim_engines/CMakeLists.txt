@@ -5,7 +5,7 @@ set(NAMESPACE_NAME "${PROJECT_NAME}")
 
 set(LIBRARY_NAME "${PROJECT_NAME}")
 set(PYTHON_MODULE_NAME "docker_sim")
-set(EXECUTABLE_NAME "NRPPythonExecutable")
+set(EXECUTABLE_NAME "NRPDockerExecutable")
 set(TEST_NAME "${PROJECT_NAME}Tests")
 
 set(LIB_EXPORT_NAME "${LIBRARY_NAME}Targets")
@@ -22,7 +22,6 @@ include(ExternalProject)
 set(LIB_SRC_FILES
     nrp_docker_sim_engine/config/docker_config.cpp
     nrp_docker_sim_engine/nrp_client/docker_sim_engine.cpp
-    nrp_docker_sim_engine/nrp_client/docker_sim_nrp_client.cpp
 )
 
 # List of python module build files
@@ -159,15 +158,6 @@ if(TARGET ${PYTHON_MODULE_NAME})
         DESTINATION "${PYTHON_INSTALL_DIR_REL}/${NRP_PYTHON_MODULE_NAME}/engines/${PYTHON_MODULE_NAME}")
 endif()
 
-install(FILES "${HEADER_DIRECTORY}/python/__init__.py"
-    DESTINATION "${PYTHON_INSTALL_DIR_REL}/${NRP_PYTHON_MODULE_NAME}/engines/${PYTHON_MODULE_NAME}")
-
-install(FILES "${HEADER_DIRECTORY}/python/ClientLib.py"
-    DESTINATION "${PYTHON_INSTALL_DIR_REL}/${NRP_PYTHON_MODULE_NAME}/engines/${PYTHON_MODULE_NAME}")
-install(FILES "${HEADER_DIRECTORY}/python/NetConnector.py"
-    DESTINATION "${PYTHON_INSTALL_DIR_REL}/${NRP_PYTHON_MODULE_NAME}/engines/${PYTHON_MODULE_NAME}")
-install(FILES "${HEADER_DIRECTORY}/python/EnvSet.py"
-    DESTINATION "${PYTHON_INSTALL_DIR_REL}/${NRP_PYTHON_MODULE_NAME}/engines/${PYTHON_MODULE_NAME}")
 
 
 # Install executable files

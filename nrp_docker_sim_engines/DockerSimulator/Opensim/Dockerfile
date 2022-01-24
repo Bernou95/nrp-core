@@ -85,8 +85,11 @@ WORKDIR $OPENSIM_PATH
 WORKDIR $OPENSIM_INSTALL_PATH/lib/python3.8/site-packages
 RUN python3 setup.py install
 
+RUN pip3 install Flask
+RUN pip3 install flask-socketio
+
 WORKDIR /root
-ADD opensim /root/opensim
+ADD simulator /root/simulator
 
 RUN /bin/bash -c "echo 'export LD_LIBRARY_PATH='$OPENSIM_INSTALL_PATH'/lib:\$LD_LIBRARY_PATH' >> $HOME/.bashrc"
 RUN /bin/bash -c "echo 'export PYTHONPATH='$OPENSIM_INSTALL_PATH'/lib/python3.8/site-packages:\$PYTHONPATH' >> $HOME/.bashrc"

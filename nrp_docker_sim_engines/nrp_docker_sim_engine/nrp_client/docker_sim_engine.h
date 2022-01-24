@@ -23,27 +23,50 @@
 #ifndef DOCKER_SIM_ENGINE_H
 #define DOCKER_SIM_ENGINE_H
 
-#include "nrp_docker_sim_engine/nrp_client/docker_sim_nrp_client.h"
+//#include "nrp_docker_sim_engine/nrp_client/docker_sim_nrp_client.h"
 #include "nrp_general_library/plugin_system/plugin.h"
 
+#include "nrp_general_library/engine_interfaces/engine_client_interface.h"
+
+#include "nrp_json_engine_protocol/nrp_client/engine_json_nrp_client.h"
+#include "nrp_json_engine_protocol/config/engine_json_config.h"
+
+#include "nrp_docker_sim_engine/config/docker_config.h"
 
 /*!
  * \brief PythonJSONEngine client
  */
 class DockerSimEngine
-: public DockerSimNrpClient<DockerSimEngine, DockerConfigConst::EngineSchema>
+: public EngineJSONNRPClient<DockerSimEngine, DockerConfigConst::EngineSchema>
 {
 public:
 
     DockerSimEngine(nlohmann::json &config, ProcessLauncherInterface::unique_ptr &&launcher)
-            : DockerSimNrpClient(config, std::move(launcher))
+            : EngineJSONNRPClient(config, std::move(launcher))
     {
         NRP_LOGGER_TRACE("{} called", __FUNCTION__);
         setDefaultProperty<std::string>("EngineProcCmd", "NONE");
     }
+
+    virtual void initialize() override
+    {   NRP_LOGGER_TRACE("{} called", __FUNCTION__);    }
+    virtual void reset() override
+    {   NRP_LOGGER_TRACE("{} called", __FUNCTION__); std::cout << "reset\n"; }
+    virtual void shutdown() override
+    {   std::cout << "Docker Engine is shutting down !!!\n"; }
+    
+
+    virtual const std::vector<std::string> engineProcStartParams() const override
+    {
+        NRP_LOGGER_TRACE("{} called", __FUNCTION__);
+        std::vector<std::string> startParams;
+        // Add Server address
+        startParams.push_back("--host");
+        startParams.push_back(this->engineConfig().at("IPHost"));
+        return startParams;
+    }
     
     SimulationTime runLoopStepCallback(SimulationTime timeStep) override;
-    
     virtual void sendDataPacksToEngine(const datapacks_ptr_t &datapacksArray) override;
     virtual datapacks_set_t getDataPacksFromEngine(const datapack_identifiers_set_t &datapackIdentifiers) override;
 

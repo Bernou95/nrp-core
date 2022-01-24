@@ -24,7 +24,7 @@
 #include "Python.h"
 
 namespace{
-	bool isDataPackTypeValid(const DataPackIdentifier & datapack, const std::string & engineName)
+    bool isDataPackTypeValid(const DataPackIdentifier & datapack, const std::string & engineName)
     {
         // Check if type matches the NestServerDataPack type
         // Skip the check if type was not set
@@ -32,12 +32,17 @@ namespace{
         return (isTypeValid && datapack.EngineName == engineName);
     }
 }
-
 SimulationTime DockerSimEngine::runLoopStepCallback(SimulationTime timeStep){
-    this->pInfo = this->toRunStep(this->pCommond);
-	return timeStep;
+    std::string header = "http://";
+    std::string tail = "//transfer";
+    std::string addr = this->engineConfig()["ServerAddress"];
+    std::string targetWeb = header+addr+tail;
+    
+    auto infoMsg = this->sendRequest(targetWeb, "application/json", this->pCommond,
+            "Engine server \"" + this->engineName() + "\" failed during Network");
+    this->pInfo = infoMsg.dump();
+    return timeStep;
 }
-
 
 EngineClientInterface::datapacks_set_t DockerSimEngine::getDataPacksFromEngine(const datapack_identifiers_set_t &datapackIdentifiers)
 {
@@ -46,7 +51,7 @@ EngineClientInterface::datapacks_set_t DockerSimEngine::getDataPacksFromEngine(c
     EngineClientInterface::datapacks_set_t retVals;
 
     for(const auto &devID : datapackIdentifiers)
-    {
+    {   
         if(isDataPackTypeValid(devID, this->engineName()))
         {
             retVals.emplace(new JsonDataPack(devID.Name, devID.EngineName,
@@ -60,7 +65,7 @@ EngineClientInterface::datapacks_set_t DockerSimEngine::getDataPacksFromEngine(c
 void DockerSimEngine::sendDataPacksToEngine(const datapacks_ptr_t &datapacksArray)
 {
     NRP_LOGGER_TRACE("{} called", __FUNCTION__);
-
+    
     for(DataPackInterface * const datapack : datapacksArray)
     {
         if(isDataPackTypeValid(datapack->id(), this->engineName()))
