@@ -1,6 +1,6 @@
 Step 1: build 2 virtual machine and install docker respectively
 
-	For example: To build the image for nrp-core, we can use command "docker build -t nrp:v0 ." inside the floder "NRP". "nrp:v0" is the name and tag of the docker image.
+For example: To build the image for nrp-core, we can use command "sudo docker build -t nrp:v0 -f ./Dockerfile ../../../../" inside the floder "NRP". "nrp:v0" is the name and tag of the docker image. To build the image for opensim, we can use command "sudo docker build -t opensim:v0 ." inside the floder "Opensim".
 
 Step 2: Install the simulator container in Follower VM, install NRP Container in Manager VM
 

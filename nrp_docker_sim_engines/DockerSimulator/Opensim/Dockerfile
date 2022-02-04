@@ -18,9 +18,9 @@ RUN apt-get install -y libtool libtool-bin
 RUN apt-get install -y autoconf
 RUN apt-get install -y libadolc-dev
 
-RUN apt-get -y install  cmake cmake-curses-gui \
-                           freeglut3-dev libxi-dev libxmu-dev \
-                           liblapack-dev swig python-dev \
+RUN apt-get update 
+RUN apt-get -y install  cmake cmake-curses-gui freeglut3-dev
+RUN apt-get -y install  libxi-dev libxmu-dev liblapack-dev swig python-dev \
                            openjdk-8-jdk
 ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
 
@@ -32,12 +32,13 @@ WORKDIR $OPENSIM_PATH
 # Build Opensim dependencie
 RUN mkdir Document
 WORKDIR Document
+RUN apt-get update
+RUN apt-get install -y libpcre2-dev
 RUN apt-get install -y libpcre3 libpcre3-dev
 RUN apt-get install -y bison byacc
 RUN git clone https://github.com/swig/swig
-RUN echo $(ls -1)
+
 WORKDIR swig
-RUN echo $(ls -1)
 RUN chmod a+x autogen.sh
 RUN /bin/bash -c "source autogen.sh"
 RUN /bin/bash -c "./configure"

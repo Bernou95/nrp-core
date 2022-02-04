@@ -35,11 +35,30 @@ RUN apt install -y git cmake libpistache-dev g++-10 libboost-python-dev libboost
  
 RUN apt install -y libgazebo11-dev gazebo11 gazebo11-plugin-base
 RUN apt install -y python3-flask python3-flask-cors python3-restrictedpython uwsgi-core uwsgi-plugin-python3
-
-ADD build.sh /root
-ADD export_nrp.sh /root
-
-ADD ../../../../nrp-core /root/nrp-core
+# For MQTT
+RUN mkdir Document
+RUN apt-get install -y cmake-gui cmake-curses-gui
+RUN apt-get install -y libssl-dev
+RUN apt-get install -y graphviz
+WORKDIR /root/Document
+RUN git clone https://github.com/eclipse/paho.mqtt.c
+WORKDIR paho.mqtt.c
+RUN cmake -Bbuild -H. -DPAHO_ENABLE_TESTING=OFF -DPAHO_BUILD_STATIC=ON \
+    -DPAHO_WITH_SSL=ON -DPAHO_HIGH_PERFORMANCE=ON
+RUN cmake --build build --target install
+RUN ldconfig
+WORKDIR /root/Document
+RUN git clone https://github.com/eclipse/paho.mqtt.cpp
+WORKDIR paho.mqtt.cpp
+RUN cmake -Bbuild -H. -DPAHO_BUILD_STATIC=ON \
+    -DPAHO_BUILD_DOCUMENTATION=TRUE -DPAHO_BUILD_SAMPLES=TRUE
+RUN cmake --build build --target install
+RUN ldconfig
+# For NRP-CORE
+WORKDIR /root
+ADD nrp-core/nrp_docker_sim_engines/DockerSimulator/NRP/build.sh /root
+ADD nrp-core/nrp_docker_sim_engines/DockerSimulator/NRP/export_nrp.sh /root
+ADD nrp-core /root/nrp-core
 WORKDIR /root
 ARG NRP_INSTALL_PATH=/NRP/nrp
 RUN mkdir -p $NRP_INSTALL_PATH
@@ -64,5 +83,4 @@ RUN apt-get update
 RUN apt-get install -y docker-ce docker-ce-cli containerd.io
 RUN pip3 install docker
 RUN mkdir /Model
-ADD opensim /Model/opensim
 VOLUME ["/Model"]
