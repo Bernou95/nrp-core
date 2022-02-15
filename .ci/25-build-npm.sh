@@ -14,24 +14,11 @@ cd "${repo_root}"/.ci/nrp-jsproto/ || exit 1
 cp "${repo_root}"/build/nrp_protobuf/js-dist/nrp-jsproto/nrp-jsproto.js ./
 sed -i -E "s/\"version\":\s+\".*\"/\"version\": \"${version}\"/" package.json
 
-# NPM_USER, NPM_PASS, NPM_REGISTRY should be set
-[ -z $NPM_USER ] && exit 1
-[ -z $NPM_PASS ] && exit 1
-[ -z $NPM_REGISTRY ] && exit 1
-export NPM_RC_PATH="${repo_root}"/.ci/nrp-jsproto/.npmrc
-export NPM_EMAIL=ci@neurorobotics.eu
-
 # install npm
 sudo apt update && sudo apt install -y nodejs npm
-npm install -g npm-cli-login
 
-rm -rf .npmrc
-npm-cli-login
-sed -i "s/.*://" .npmrc
-echo "registry=${NPM_REGISTRY}" >> .npmrc
-
-npm-cli-login
+npm login
 npm publish
-npm logout --registry="${NPM_REGISTRY}"
+npm logout
 
 # EOF
