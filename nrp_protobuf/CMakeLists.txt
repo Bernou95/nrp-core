@@ -280,7 +280,7 @@ foreach(LINE IN LISTS DATAPACK_MSG_FILE)
     endif()
 endforeach()
 string(REGEX REPLACE ",$" "" DATAPACK_MSG_TYPES "${DATAPACK_MSG_TYPES}")
-generate_proto_js("${CMAKE_CURRENT_SOURCE_DIR}/engine_proto_defs/dump_msgs.proto" "nrp-jsproto" PROTO_JS_FILES)
+generate_proto_js("${CMAKE_CURRENT_SOURCE_DIR}/*/*.proto" "nrp-jsproto" PROTO_JS_FILES)
 
 # js protobuf package generation
 add_custom_target(
