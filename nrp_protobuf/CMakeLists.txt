@@ -218,7 +218,7 @@ function(GENERATE_PROTO_JS PROTO_FILE_NAME PROTO_JS_LIBNAME PROTO_JS_FILES_VAR)
             OUTPUT "${proto_js}"
             COMMAND "mkdir" ARGS -p "${js_lib_path}"
             COMMAND ${PROTOC}
-            ARGS --js_out "library=${PROTO_JS_LIBNAME},binary:${js_lib_path}"
+            ARGS "--js_out=import_style=commonjs,binary:${js_lib_path}"
             --proto_path "${CMAKE_CURRENT_SOURCE_DIR}/nrp_proto_defs"
             --proto_path "${CMAKE_CURRENT_SOURCE_DIR}/engine_proto_defs"
             "${hw_proto}"

@@ -11,7 +11,7 @@ version=$(bash "${repo_root}"/.ci/js-version.bash)
 echo "$version"
 cd "${repo_root}"/.ci/nrp-jsproto/ || exit 1
 # todo: automatize somehow the path definition
-cp "${repo_root}"/build/nrp_protobuf/js-dist/nrp-jsproto/nrp-jsproto.js ./
+cp "${repo_root}"/build/nrp_protobuf/js-dist/nrp-jsproto/* ./
 sed -i -E "s/\"version\":\s+\".*\"/\"version\": \"${version}\"/" package.json
 
 # install npm
