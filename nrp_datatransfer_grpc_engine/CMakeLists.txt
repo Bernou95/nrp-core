@@ -37,17 +37,16 @@ set(EXEC_SRC_FILES
 
 # List testing build files
 set(TEST_SRC_FILES
+    tests/test_datatransfer_grpc_engine.cpp
+    # TODO: duplicated from nrp_mqtt_proxy.
+    #  How to make it accessible for testing here without including it in mqtt proxy target,
+    #  a target only for this mock?
+    tests/nrp_mqtt_client_mock.cpp
 )
 
 
 ##########################################
 ## Dependencies
-
-# MQTT Library
-if(NOT ENABLE_MQTT STREQUAL OFF)
-    find_package(eclipse-paho-mqtt-c 1.3.8 REQUIRED)
-    find_package(PahoMqttCpp 1.2.0 REQUIRED)
-endif()
 
 ##########################################
 ## Header configuration
@@ -80,7 +79,7 @@ target_link_libraries(${LIBRARY_NAME}
 if(NOT ENABLE_MQTT STREQUAL OFF)
     target_link_libraries(${LIBRARY_NAME}
         PUBLIC
-            PahoMqttCpp::paho-mqttpp3
+            ${NRP_MQTT_PROXY_TARGET}
     )
 endif()
 
@@ -140,8 +139,10 @@ if(${ENABLE_TESTING} AND NOT "${TEST_SRC_FILES}" STREQUAL "")
     target_link_libraries(${TEST_NAME}
         PUBLIC
         ${NAMESPACE_NAME}::${LIBRARY_NAME}
-        GTest::gtest
-        GTest::gtest_main)
+        GTest::GTest
+        GTest::Main
+        gmock_main
+        gmock)
 
     gtest_discover_tests(${TEST_NAME}
         WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/tests"
