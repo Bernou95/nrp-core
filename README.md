@@ -2,10 +2,11 @@ This README file contains information on how to get nrp-core installed in your s
 
 **WARNING:** nrp-core is in alpha release state, use it at your own risk. Also notice that nrp-core has only been tested on Ubuntu 20.04 at the moment and this OS and version are assumed in the instructions below. Installation in other environments might be possible but has not been tested yet.
 
- * Before starting the installation, define, please, the nrp-core installation directory:
+ * Before starting the installation, define, please, the directories for installing nrp-core and its external dependencies:
  
  ```
 export NRP_INSTALL_DIR="/home/${USER}/.local/nrp"
+export NRP_DEPS_DIR="/home/${USER}/.local/nrp_deps"
  ```
 
 ## Dependency Installation
@@ -51,7 +52,7 @@ Ensure that if using a virtualenv, this is active when running any SpiNNaker scr
 git clone https://github.com/eclipse/paho.mqtt.c.git \
 cd paho.mqtt.c \
 git checkout v1.3.8 \
-cmake -Bbuild -H. -DPAHO_ENABLE_TESTING=OFF -DPAHO_BUILD_STATIC=OFF -DPAHO_BUILD_SHARED=ON -DPAHO_WITH_SSL=ON -DPAHO_HIGH_PERFORMANCE=ON -DCMAKE_INSTALL_PREFIX="${NRP_INSTALL_DIR}"\
+cmake -Bbuild -H. -DPAHO_ENABLE_TESTING=OFF -DPAHO_BUILD_STATIC=OFF -DPAHO_BUILD_SHARED=ON -DPAHO_WITH_SSL=ON -DPAHO_HIGH_PERFORMANCE=ON -DCMAKE_INSTALL_PREFIX="${NRP_DEPS_DIR}"\
 cmake --build build/ --target install \
 sudo ldconfig && cd ..
 
@@ -59,7 +60,7 @@ sudo ldconfig && cd ..
 git clone https://github.com/eclipse/paho.mqtt.cpp \
 cd paho.mqtt.cpp \
 git checkout v1.2.0 \
-cmake -Bbuild -H. -DPAHO_BUILD_STATIC=OFF -DPAHO_BUILD_SHARED=ON -DCMAKE_INSTALL_PREFIX="${NRP_INSTALL_DIR}" -DCMAKE_PREFIX_PATH="${NRP_INSTALL_DIR}"\
+cmake -Bbuild -H. -DPAHO_BUILD_STATIC=OFF -DPAHO_BUILD_SHARED=ON -DCMAKE_INSTALL_PREFIX="${NRP_DEPS_DIR}" -DCMAKE_PREFIX_PATH="${NRP_DEPS_DIR}"\
 cmake --build build/ --target install \
 sudo ldconfig && cd ..
 
@@ -94,9 +95,10 @@ make nrp_doxygen
  ```bash
  # Start of setting environment
  export NRP_INSTALL_DIR="/home/${USER}/.local/nrp" # The installation directory, which was given before
+ export NRP_DEPS_DIR="/home/${USER}/.local/nrp_deps" # The installation directory for nrp-core external dependencies
  export PYTHONPATH="${NRP_INSTALL_DIR}"/lib/python3.8/site-packages:$PYTHONPATH
- export LD_LIBRARY_PATH="${NRP_INSTALL_DIR}"/lib:$LD_LIBRARY_PATH
- export PATH=$PATH:"${NRP_INSTALL_DIR}"/bin
+ export LD_LIBRARY_PATH="${NRP_INSTALL_DIR}"/lib:"${NRP_DEPS_DIR}"/lib:$LD_LIBRARY_PATH
+ export PATH=$PATH:"${NRP_INSTALL_DIR}"/bin:"${NRP_DEPS_DIR}"/bin
  export ROS_PACKAGE_PATH=/<prefix-to-nrp-core>/nrp-core:$ROS_PACKAGE_PATH
  . /usr/share/gazebo-11/setup.sh
  . /opt/ros/noetic/setup.bash
