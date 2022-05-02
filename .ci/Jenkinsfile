@@ -1,0 +1,77 @@
+#!groovy
+// Load shared library at master branch
+// the path to the repo with this library should be specified in Jenkins
+// https://tomd.xyz/jenkins-shared-library/
+// https://www.jenkins.io/doc/book/pipeline/shared-libraries/
+@Library('nrp-shared-libs@master') _
+
+pipeline {
+    environment {
+        NexusDockerRegistryUrl = "${env.NEXUS_REGISTRY_IP}:${env.NEXUS_REGISTRY_PORT}"
+    }
+    agent {
+        any
+        label 'cd_label'
+    }
+    options {
+        // Abort a build on timeout
+        timeout(time: 3, unit: 'HOURS') 
+    }
+
+    stages {
+       
+        stage('Build images') {
+            steps {
+                bitbucketStatusNotify(buildState: 'INPROGRESS')
+                withCredentials([usernamePassword(credentialsId: 'nexusadmin', usernameVariable: 'USER', passwordVariable: 'PASSWORD')])
+                {
+                    sh 'docker login -u $USER -p $PASSWORD ${NexusDockerRegistryUrl}'
+                }
+                sh 'docker-compose build && docker-compose push'
+                sh 'docker logout ${NexusDockerRegistryUrl}'
+            }
+        }
+
+        stage('Build and Test'){
+            parallel 
+            {
+                stage('NEST + GAZEBO')
+                {
+                    agent
+                    {
+                        docker
+                        {
+                            label 'cd_label'
+                            registryUrl "${NexusDockerRegistryUrl}/"
+                            image "nrp-gazebo-nest-ubuntu20:latest"
+                            registryCredentialsId 'nexusadmin'
+                        }
+                    }
+                    steps
+                    {
+                        sh 'bash .ci/10-prepare-build.sh'
+                        sh 'bash .ci/20-build.sh'
+                        sh 'bash .ci/25-build_docs.sh'
+                        lock("${NODE_NAME}-nrp-core-unit-tests") {
+                            sh 'bash .ci/30-run-tests.sh'
+                            cobertura coberturaReportFile: 'build/gcovr.xml'
+                        }
+                        sh 'bash .ci/40-run-cppcheck.sh'
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        aborted {
+            bitbucketStatusNotify(buildState: 'FAILED', buildDescription: 'Build aborted!')
+        }
+        failure {
+            bitbucketStatusNotify(buildState: 'FAILED', buildDescription: 'Build failed, see console output!')
+        }
+        success{
+            bitbucketStatusNotify(buildState: 'SUCCESSFUL', buildDescription: 'branch ' + env.BRANCH_NAME)
+        } 
+    }
+}

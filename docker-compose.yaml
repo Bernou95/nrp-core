@@ -1,0 +1,56 @@
+version: '3.1'
+
+services:
+
+    base:
+        build:
+            context: .
+            dockerfile: dockerfiles/base.Dockerfile
+            args:
+                BASE_IMAGE: ubuntu:20.04
+        image: nexus.neurorobotics.ebrains.eu:443/nrp-core/base-ubuntu20:latest
+
+
+    nest:
+        build:
+            context: .
+            dockerfile: dockerfiles/nest.Dockerfile
+            args:
+                BASE_IMAGE: nexus.neurorobotics.ebrains.eu:443/nrp-core/base-ubuntu20:latest
+        image: nexus.neurorobotics.ebrains.eu:443/nrp-core/nest-ubuntu20:latest
+        depends_on:
+        - base
+
+
+    gazebo:
+        build:
+            context: .
+            dockerfile: dockerfiles/gazebo.Dockerfile
+            args:
+                BASE_IMAGE: nexus.neurorobotics.ebrains.eu:443/nrp-core/base-ubuntu20:latest
+        image: nexus.neurorobotics.ebrains.eu:443/nrp-core/gazebo-ubuntu20:latest
+        depends_on:
+        - base
+
+
+    gazebo-nest:
+        build:
+            context: .
+            dockerfile: dockerfiles/gazebo.Dockerfile
+            args:
+                BASE_IMAGE: nexus.neurorobotics.ebrains.eu:443/nrp-core/nest-ubuntu20:latest
+        image: nexus.neurorobotics.ebrains.eu:443/nrp-core/gazebo-nest-ubuntu20:latest
+        depends_on:
+        - nest
+
+
+    nrp-gazebo-nest:
+        build:
+            context: .
+            dockerfile: dockerfiles/nrp-core.Dockerfile
+            args:
+                BASE_IMAGE: nexus.neurorobotics.ebrains.eu:443/nrp-core/gazebo-nest-ubuntu20:latest
+        image: nexus.neurorobotics.ebrains.eu:443/nrp-core/nrp-gazebo-nest-ubuntu20:latest
+        depends_on:
+        - gazebo-nest
+

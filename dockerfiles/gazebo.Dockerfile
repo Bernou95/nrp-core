@@ -1,3 +1,8 @@
+# Download base image
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE}
+
+
 # Add gazebo repository
 
 RUN sh -c 'echo "deb http://packages.osrfoundation.org/gazebo/ubuntu-stable `lsb_release -cs` main" > /etc/apt/sources.list.d/gazebo-stable.list'

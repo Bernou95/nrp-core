@@ -1,6 +1,7 @@
-# Download base image ubuntu 20.04
+# Download base image
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE}
 
-FROM ubuntu:20.04
 
 ARG NRP_USER=nrpuser
 ARG NRP_GROUP=nrpgroup

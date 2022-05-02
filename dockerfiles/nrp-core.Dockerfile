@@ -1,6 +1,7 @@
-# syntax = edrevo/dockerfile-plus
+# Download base image
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE}
 
-INCLUDE+ dockerfiles/base.Dockerfile
 
 # Install dependencies for testing
 
