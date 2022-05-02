@@ -1,18 +1,9 @@
 #!groovy
-// Load shared library at master branch
-// the path to the repo with this library should be specified in Jenkins
-// https://tomd.xyz/jenkins-shared-library/
-// https://www.jenkins.io/doc/book/pipeline/shared-libraries/
-@Library('nrp-shared-libs@master') _
-
 pipeline {
     environment {
         NexusDockerRegistryUrl = "${env.NEXUS_REGISTRY_IP}:${env.NEXUS_REGISTRY_PORT}"
     }
-    agent {
-        any
-        label 'cd_label'
-    }
+    agent none
     options {
         // Abort a build on timeout
         timeout(time: 3, unit: 'HOURS') 
@@ -21,6 +12,9 @@ pipeline {
     stages {
        
         stage('Build images') {
+            agent {
+                label 'cd_label'
+            }
             steps {
                 bitbucketStatusNotify(buildState: 'INPROGRESS')
                 withCredentials([usernamePassword(credentialsId: 'nexusadmin', usernameVariable: 'USER', passwordVariable: 'PASSWORD')])
@@ -42,8 +36,8 @@ pipeline {
                         docker
                         {
                             label 'cd_label'
-                            registryUrl "${NexusDockerRegistryUrl}/"
-                            image "nrp-gazebo-nest-ubuntu20:latest"
+                            registryUrl "https://${NexusDockerRegistryUrl}"
+                            image "${NexusDockerRegistryUrl}/nrp-core/nrp-gazebo-nest-ubuntu20:latest"
                             registryCredentialsId 'nexusadmin'
                         }
                     }
