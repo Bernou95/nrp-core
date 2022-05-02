@@ -4,3 +4,6 @@ gnupg2
 software-properties-common
 git
 curl
+doxygen
+cmake
+g++
