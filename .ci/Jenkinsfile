@@ -39,6 +39,7 @@ pipeline {
                             registryUrl "https://${NexusDockerRegistryUrl}"
                             image "${NexusDockerRegistryUrl}/nrp-core/nrp-gazebo-nest-ubuntu20:latest"
                             registryCredentialsId 'nexusadmin'
+                            args '-u nrpuser:nrpgroup --privileged --net=host'
                         }
                     }
                     steps
