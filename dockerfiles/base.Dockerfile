@@ -51,4 +51,10 @@ COPY --chown=${NRP_USER}:${NRP_GROUP} .ci/dependencies ${HOME}/.dependencies
 
 RUN apt-get update && apt-get -y install $(grep -vE "^\s*#" ${HOME}/.dependencies/apt/requirements.basic.txt  | tr "\n" " ")
 
+# Switch to NRP user
+
+USER ${NRP_USER}
+ENV USER ${NRP_USER}
+WORKDIR ${HOME}
+
 # EOF

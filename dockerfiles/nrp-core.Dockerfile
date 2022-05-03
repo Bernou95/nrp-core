@@ -5,33 +5,27 @@ FROM ${BASE_IMAGE}
 
 # Install dependencies for testing
 
-RUN apt-get update && apt-get -y install $(grep -vE "^\s*#" ${HOME}/.dependencies/apt/requirements.tests.txt  | tr "\n" " ")
+RUN sudo apt-get update && sudo apt-get -y install $(grep -vE "^\s*#" ${HOME}/.dependencies/apt/requirements.tests.txt  | tr "\n" " ")
 
 # Pistache REST Server
 
-RUN add-apt-repository ppa:pistache+team/unstable
+RUN sudo add-apt-repository ppa:pistache+team/unstable
 
 # ROS
 
-RUN sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
-RUN curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | apt-key add -
+RUN sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
+RUN sudo sh -c 'curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | apt-key add -'
 
 # Install CLE dependencies
 
-RUN apt-get update && apt-get -y install $(grep -vE "^\s*#" ${HOME}/.dependencies/apt/requirements.cle.txt  | tr "\n" " ")
+RUN sudo apt-get update && sudo apt-get -y install $(grep -vE "^\s*#" ${HOME}/.dependencies/apt/requirements.cle.txt  | tr "\n" " ")
 
 # If this image will be used for TVB integration, then flask==1.1.4 is needed and after markupsafe (included in flask) has to be downgraded to 2.0.1
 RUN pip install grpcio-tools pytest flask gunicorn flask_cors psutil
 
 # Install Documentation dependencies
 
-RUN apt-get update && apt-get -y install $(grep -vE "^\s*#" ${HOME}/.dependencies/apt/requirements.docs.txt  | tr "\n" " ")
-
-# Switch to NRP user
-
-USER ${NRP_USER}
-ENV USER ${NRP_USER}
-WORKDIR ${HOME}
+RUN sudo apt-get update && sudo apt-get -y install $(grep -vE "^\s*#" ${HOME}/.dependencies/apt/requirements.docs.txt  | tr "\n" " ")
 
 # Install MQTT (to NRP_INSTALL_DIR)
 RUN git clone https://github.com/eclipse/paho.mqtt.c.git \
