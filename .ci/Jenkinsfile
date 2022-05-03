@@ -69,7 +69,7 @@ pipeline {
                     }
                     steps
                     {
-                        sh 'bash .ci/10-prepare-build.sh'
+                        sh 'bash .ci/11-prepare-build.sh'
                         sh 'bash .ci/20-build.sh'
                         sh 'bash .ci/25-build_docs.sh'
                         lock("${NODE_NAME}-nrp-core-unit-tests") {
