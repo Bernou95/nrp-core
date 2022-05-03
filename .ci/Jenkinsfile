@@ -37,7 +37,32 @@ pipeline {
                         {
                             label 'cd_label'
                             registryUrl "https://${NexusDockerRegistryUrl}"
-                            image "${NexusDockerRegistryUrl}/nrp-core/nrp-gazebo-nest-ubuntu20:latest"
+                            image "${NexusDockerRegistryUrl}/nrp-core/nrp-gazebo-nest-ubuntu20-env:latest"
+                            registryCredentialsId 'nexusadmin'
+                            args '-u nrpuser:nrpgroup --privileged --net=host'
+                        }
+                    }
+                    steps
+                    {
+                        sh 'bash .ci/10-prepare-build.sh'
+                        sh 'bash .ci/20-build.sh'
+                        sh 'bash .ci/25-build_docs.sh'
+                        lock("${NODE_NAME}-nrp-core-unit-tests") {
+                            sh 'bash .ci/30-run-tests.sh'
+                            cobertura coberturaReportFile: 'build/gcovr.xml'
+                        }
+                        sh 'bash .ci/40-run-cppcheck.sh'
+                    }
+                }
+                stage('Vanilla NRP')
+                {
+                    agent
+                    {
+                        docker
+                        {
+                            label 'cd_label'
+                            registryUrl "https://${NexusDockerRegistryUrl}"
+                            image "${NexusDockerRegistryUrl}/nrp-core/nrp-ubuntu20-env:latest"
                             registryCredentialsId 'nexusadmin'
                             args '-u nrpuser:nrpgroup --privileged --net=host'
                         }
