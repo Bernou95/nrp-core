@@ -44,7 +44,7 @@ pipeline {
                     }
                     steps
                     {
-                        sh 'bash .ci/10-prepare-build.sh'
+                        sh 'export CMAKE_CACHE_FILE=.ci/cmake_cache/nest-gazebo.cmake; bash .ci/11-prepare-build.sh'
                         sh 'bash .ci/20-build.sh'
                         sh 'bash .ci/25-build_docs.sh'
                         lock("${NODE_NAME}-nrp-core-unit-tests") {
@@ -52,6 +52,26 @@ pipeline {
                             cobertura coberturaReportFile: 'build/gcovr.xml'
                         }
                         sh 'bash .ci/40-run-cppcheck.sh'
+                        xunit (
+                        thresholds: [
+                            skipped(failureThreshold: '3'),
+                            failed(failureThreshold: '0')
+                            ],
+                        tools: [CTest(
+                            pattern: 'build/Testing/**/*.xml',
+                            deleteOutputFiles: true,
+                            failIfNotNew: false,
+                            skipNoTestFiles: false,
+                            stopProcessingIfError: true
+                            ),
+                            JUnit(
+                            pattern: 'build/xml/*.xml',
+                            deleteOutputFiles: true,
+                            failIfNotNew: false,
+                            skipNoTestFiles: false,
+                            stopProcessingIfError: true
+                            )]
+                        )
                     }
                 }
                 stage('Vanilla NRP')
@@ -69,7 +89,7 @@ pipeline {
                     }
                     steps
                     {
-                        sh 'bash .ci/11-prepare-build.sh'
+                        sh 'export CMAKE_CACHE_FILE=.ci/cmake_cache/vanilla.cmake; bash .ci/10-prepare-build.sh'
                         sh 'bash .ci/20-build.sh'
                         sh 'bash .ci/25-build_docs.sh'
                         lock("${NODE_NAME}-nrp-core-unit-tests") {
@@ -77,6 +97,71 @@ pipeline {
                             cobertura coberturaReportFile: 'build/gcovr.xml'
                         }
                         sh 'bash .ci/40-run-cppcheck.sh'
+                        xunit (
+                        thresholds: [
+                            skipped(failureThreshold: '3'),
+                            failed(failureThreshold: '0')
+                            ],
+                        tools: [CTest(
+                            pattern: 'build/Testing/**/*.xml',
+                            deleteOutputFiles: true,
+                            failIfNotNew: false,
+                            skipNoTestFiles: false,
+                            stopProcessingIfError: true
+                            ),
+                            JUnit(
+                            pattern: 'build/xml/*.xml',
+                            deleteOutputFiles: true,
+                            failIfNotNew: false,
+                            skipNoTestFiles: false,
+                            stopProcessingIfError: true
+                            )]
+                        )
+                    }
+                }
+                stage('Vanilla NRP - no MQTT no ROS')
+                {
+                    agent
+                    {
+                        docker
+                        {
+                            label 'cd_label'
+                            registryUrl "https://${NexusDockerRegistryUrl}"
+                            image "${NexusDockerRegistryUrl}/nrp-core/nrp-ubuntu20-env:latest"
+                            registryCredentialsId 'nexusadmin'
+                            args '-u nrpuser:nrpgroup --privileged --net=host'
+                        }
+                    }
+                    steps
+                    {
+                        sh 'export CMAKE_CACHE_FILE=.ci/cmake_cache/vanilla-nomqtt-noros.cmake; bash .ci/10-prepare-build.sh'
+                        sh 'bash .ci/20-build.sh'
+                        sh 'bash .ci/25-build_docs.sh'
+                        lock("${NODE_NAME}-nrp-core-unit-tests") {
+                            sh 'bash .ci/30-run-tests.sh'
+                            cobertura coberturaReportFile: 'build/gcovr.xml'
+                        }
+                        sh 'bash .ci/40-run-cppcheck.sh'
+                        xunit (
+                        thresholds: [
+                            skipped(failureThreshold: '3'),
+                            failed(failureThreshold: '0')
+                            ],
+                        tools: [CTest(
+                            pattern: 'build/Testing/**/*.xml',
+                            deleteOutputFiles: true,
+                            failIfNotNew: false,
+                            skipNoTestFiles: false,
+                            stopProcessingIfError: true
+                            ),
+                            JUnit(
+                            pattern: 'build/xml/*.xml',
+                            deleteOutputFiles: true,
+                            failIfNotNew: false,
+                            skipNoTestFiles: false,
+                            stopProcessingIfError: true
+                            )]
+                        )
                     }
                 }
             }

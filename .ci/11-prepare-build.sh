@@ -8,7 +8,6 @@ repo_root=$(git rev-parse --show-toplevel)
 
 rm -rf "$repo_root"/build
 mkdir -p "$repo_root"/build
-# cd "$repo_root"/build || exit 1;
 
 if [ -z "$NRP_INSTALL_DIR" ]; then
     echo "NRP_INSTALL_DIR is unset"
