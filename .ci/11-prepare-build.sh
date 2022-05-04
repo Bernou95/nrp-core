@@ -8,7 +8,7 @@ repo_root=$(git rev-parse --show-toplevel)
 
 rm -rf "$repo_root"/build
 mkdir -p "$repo_root"/build
-cd "$repo_root"/build || exit 1;
+# cd "$repo_root"/build || exit 1;
 
 if [ -z "$NRP_INSTALL_DIR" ]; then
     echo "NRP_INSTALL_DIR is unset"
@@ -25,10 +25,10 @@ source "$HOME"/.bashrc
 
 # Check if NEST_INSTALL_DIR is set and the external nest-simulator can be used
 
-[[ -z "$CMAKE_CACHE_FILE" ]] && CMAKE_CACHE_FILE="${repo_root}/.ci/cmake_cache/vanilla.cache"
+[[ -z "$CMAKE_CACHE_FILE" ]] && CMAKE_CACHE_FILE="${repo_root}/.ci/cmake_cache/vanilla.cmake"
 
 # Run cmake
 
-cmake .. -DCMAKE_INSTALL_PREFIX="$NRP_INSTALL_DIR" "${NEST_INSTALL_OPTION}" -C "$CMAKE_CACHE_FILE"
+cmake -C "$CMAKE_CACHE_FILE" -DCMAKE_INSTALL_PREFIX="$NRP_INSTALL_DIR" "${NEST_INSTALL_OPTION}" -Bbuild
 
 # EOF
