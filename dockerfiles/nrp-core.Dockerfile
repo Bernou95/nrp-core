@@ -21,7 +21,7 @@ RUN sudo sh -c 'curl -s https://raw.githubusercontent.com/ros/rosdistro/master/r
 RUN sudo apt-get update && sudo apt-get -y install $(grep -vE "^\s*#" ${HOME}/.dependencies/apt/requirements.cle.txt  | tr "\n" " ")
 
 # If this image will be used for TVB integration, then flask==1.1.4 is needed and after markupsafe (included in flask) has to be downgraded to 2.0.1
-RUN pip install grpcio-tools pytest flask gunicorn flask_cors psutil
+RUN pip install grpcio-tools pytest psutil flask gunicorn flask_cors mpi4py docopt
 
 # Install Documentation dependencies
 
