@@ -11,13 +11,14 @@ services:
         image: nexus.neurorobotics.ebrains.eu:443/nrp-core/base-ubuntu20-env:latest
 
 
-    nrp-env:
+    nrp-vanilla:
         build:
             context: .
             dockerfile: dockerfiles/nrp-core.Dockerfile
             args:
                 BASE_IMAGE: nexus.neurorobotics.ebrains.eu:443/nrp-core/base-ubuntu20-env:latest
-        image: nexus.neurorobotics.ebrains.eu:443/nrp-core/nrp-ubuntu20-env:latest
+                CMAKE_CACHE_FILE: .ci/cmake_cache/vanilla.cmake
+        image: nexus.neurorobotics.ebrains.eu:443/nrp-core/nrp-vanilla-ubuntu20:latest
         depends_on:
         - base-env
 
@@ -55,13 +56,14 @@ services:
         - nest-env
 
 
-    nrp-gazebo-nest-env:
+    nrp-gazebo-nest:
         build:
             context: .
             dockerfile: dockerfiles/nrp-core.Dockerfile
             args:
                 BASE_IMAGE: nexus.neurorobotics.ebrains.eu:443/nrp-core/gazebo-nest-ubuntu20-env:latest
-        image: nexus.neurorobotics.ebrains.eu:443/nrp-core/nrp-gazebo-nest-ubuntu20-env:latest
+                CMAKE_CACHE_FILE: .ci/cmake_cache/nest-gazebo.cmake
+        image: nexus.neurorobotics.ebrains.eu:443/nrp-core/nrp-gazebo-nest-ubuntu20:latest
         depends_on:
         - gazebo-nest-env
 

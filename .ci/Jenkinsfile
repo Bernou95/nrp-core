@@ -37,7 +37,7 @@ pipeline {
                         {
                             label 'cd_label'
                             registryUrl "https://${NexusDockerRegistryUrl}"
-                            image "${NexusDockerRegistryUrl}/nrp-core/nrp-gazebo-nest-ubuntu20-env:latest"
+                            image "${NexusDockerRegistryUrl}/nrp-core/nrp-gazebo-nest-ubuntu20:latest"
                             registryCredentialsId 'nexusadmin'
                             args '-u nrpuser:nrpgroup --privileged --net=host'
                         }
@@ -80,7 +80,7 @@ pipeline {
                         {
                             label 'cd_label'
                             registryUrl "https://${NexusDockerRegistryUrl}"
-                            image "${NexusDockerRegistryUrl}/nrp-core/nrp-gazebo-nest-ubuntu20-env:latest"
+                            image "${NexusDockerRegistryUrl}/nrp-core/nrp-gazebo-nest-ubuntu20:latest"
                             registryCredentialsId 'nexusadmin'
                             args '-u nrpuser:nrpgroup --privileged --net=host'
                         }
@@ -123,7 +123,7 @@ pipeline {
                         {
                             label 'cd_label'
                             registryUrl "https://${NexusDockerRegistryUrl}"
-                            image "${NexusDockerRegistryUrl}/nrp-core/nrp-ubuntu20-env:latest"
+                            image "${NexusDockerRegistryUrl}/nrp-core/nrp-vanilla-ubuntu20:latest"
                             registryCredentialsId 'nexusadmin'
                             args '-u nrpuser:nrpgroup --privileged --net=host'
                         }
@@ -166,7 +166,7 @@ pipeline {
                         {
                             label 'cd_label'
                             registryUrl "https://${NexusDockerRegistryUrl}"
-                            image "${NexusDockerRegistryUrl}/nrp-core/nrp-ubuntu20-env:latest"
+                            image "${NexusDockerRegistryUrl}/nrp-core/nrp-vanilla-ubuntu20:latest"
                             registryCredentialsId 'nexusadmin'
                             args '-u nrpuser:nrpgroup --privileged --net=host'
                         }

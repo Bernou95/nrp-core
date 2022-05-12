@@ -1,7 +1,10 @@
 # Download base image
 ARG BASE_IMAGE
-FROM ${BASE_IMAGE}
+FROM ${BASE_IMAGE} AS nrp-core
 
+# CMake configuration
+ARG CMAKE_CACHE_FILE
+ENV CMAKE_CACHE_FILE ${CMAKE_CACHE_FILE}
 
 # Install dependencies for testing
 
@@ -41,5 +44,18 @@ RUN git clone https://github.com/eclipse/paho.mqtt.cpp \
     && cmake -Bbuild -H. -DPAHO_BUILD_STATIC=OFF -DPAHO_BUILD_SHARED=ON -DCMAKE_INSTALL_PREFIX="${NRP_INSTALL_DIR}" -DCMAKE_PREFIX_PATH="${NRP_INSTALL_DIR}"\
     && cmake --build build/ --target install \
     && sudo ldconfig && cd .. && rm -rf paho.mqtt.cpp
+
+
+# Configure and install NRP in a intermediate sub-image
+
+FROM nrp-core AS nrp-core-builder
+RUN mkdir -p ${HOME}/nrp-core-src
+COPY --chown=${NRP_USER}:${NRP_GROUP} . ${HOME}/nrp-core-src/
+RUN cd ${HOME}/nrp-core-src && ls -l && bash .ci/11-prepare-build.sh && bash .ci/20-build.sh
+
+
+# Copy the installed nrp to the main image (the intermediate container with code will be unseen for production)
+FROM nrp-core
+COPY --from=nrp-core-builder ${NRP_INSTALL_DIR} ${NRP_INSTALL_DIR}
 
 # EOF
