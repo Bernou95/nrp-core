@@ -23,4 +23,6 @@ RUN git clone https://github.com/nest/nest-simulator.git \
     && cd .. && rm -rf nest-simulator
 ENV NEST_INSTALL_DIR ${NRP_INSTALL_DIR}
 
+WORKDIR ${HOME}
+
 # EOF

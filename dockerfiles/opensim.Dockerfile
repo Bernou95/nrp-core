@@ -74,4 +74,6 @@ RUN cmake ../opensim-core \
 RUN make -j8
 RUN make -j8 install
 
+WORKDIR ${HOME}
+
 # EOF

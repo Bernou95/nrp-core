@@ -42,4 +42,6 @@ RUN git clone https://github.com/eclipse/paho.mqtt.cpp \
     && cmake --build build/ --target install \
     && sudo ldconfig && cd .. && rm -rf paho.mqtt.cpp
 
+WORKDIR ${HOME}
+
 # EOF

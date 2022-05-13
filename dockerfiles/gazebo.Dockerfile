@@ -23,4 +23,6 @@ RUN mkdir ${HOME}/nrp \
     && cd models \
     && ./create-symlinks.sh
 
+WORKDIR ${HOME}
+
 # EOF
