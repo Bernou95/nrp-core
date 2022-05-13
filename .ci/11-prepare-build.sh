@@ -1,13 +1,14 @@
 #!/usr/bin/env bash
 
-# Get the root directory of the repo
+# Get the root directory of the script
 
-repo_root=$(git rev-parse --show-toplevel)
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 # Create a build directory in the root directory
 
-rm -rf "$repo_root"/build
-mkdir -p "$repo_root"/build
+cd "${SCRIPT_DIR}/.." || return
+rm -rf build
+mkdir -p build
 
 if [ -z "$NRP_INSTALL_DIR" ]; then
     echo "NRP_INSTALL_DIR is unset"

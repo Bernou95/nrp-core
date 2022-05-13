@@ -12,3 +12,4 @@ python3-junitparser
 python3-mpi4py
 openmpi-bin
 libopenmpi-dev
+uwsgi-plugin-python3

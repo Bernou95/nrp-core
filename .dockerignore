@@ -2,3 +2,4 @@ build
 .vscode
 .pytest_cache
 generatedJUnitFiles
+.git

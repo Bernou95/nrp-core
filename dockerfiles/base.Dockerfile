@@ -2,6 +2,8 @@
 ARG BASE_IMAGE
 FROM ${BASE_IMAGE}
 
+SHELL ["/bin/bash", "-c"]
+
 
 ARG NRP_USER=nrpuser
 ARG NRP_GROUP=nrpgroup

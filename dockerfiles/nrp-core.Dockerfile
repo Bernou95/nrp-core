@@ -56,6 +56,11 @@ RUN cd ${HOME}/nrp-core-src && ls -l && bash .ci/11-prepare-build.sh && bash .ci
 
 # Copy the installed nrp to the main image (the intermediate container with code will be unseen for production)
 FROM nrp-core
+
+ENV PATH=$PATH:$NRP_INSTALL_DIR/bin:$HOME/.local/bin
+ENV LD_LIBRARY_PATH=$NRP_INSTALL_DIR/lib:$LD_LIBRARY_PATH
+ENV PYTHONPATH=$NRP_INSTALL_DIR/lib/python3.8/site-packages:$PYTHONPATH
+
 COPY --from=nrp-core-builder ${NRP_INSTALL_DIR} ${NRP_INSTALL_DIR}
 
 # EOF

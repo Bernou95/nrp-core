@@ -22,5 +22,6 @@ RUN git clone https://github.com/nest/nest-simulator.git \
     && make -j4 && make install \
     && cd .. && rm -rf nest-simulator
 ENV NEST_INSTALL_DIR ${NRP_INSTALL_DIR}
+ENV PYTHONPATH=$NEST_INSTALL_DIR/lib/python3.8/site-packages:$PYTHONPATH
 
 # EOF
