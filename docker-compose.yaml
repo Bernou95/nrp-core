@@ -110,3 +110,23 @@ services:
         image: nexus.neurorobotics.ebrains.eu:443/nrp-core/nrp-tvb-ubuntu20-env:latest
         depends_on:
         - tvb-env
+
+
+    base-nvidia-cuda-env:
+        build:
+            context: .
+            dockerfile: dockerfiles/base.Dockerfile
+            args:
+                BASE_IMAGE: nvidia/cudagl:11.4.2-base-ubuntu20.04
+        image: nexus.neurorobotics.ebrains.eu:443/nrp-core/base-nvidia-cuda-ubuntu20-env:latest
+
+
+    nvidia-cuda-env:
+        build:
+            context: .
+            dockerfile: dockerfiles/nvidia_cuda.Dockerfile
+            args:
+                BASE_IMAGE: nexus.neurorobotics.ebrains.eu:443/nrp-core/base-nvidia-cuda-ubuntu20-env:latest
+        image: nexus.neurorobotics.ebrains.eu:443/nrp-core/nvidia-cuda-ubuntu20-env:latest
+        depends_on:
+        - base-nvidia-cuda-env
