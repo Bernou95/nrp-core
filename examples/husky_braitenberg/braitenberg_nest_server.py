@@ -6,6 +6,8 @@ This file contains the setup of the neuronal network running the Husky experimen
 
 import nest
 
+nest.ResetKernel()
+
 SENSORPARAMS = {'E_L': -60.5,
                 'C_m': 25.0,
                 'g_L': 25.0 / 10.,

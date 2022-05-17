@@ -60,11 +60,12 @@ if(${ENABLE_TESTING})
 
             set(INSTALL_GTEST OFF)
             add_subdirectory(${gtest_SOURCE_DIR} ${gtest_BINARY_DIR})
-
-            add_library(GTest::GTest ALIAS gtest)
-            add_library(GTest::Main  ALIAS gtest_main)
         endif()
     endif()
+
+    # Add cmake file that allows to find gmock libraries
+    list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+    find_package(GMock REQUIRED)
 endif()
 
 
@@ -393,6 +394,7 @@ doxygen_add_docs(nrp_doxygen
         "docs/engines/nest/nest_server.dox"
         "docs/engines/python_json_engine.dox"
         "docs/engines/pysim/pysim_engine.dox"
+        "docs/engines/tvb/tvb_engine.dox"
         "docs/engines/datatransfer/datatransfer_engine.dox"
 
         "docs/getting_started/getting_started.dox"

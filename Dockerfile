@@ -60,6 +60,10 @@ RUN add-apt-repository ppa:pistache+team/unstable
 RUN sh -c 'echo "deb http://packages.osrfoundation.org/gazebo/ubuntu-stable `lsb_release -cs` main" > /etc/apt/sources.list.d/gazebo-stable.list'
 RUN wget https://packages.osrfoundation.org/gazebo.key -O - | apt-key add -
 
+# Install gazebo dependencies
+
+RUN apt-get update && apt-get -y install $(grep -vE "^\s*#" ${HOME}/.dependencies/apt/requirements.gazebo.txt  | tr "\n" " ")
+
 # ROS
 
 RUN sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
@@ -70,7 +74,7 @@ RUN curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | apt
 RUN apt-get update && apt-get -y install $(grep -vE "^\s*#" ${HOME}/.dependencies/apt/requirements.cle.txt  | tr "\n" " ")
 
 # If this image will be used for TVB integration, then flask==1.1.4 is needed and after markupsafe (included in flask) has to be downgraded to 2.0.1
-RUN pip install grpcio-tools pytest flask gunicorn flask_cors psutil
+RUN pip install grpcio-tools pytest psutil flask gunicorn flask_cors mpi4py docopt
 
 # Install Documentation dependencies
 
@@ -96,6 +100,10 @@ RUN git clone https://github.com/eclipse/paho.mqtt.cpp \
     && cmake -Bbuild -H. -DPAHO_BUILD_STATIC=OFF -DPAHO_BUILD_SHARED=ON -DCMAKE_INSTALL_PREFIX="${NRP_INSTALL_DIR}" -DCMAKE_PREFIX_PATH="${NRP_INSTALL_DIR}"\
     && cmake --build build/ --target install \
     && sudo ldconfig && cd .. && rm -rf paho.mqtt.cpp
+
+# Install nest dependencies
+
+RUN apt-get update && apt-get -y install $(grep -vE "^\s*#" ${HOME}/.dependencies/apt/requirements.nest.txt  | tr "\n" " ")
 
 # Install nest-simulator (to NRP_INSTALL_DIR)
 RUN git clone https://github.com/nest/nest-simulator.git \

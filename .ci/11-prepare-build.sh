@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 
-# Get the root directory of the repo
+# Get the root directory of the script
 
-repo_root=$(git rev-parse --show-toplevel)
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 # Create a build directory in the root directory
 
-rm -rf "$repo_root"/build
-mkdir -p "$repo_root"/build
-cd "$repo_root"/build || exit 1;
+cd "${SCRIPT_DIR}/.." || return
+rm -rf build
+mkdir -p build
 
 if [ -z "$NRP_INSTALL_DIR" ]; then
     echo "NRP_INSTALL_DIR is unset"
@@ -21,10 +21,14 @@ source "$HOME"/.bashrc
 
 # Check if NEST_INSTALL_DIR is set and the external nest-simulator can be used
 
-[[ -z "$NRP_INSTALL_DIR" ]] && NEST_INSTALL_OPTION="" || NEST_INSTALL_OPTION="-DNEST_INSTALL_DIR=${NEST_INSTALL_DIR}"
+[[ -z "$NEST_INSTALL_DIR" ]] && NEST_INSTALL_OPTION="" || NEST_INSTALL_OPTION="-DNEST_INSTALL_DIR=${NEST_INSTALL_DIR}"
+
+# Check if NEST_INSTALL_DIR is set and the external nest-simulator can be used
+
+[[ -z "$CMAKE_CACHE_FILE" ]] && CMAKE_CACHE_FILE="${repo_root}/.ci/cmake_cache/vanilla.cmake"
 
 # Run cmake
 
-cmake .. -DCMAKE_INSTALL_PREFIX="$NRP_INSTALL_DIR" "${NEST_INSTALL_OPTION}" -DCOVERAGE:BOOL=ON -DBUILD_RST=ON -DENABLE_GAZEBO=OFF -DENABLE_NEST=OFF
+cmake -C "$CMAKE_CACHE_FILE" -DCMAKE_INSTALL_PREFIX="$NRP_INSTALL_DIR" "${NEST_INSTALL_OPTION}" -Bbuild
 
 # EOF
