@@ -76,4 +76,15 @@ RUN make -j8 install
 
 WORKDIR ${HOME}
 
+# Export opensim python wrappers and packages
+
+RUN echo 'export PYTHONPATH=$HOME/opensim_install/lib/python3.8/site-packages/:$PYTHONPATH' >> .bashrc
+
+# Export opensim libraries
+# Some of the dependecies (ipopt, adolc) arent installed with 'make install', we have to export them too
+
+RUN echo 'export LD_LIBRARY_PATH=$HOME/opensim_dependencies_install/ipopt/lib/:$LD_LIBRARY_PATH' >> .bashrc
+RUN echo 'export LD_LIBRARY_PATH=$HOME/opensim_dependencies_install/adol-c/lib64/:$LD_LIBRARY_PATH' >> .bashrc
+RUN echo 'export LD_LIBRARY_PATH=$HOME/opensim_install/lib/:$LD_LIBRARY_PATH' >> .bashrc
+
 # EOF
