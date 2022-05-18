@@ -10,6 +10,7 @@ RUN sudo sh -c 'wget https://packages.osrfoundation.org/gazebo.key -O - | apt-ke
 
 # Install gazebo libraries and dependencies
 
+COPY --chown=${NRP_USER}:${NRP_GROUP} .ci/dependencies/apt/requirements.gazebo.txt ${HOME}/.dependencies/apt/requirements.gazebo.txt
 RUN sudo apt-get update && sudo apt-get -y install $(grep -vE "^\s*#" ${HOME}/.dependencies/apt/requirements.gazebo.txt  | tr "\n" " ")
 
 # Install Gazebo Models. TODO/WARNING: extra building time and container size!!!

@@ -8,6 +8,7 @@ ENV CMAKE_CACHE_FILE ${CMAKE_CACHE_FILE}
 
 # Install dependencies for testing
 
+COPY --chown=${NRP_USER}:${NRP_GROUP} .ci/dependencies/apt/requirements.tests.txt ${HOME}/.dependencies/apt/requirements.tests.txt
 RUN sudo apt-get update && sudo apt-get -y install $(grep -vE "^\s*#" ${HOME}/.dependencies/apt/requirements.tests.txt  | tr "\n" " ")
 
 # Pistache REST Server
@@ -21,6 +22,7 @@ RUN sudo sh -c 'curl -s https://raw.githubusercontent.com/ros/rosdistro/master/r
 
 # Install CLE dependencies
 
+COPY --chown=${NRP_USER}:${NRP_GROUP} .ci/dependencies/apt/requirements.cle.txt ${HOME}/.dependencies/apt/requirements.cle.txt
 RUN sudo apt-get update && sudo apt-get -y install $(grep -vE "^\s*#" ${HOME}/.dependencies/apt/requirements.cle.txt  | tr "\n" " ")
 
 # If this image will be used for TVB integration, then flask==1.1.4 is needed and after markupsafe (included in flask) has to be downgraded to 2.0.1
@@ -28,6 +30,7 @@ RUN pip install grpcio-tools pytest psutil flask gunicorn flask_cors mpi4py doco
 
 # Install Documentation dependencies
 
+COPY --chown=${NRP_USER}:${NRP_GROUP} .ci/dependencies/apt/requirements.docs.txt ${HOME}/.dependencies/apt/requirements.docs.txt
 RUN sudo apt-get update && sudo apt-get -y install $(grep -vE "^\s*#" ${HOME}/.dependencies/apt/requirements.docs.txt  | tr "\n" " ")
 
 # Install MQTT (to NRP_INSTALL_DIR)

@@ -2,8 +2,11 @@
 ARG BASE_IMAGE
 FROM ${BASE_IMAGE}
 
+# Make bash default shell
+
 SHELL ["/bin/bash", "-c"]
 
+# Setup default Docker arguments
 
 ARG NRP_USER=nrpuser
 ARG NRP_GROUP=nrpgroup
@@ -22,7 +25,7 @@ ENV NRP_GROUP ${NRP_GROUP}
 
 # Disable Prompt During Packages Installation
 
-ARG DEBIAN_FRONTEND=noninteractive
+ENV DEBIAN_FRONTEND "noninteractive"
 
 # INSTALL sudo
 
@@ -45,12 +48,9 @@ RUN mkdir -p \
 
 COPY --chown=${NRP_USER}:${NRP_GROUP} .ci/bashrc $HOME/.bashrc
 
-# Copy requirements files
-
-COPY --chown=${NRP_USER}:${NRP_GROUP} .ci/dependencies ${HOME}/.dependencies
-
 # Install basic dependencies
 
+COPY --chown=${NRP_USER}:${NRP_GROUP} .ci/dependencies/apt/requirements.basic.txt ${HOME}/.dependencies/apt/requirements.basic.txt
 RUN apt-get update && apt-get -y install $(grep -vE "^\s*#" ${HOME}/.dependencies/apt/requirements.basic.txt  | tr "\n" " ")
 
 # Switch to NRP user

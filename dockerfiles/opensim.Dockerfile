@@ -8,6 +8,7 @@ FROM ${BASE_IMAGE}
 
 # Install dependecies
 
+COPY --chown=${NRP_USER}:${NRP_GROUP} .ci/dependencies/apt/requirements.opensim.txt ${HOME}/.dependencies/apt/requirements.opensim.txt
 RUN sudo apt-get update && sudo apt-get -y install $(grep -vE "^\s*#" ${HOME}/.dependencies/apt/requirements.opensim.txt  | tr "\n" " ")
 
 # We install numpy using pip, because it's easier to uninstall

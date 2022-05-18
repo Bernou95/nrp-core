@@ -5,6 +5,7 @@ FROM ${BASE_IMAGE}
 
 # Install nest dependencies
 
+COPY --chown=${NRP_USER}:${NRP_GROUP} .ci/dependencies/apt/requirements.nest.txt ${HOME}/.dependencies/apt/requirements.nest.txt
 RUN sudo apt-get update && sudo apt-get -y install $(grep -vE "^\s*#" ${HOME}/.dependencies/apt/requirements.nest.txt  | tr "\n" " ")
 
 # Switch to NRP user
