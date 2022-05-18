@@ -24,4 +24,6 @@ RUN git clone https://github.com/the-virtual-brain/tvb-root.git
 WORKDIR ${HOME}/tvb-root/tvb_build
 RUN sh install_full_tvb.sh
 
+WORKDIR ${HOME}
+
 # EOF

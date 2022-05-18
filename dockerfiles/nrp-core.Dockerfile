@@ -63,4 +63,6 @@ ENV PYTHONPATH=$NRP_INSTALL_DIR/lib/python3.8/site-packages:$PYTHONPATH
 
 COPY --from=nrp-core-builder ${NRP_INSTALL_DIR} ${NRP_INSTALL_DIR}
 
+WORKDIR ${HOME}
+
 # EOF

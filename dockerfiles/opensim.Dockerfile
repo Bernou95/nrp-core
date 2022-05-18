@@ -37,10 +37,16 @@ RUN mkdir ${HOME}/opensim_install
 
 # Clone opensim
 
+# NOTE:
+# Both opensim and its dependencies should be built in Release mode (CMAKE_BUILD_TYPE=Release)!
+# Building with Debug Symbols makes the size of the resulting image unacceptable
+
 WORKDIR ${HOME}
 RUN git clone https://github.com/opensim-org/opensim-core.git
 
 # Build some of the dependencies (simbody, spdlog...) as part of OpenSim 'superbuild'
+# OPENSIM_WITH_CASADI=ON and OPENSIM_WITH_TROPTER=ON switches will trigger
+# builds of certain necessary dependencies, like casadi, adolc, colpack, etc.
 
 WORKDIR ${HOME}/opensim_dependencies_build
 RUN cmake ../opensim-core/dependencies/ \
@@ -63,10 +69,22 @@ RUN cmake ../opensim-core \
       -DOPENSIM_DEPENDENCIES_DIR="~/opensim_dependencies_install" \
       -DBUILD_PYTHON_WRAPPING=ON \
       -DBUILD_JAVA_WRAPPING=ON \
-      -DWITH_BTK=ON \
-      -DSUPERBUILD_colpack=ON
+      -DWITH_BTK=ON
       
 RUN make -j8
 RUN make -j8 install
+
+WORKDIR ${HOME}
+
+# Export opensim python wrappers and packages
+
+RUN echo 'export PYTHONPATH=$HOME/opensim_install/lib/python3.8/site-packages/:$PYTHONPATH' >> .bashrc
+
+# Export opensim libraries
+# Some of the dependecies (ipopt, adolc) arent installed with 'make install', we have to export them too
+
+RUN echo 'export LD_LIBRARY_PATH=$HOME/opensim_dependencies_install/ipopt/lib/:$LD_LIBRARY_PATH' >> .bashrc
+RUN echo 'export LD_LIBRARY_PATH=$HOME/opensim_dependencies_install/adol-c/lib64/:$LD_LIBRARY_PATH' >> .bashrc
+RUN echo 'export LD_LIBRARY_PATH=$HOME/opensim_install/lib/:$LD_LIBRARY_PATH' >> .bashrc
 
 # EOF
