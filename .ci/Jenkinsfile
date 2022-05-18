@@ -19,9 +19,8 @@ pipeline {
                 bitbucketStatusNotify(buildState: 'INPROGRESS')
                 withCredentials([usernamePassword(credentialsId: 'nexusadmin', usernameVariable: 'USER', passwordVariable: 'PASSWORD')])
                 {
-                    sh 'docker login -u $USER -p $PASSWORD ${NexusDockerRegistryUrl}'
+                    sh 'docker-compose build && docker login -u $USER -p $PASSWORD ${NexusDockerRegistryUrl} && docker-compose push'
                 }
-                sh 'docker-compose build && docker-compose push'
                 sh 'docker logout ${NexusDockerRegistryUrl}'
             }
         }
