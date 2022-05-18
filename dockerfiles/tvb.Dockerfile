@@ -4,6 +4,7 @@ FROM ${BASE_IMAGE}
 
 # Install dependecies
 
+COPY --chown=${NRP_USER}:${NRP_GROUP} .ci/dependencies/apt/requirements.tvb.txt ${HOME}/.dependencies/apt/requirements.tvb.txt
 RUN sudo apt-get update && sudo apt-get -y install $(grep -vE "^\s*#" ${HOME}/.dependencies/apt/requirements.tvb.txt  | tr "\n" " ")
 
 # numba (dependency of tvb) requires numpy < 1.22
