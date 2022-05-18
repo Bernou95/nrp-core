@@ -90,23 +90,25 @@ services:
         - base-env
 
 
-    nrp-opensim-env:
+    nrp-opensim:
         build:
             context: .
             dockerfile: dockerfiles/nrp-core.Dockerfile
             args:
                 BASE_IMAGE: nexus.neurorobotics.ebrains.eu:443/nrp-core/opensim-ubuntu20-env:latest
+                CMAKE_CACHE_FILE: .ci/cmake_cache/opensim.cmake
         image: nexus.neurorobotics.ebrains.eu:443/nrp-core/nrp-opensim-ubuntu20-env:latest
         depends_on:
         - opensim-env
 
 
-    nrp-tvb-env:
+    nrp-tvb:
         build:
             context: .
             dockerfile: dockerfiles/nrp-core.Dockerfile
             args:
                 BASE_IMAGE: nexus.neurorobotics.ebrains.eu:443/nrp-core/tvb-ubuntu20-env:latest
+                CMAKE_CACHE_FILE: .ci/cmake_cache/tvb.cmake
         image: nexus.neurorobotics.ebrains.eu:443/nrp-core/nrp-tvb-ubuntu20-env:latest
         depends_on:
         - tvb-env
