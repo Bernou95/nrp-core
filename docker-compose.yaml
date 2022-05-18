@@ -112,3 +112,14 @@ services:
         image: nexus.neurorobotics.ebrains.eu:443/nrp-core/nrp-tvb-ubuntu20-env:latest
         depends_on:
         - tvb-env
+
+
+    opensim-tvb-env:
+        build:
+            context: .
+            dockerfile: dockerfiles/opensim.Dockerfile
+            args:
+                BASE_IMAGE: nexus.neurorobotics.ebrains.eu:443/nrp-core/tvb-ubuntu20-env:latest
+        image: nexus.neurorobotics.ebrains.eu:443/nrp-core/opensim-tvb-ubuntu20-env:latest
+        depends_on:
+        - tvb-env
