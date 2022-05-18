@@ -89,7 +89,7 @@ void TFManagerHandle::sendDataPacksToEngines(const std::vector<EngineClientInter
 
             // If no datapacks are available, have interface handle empty datapack input list
             // TODO: be sure that this is right
-            engine->sendDataPacksToEngine(typename EngineClientInterface::datapacks_ptr_t());
+            //engine->sendDataPacksToEngine(typename EngineClientInterface::datapacks_ptr_t());
         }
         catch(std::exception &e)
         {

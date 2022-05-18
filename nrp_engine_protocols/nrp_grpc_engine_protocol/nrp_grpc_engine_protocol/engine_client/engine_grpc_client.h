@@ -100,7 +100,7 @@ class EngineGrpcClient
         void sendInitializeCommand(const nlohmann::json & data)
         {
             NRP_LOGGER_TRACE("{} called", __FUNCTION__);
-            sleep(1);
+            sleep(10);
             EngineGrpc::InitializeRequest request;
             EngineGrpc::InitializeReply   reply;
             grpc::ClientContext           context;
@@ -276,7 +276,6 @@ class EngineGrpcClient
                     NRPLogger::warn("Attempting to send DataPack \"" + datapack->name() + "\" linked to engine \"" + datapack->engineName() +
                     "\" to Engine \"" + this->engineName() + "\". It won't be sent.");
             }
-
             grpc::Status status = _stub->setDataPacks(&context, request, &reply);
 
             if(!status.ok())
