@@ -13,7 +13,7 @@ RUN sudo apt-get update && sudo apt-get -y install $(grep -vE "^\s*#" ${HOME}/.d
 # We install numpy using pip, because it's easier to uninstall
 # in case a specific version is needed by other simulators
 
-RUN pip install numpy
+RUN pip install numpy==1.21
 
 # Compile and install (globally) the latest version of swig
 # The version available through apt (4.0.1) is incompatible with the latest opensim
@@ -54,7 +54,7 @@ RUN cmake ../opensim-core/dependencies/ \
       -DCMAKE_BUILD_TYPE=Release \
       -DOPENSIM_WITH_CASADI=ON \
       -DOPENSIM_WITH_TROPTER=ON
-RUN make -j8
+RUN make -j4
 
 # Fixes "opensim/modeling/SmoothSphereHalfSpaceForce.java:49: error: unmappable character for encoding ASCII"
 
