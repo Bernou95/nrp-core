@@ -28,6 +28,9 @@ RUN sudo apt-get update && sudo apt-get -y install $(grep -vE "^\s*#" ${HOME}/.d
 # If this image will be used for TVB integration, then flask==1.1.4 is needed and after markupsafe (included in flask) has to be downgraded to 2.0.1
 RUN pip install grpcio-tools pytest psutil flask gunicorn flask_cors mpi4py docopt
 
+# Experiments
+RUN pip install opencv-python
+
 # Install Documentation dependencies
 
 COPY --chown=${NRP_USER}:${NRP_GROUP} .ci/dependencies/apt/requirements.docs.txt ${HOME}/.dependencies/apt/requirements.docs.txt
