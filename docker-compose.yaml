@@ -109,7 +109,7 @@ services:
             args:
                 BASE_IMAGE: nexus.neurorobotics.ebrains.eu:443/nrp-core/opensim-ubuntu20-env:latest
                 CMAKE_CACHE_FILE: .ci/cmake_cache/opensim.cmake
-        image: nexus.neurorobotics.ebrains.eu:443/nrp-core/nrp-opensim-ubuntu20-env:latest
+        image: nexus.neurorobotics.ebrains.eu:443/nrp-core/nrp-opensim-ubuntu20:latest
         depends_on:
         - opensim-env
 
@@ -121,7 +121,7 @@ services:
             args:
                 BASE_IMAGE: nexus.neurorobotics.ebrains.eu:443/nrp-core/tvb-ubuntu20-env:latest
                 CMAKE_CACHE_FILE: .ci/cmake_cache/tvb.cmake
-        image: nexus.neurorobotics.ebrains.eu:443/nrp-core/nrp-tvb-ubuntu20-env:latest
+        image: nexus.neurorobotics.ebrains.eu:443/nrp-core/nrp-tvb-ubuntu20:latest
         depends_on:
         - tvb-env
 
