@@ -34,4 +34,9 @@ message Joint
     float effort   = 3;
 }
 
+message SetVelocity
+{
+    float velocity = 1;
+}
+
 // EOF

@@ -142,7 +142,28 @@ target_link_libraries(NRPGazeboGrpcCameraControllerPlugin
         CameraPlugin
 )
 
+########################################
+## Gazebo Joint Controller Plugin
+add_library(NRPGazeboGrpcSetJointVelocityPlugin SHARED "nrp_set_joint_velocity/nrp_set_joint_velocity_controller.cpp")
+add_library(NRPGazeboGrpcPlugins::NRPGazeboGrpcSetJointVelocityPlugin ALIAS NRPGazeboGrpcSetJointVelocityPlugin)
+target_compile_options(NRPGazeboGrpcSetJointVelocityPlugin PRIVATE $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:GNU>>:${NRP_COMMON_COMPILATION_FLAGS}>)
 
+target_include_directories(NRPGazeboGrpcSetJointVelocityPlugin
+    PUBLIC
+        $<INSTALL_INTERFACE:include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+        $<BUILD_INTERFACE:${GAZEBO_INCLUDE_DIRS}>
+)
+
+target_link_libraries(NRPGazeboGrpcSetJointVelocityPlugin
+    PUBLIC
+        ${NRP_GAZEBO_LIB_TARGETS}
+
+    PRIVATE
+        ${NRP_GEN_LIB_TARGET}
+        ${NRP_GAZEBO_COMMUNICATION_PLUGIN}
+        ${GAZEBO_LIBRARIES}
+)
 ##########################################
 ## Append Doxygen files
 add_doxygen_source("${CMAKE_CURRENT_SOURCE_DIR}" "")
@@ -152,7 +173,7 @@ add_doxygen_source("${CMAKE_CURRENT_SOURCE_DIR}" "")
 ## Configure targets
 set(PLUGIN_TARGETS ${NRP_GAZEBO_COMMUNICATION_PLUGIN} NRPGazeboGrpcWorldPlugin
     NRPGazeboGrpcJointControllerPlugin NRPGazeboGrpcLinkControllerPlugin
-    NRPGazeboGrpcCameraControllerPlugin)
+    NRPGazeboGrpcCameraControllerPlugin NRPGazeboGrpcSetJointVelocityPlugin)
 
 set_target_properties(${PLUGIN_TARGETS}
     PROPERTIES PREFIX "")

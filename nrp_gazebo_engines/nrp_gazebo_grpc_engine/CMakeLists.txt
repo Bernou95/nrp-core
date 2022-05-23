@@ -157,7 +157,8 @@ if(ENABLE_GAZEBO STREQUAL FULL)
             NRPGazeboGrpcPlugins::NRPGazeboGrpcLinkControllerPlugin
             NRPGazeboGrpcPlugins::NRPGazeboGrpcCameraControllerPlugin
             NRPGazeboGrpcPlugins::NRPGazeboGrpcWorldPlugin
-            NRPGazeboGrpcPlugins::NRPGazeboGrpcCommunicationPlugin)
+            NRPGazeboGrpcPlugins::NRPGazeboGrpcCommunicationPlugin
+            NRPGazeboGrpcPlugins::NRPGazeboGrpcSetJointVelocityPlugin)
 
         gtest_discover_tests(${TEST_NAME}
             WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/tests"

@@ -10,6 +10,7 @@ set(LIB_SRC_FILES
         camera_datapack_controller.cpp
         joint_datapack_controller.cpp
         link_datapack_controller.cpp
+        joint_set_velocity_datapack/joint_set_velocity_datapack.cpp
 )
 
 
