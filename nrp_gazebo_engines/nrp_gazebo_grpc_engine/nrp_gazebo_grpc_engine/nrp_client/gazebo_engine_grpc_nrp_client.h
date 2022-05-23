@@ -36,7 +36,7 @@
  *  \brief NRP - Gazebo Communicator on the NRP side. Converts DataPackInterface classes from/to JSON objects
  */
 class GazeboEngineGrpcNRPClient
-: public EngineGrpcClient<GazeboEngineGrpcNRPClient, GazeboGrpcConfigConst::EngineSchema, Gazebo::Camera, Gazebo::Joint, Gazebo::Link , Gazebo::SetVelocity>
+: public EngineGrpcClient<GazeboEngineGrpcNRPClient, GazeboGrpcConfigConst::EngineSchema, Gazebo::Camera, Gazebo::Joint, Gazebo::Link , Gazebo::SetVelocity, Gazebo::SetRelativeForce>
 {
     public:
         GazeboEngineGrpcNRPClient(nlohmann::json &config, ProcessLauncherInterface::unique_ptr &&launcher);

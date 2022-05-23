@@ -11,6 +11,7 @@ set(LIB_SRC_FILES
         joint_datapack_controller.cpp
         link_datapack_controller.cpp
         joint_set_velocity_datapack/joint_set_velocity_datapack.cpp
+        link_relative_force_datapack_controller/link_relative_force_datapack_controller.cpp
 )
 
 

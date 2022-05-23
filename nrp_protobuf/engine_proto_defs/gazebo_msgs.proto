@@ -39,4 +39,11 @@ message SetVelocity
     float velocity = 1;
 }
 
+message SetRelativeForce
+{
+    float x = 1;
+    float y = 2;
+    float z = 3;
+}
+
 // EOF

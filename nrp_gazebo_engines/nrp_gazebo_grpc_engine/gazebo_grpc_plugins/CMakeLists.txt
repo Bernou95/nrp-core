@@ -143,7 +143,7 @@ target_link_libraries(NRPGazeboGrpcCameraControllerPlugin
 )
 
 ########################################
-## Gazebo Joint Controller Plugin
+## Gazebo Set Velocity Plugin
 add_library(NRPGazeboGrpcSetJointVelocityPlugin SHARED "nrp_set_joint_velocity/nrp_set_joint_velocity_controller.cpp")
 add_library(NRPGazeboGrpcPlugins::NRPGazeboGrpcSetJointVelocityPlugin ALIAS NRPGazeboGrpcSetJointVelocityPlugin)
 target_compile_options(NRPGazeboGrpcSetJointVelocityPlugin PRIVATE $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:GNU>>:${NRP_COMMON_COMPILATION_FLAGS}>)
@@ -164,6 +164,30 @@ target_link_libraries(NRPGazeboGrpcSetJointVelocityPlugin
         ${NRP_GAZEBO_COMMUNICATION_PLUGIN}
         ${GAZEBO_LIBRARIES}
 )
+
+########################################
+## Gazebo Set Relative Force to the Link Plugin
+add_library(NRPGazeboGrpcAddRelativeForceToLinkPlugin SHARED "nrp_add_relative_force_to_link/nrp_add_link_relative_force.cpp")
+add_library(NRPGazeboGrpcPlugins::NRPGazeboGrpcAddRelativeForceToLinkPlugin ALIAS NRPGazeboGrpcAddRelativeForceToLinkPlugin)
+target_compile_options(NRPGazeboGrpcAddRelativeForceToLinkPlugin PRIVATE $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:GNU>>:${NRP_COMMON_COMPILATION_FLAGS}>)
+
+target_include_directories(NRPGazeboGrpcAddRelativeForceToLinkPlugin
+    PUBLIC
+        $<INSTALL_INTERFACE:include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+        $<BUILD_INTERFACE:${GAZEBO_INCLUDE_DIRS}>
+)
+
+target_link_libraries(NRPGazeboGrpcAddRelativeForceToLinkPlugin
+    PUBLIC
+        ${NRP_GAZEBO_LIB_TARGETS}
+
+    PRIVATE
+        ${NRP_GEN_LIB_TARGET}
+        ${NRP_GAZEBO_COMMUNICATION_PLUGIN}
+        ${GAZEBO_LIBRARIES}
+)
+
 ##########################################
 ## Append Doxygen files
 add_doxygen_source("${CMAKE_CURRENT_SOURCE_DIR}" "")
@@ -173,7 +197,7 @@ add_doxygen_source("${CMAKE_CURRENT_SOURCE_DIR}" "")
 ## Configure targets
 set(PLUGIN_TARGETS ${NRP_GAZEBO_COMMUNICATION_PLUGIN} NRPGazeboGrpcWorldPlugin
     NRPGazeboGrpcJointControllerPlugin NRPGazeboGrpcLinkControllerPlugin
-    NRPGazeboGrpcCameraControllerPlugin NRPGazeboGrpcSetJointVelocityPlugin)
+    NRPGazeboGrpcCameraControllerPlugin NRPGazeboGrpcSetJointVelocityPlugin NRPGazeboGrpcAddRelativeForceToLinkPlugin)
 
 set_target_properties(${PLUGIN_TARGETS}
     PROPERTIES PREFIX "")
