@@ -103,7 +103,8 @@ RUN git clone https://github.com/eclipse/paho.mqtt.cpp \
 
 # Install nest dependencies
 
-RUN apt-get update && apt-get -y install $(grep -vE "^\s*#" ${HOME}/.dependencies/apt/requirements.nest.txt  | tr "\n" " ")
+RUN sudo apt-get update
+RUN sudo apt-get -y install $(grep -vE "^\s*#" ${HOME}/.dependencies/apt/requirements.nest.txt  | tr "\n" " ")
 
 # Install nest-simulator (to NRP_INSTALL_DIR)
 RUN git clone https://github.com/nest/nest-simulator.git \
