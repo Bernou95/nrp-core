@@ -19,7 +19,7 @@ pipeline {
     }
     options {
         // Abort a build on timeout
-        timeout(time: 3, unit: 'HOURS') 
+        timeout(time: 12, unit: 'HOURS') 
     }
 
     stages {
