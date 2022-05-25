@@ -68,6 +68,18 @@ services:
         - nest-env
 
 
+    nrp-gazebo-nest-env:
+        build:
+            context: .
+            dockerfile: dockerfiles/nrp-core-env.Dockerfile
+            args:
+                BASE_IMAGE: nexus.neurorobotics.ebrains.eu:443/nrp-core/gazebo-nest-ubuntu20-env:latest
+                CMAKE_CACHE_FILE: .ci/cmake_cache/nest-gazebo.cmake
+        image: nexus.neurorobotics.ebrains.eu:443/nrp-core/nrp-gazebo-nest-ubuntu20-env:latest
+        depends_on:
+        - gazebo-nest-env
+
+
     nrp-gazebo-nest:
         build:
             context: .
