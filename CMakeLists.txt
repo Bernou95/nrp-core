@@ -90,29 +90,6 @@ list(TRANSFORM BOOST_PYTHON PREPEND "Boost::")
 set(PYTHON_INSTALL_DIR_REL "${CMAKE_INSTALL_LIBDIR}/python${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}/site-packages" CACHE INTERNAL "Relative install location for python libraries")
 
 
-
-
-##########################################
-## Log library
-find_package(spdlog 1.8.1 QUIET)
-if(NOT ${spdlog_FOUND})
-    message("Please wait. Downloading spdlog...")
-    FetchContent_Declare(spdlog
-        GIT_REPOSITORY https://github.com/gabime/spdlog.git
-        GIT_TAG v1.8.1)
-
-    FetchContent_GetProperties(spdlog)
-    if(NOT spdlog_POPULATED)
-        FetchContent_Populate(spdlog)
-
-        set(SPDLOG_BUILD_SHARED ON)
-        set(SPDLOG_INSTALL ON)
-
-        add_subdirectory(${spdlog_SOURCE_DIR} ${spdlog_BINARY_DIR})
-    endif()
-endif()
-
-
 ##########################################
 ## Doxygen
 find_package(Doxygen REQUIRED)
@@ -127,6 +104,11 @@ function(add_doxygen_source directory)
     set_property(GLOBAL PROPERTY DOXYGEN_SOURCE_LIST "${tmp}")
 endfunction(add_doxygen_source)
 
+if(NOT DEFINED NRP_DEP_CMAKE_INSTALL_PREFIX)
+    set(NRP_DEP_CMAKE_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX})
+else()
+    message(STATUS "Installing nrp-core dependencies at: ${NRP_DEP_CMAKE_INSTALL_PREFIX}")
+endif()
 
 ##########################################
 ## Update git submodules
@@ -149,6 +131,7 @@ endif()
 ##########################################
 ## General NRP library
 ## Includes components to create new datapacks and engines
+set(NRP_ENV_VARS "")
 add_subdirectory(nrp_general_library)
 
 
@@ -277,8 +260,7 @@ set(ENV{NRP_ENGINE_LAUNCHERS} ""
 ## Gazebo targets
 if(NOT ENABLE_GAZEBO STREQUAL OFF)
     message(STATUS "Building Gazebo engines")
-    add_subdirectory(nrp_gazebo_engines/nrp_gazebo_json_engine)
-    add_subdirectory(nrp_gazebo_engines/nrp_gazebo_grpc_engine)
+    add_subdirectory(nrp_gazebo_engines)
 else()
     message(STATUS "Gazebo engines will not be built")
 endif()
@@ -449,6 +431,7 @@ doxygen_add_docs(nrp_doxygen
         "docs/guides/engine_creation_template.dox"
         "docs/guides/python_engine_creation.dox"
         "docs/guides/troubleshooting.dox"
+        "docs/guides/docker_compose.dox"
 
         "docs/event_loop/event_loop.dox"
         "docs/event_loop/computational_graph.dox"
@@ -514,3 +497,26 @@ if(BUILD_RST STREQUAL ON)
 else()
     message(STATUS "Skipping generating rST documentation output")
 endif()
+
+# Print message with necessary env variables to run NRPCoreSim, compile and install file exporting this variables
+message(STATUS "MESSAGE: before executing NRPCoreSim be sure to add the following variables to your environment:")
+file(WRITE "${CMAKE_BINARY_DIR}/.nrp_env" "# Exports environment variables necessary to run nrp-core related commands\n")
+foreach(VAR ${NRP_ENV_VARS})
+    file(APPEND "${CMAKE_BINARY_DIR}/.nrp_env" "export ${VAR}\n")
+    message(STATUS "\t${VAR}")
+endforeach()
+
+file(COPY
+        "${CMAKE_BINARY_DIR}/.nrp_env"
+        DESTINATION
+        "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}"
+        )
+
+# Install nrp-run.bash, meant mainly to run nrp-core related commands with a correct environment
+file(COPY
+        "${CMAKE_SOURCE_DIR}/nrp-run.bash"
+        DESTINATION
+        "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}"
+        FILE_PERMISSIONS
+        OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
+        )

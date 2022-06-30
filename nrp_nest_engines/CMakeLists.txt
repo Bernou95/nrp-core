@@ -17,7 +17,7 @@ if(ENABLE_NEST STREQUAL FULL)
         endif()
 
         set(NRP_NEST_CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/nest-simulator/nest-simulator)
-        set(NEST_INSTALL_DIR ${CMAKE_INSTALL_PREFIX})
+        set(NEST_INSTALL_DIR ${NRP_DEP_CMAKE_INSTALL_PREFIX})
         if(NOT TARGET nest-simulator)
             ExternalProject_Add(nest-simulator
                     GIT_REPOSITORY https://github.com/nest/nest-simulator.git
@@ -48,6 +48,14 @@ if(ENABLE_NEST STREQUAL FULL)
         message("Using preinstalled nest-simulator: ${NEST_INSTALL_DIR}")
     endif()
 endif()
+
+set(NEST_CMAKE_INSTALL_BINDIR "${NEST_INSTALL_DIR}/${CMAKE_INSTALL_BINDIR}")
+set(NEST_CMAKE_INSTALL_PYNEST "${NEST_INSTALL_DIR}/lib/python${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}/site-packages")
+
+# add to nrp env vars
+list(APPEND NRP_ENV_VARS "PATH=${NEST_CMAKE_INSTALL_BINDIR}:\${PATH}")
+list(APPEND NRP_ENV_VARS "PYTHONPATH=${NEST_CMAKE_INSTALL_PYNEST}:\${PYTHONPATH}")
+set(NRP_ENV_VARS ${NRP_ENV_VARS} PARENT_SCOPE)
 
 
 ##########################################
