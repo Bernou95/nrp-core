@@ -37,7 +37,7 @@
       {
         "properties": {
           "EngineType": { "enum": ["gazebo_grpc"] },
-          "EngineProcCmd": { "default": "/usr/bin/gzserver" }
+          "EngineProcessLauncher": {"ProcCmd": {"default": "/usr/bin/gzserver"}}
         }
       }
     ]
@@ -53,7 +53,7 @@
       {
         "properties": {
           "EngineType": { "enum": ["gazebo_json"] },
-          "EngineProcCmd": { "default": "/usr/bin/gzserver" }
+          "EngineProcessLauncher": {"ProcCmd": {"default": "/usr/bin/gzserver"}}
         }
       }
     ]

@@ -13,32 +13,14 @@
       "type" : "string",
       "description": "Engine type. Used by EngineLauncherManager to select the correct engine launcher"
     },
-    "EngineProcCmd" : {
-      "type" : "string",
-      "description": "Engine Process Launch command"
-    },
-    "EngineProcStartParams" : {
-      "type" : "array",
-      "items": {"type" : "string"},
-      "description": "Engine Process Start Parameters"
-    },
-    "EngineEnvParams" : {
-      "type" : "array",
-      "items": {"type" : "string"},
-      "description": "Engine Process Environment Parameters"
-    },
-    "EngineLaunchCommand" : {
+    "EngineProcessLauncher" : {
       "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "Engine Launch Command",
-      "description": "LaunchCommand that will be used to launch the engine process",
-      "$id": "#EngineLaunchCommand",
+      "title": "Engine Process Launcher",
+      "description": "Process Launcher that will be used to launch the engine process",
+      "$id": "#EngineProcessLauncher",
       "type":"object",
-      "oneOf":[
-        { "$ref": "https://neurorobotics.net/launch_commands/empty_launch_cmd.json#/empty_launch_cmd" },
-        { "$ref": "https://neurorobotics.net/launch_commands/basicfork_cmd.json#/basicfork_cmd" },
-        { "$ref": "https://neurorobotics.net/launch_commands/docker_launcher_cmd.json#/docker_launcher_cmd" }
-      ],
-      "default":{"LaunchType":"BasicFork"}
+      "items": {"$ref": "https://neurorobotics.net/process_launcher.json#ProcessLauncher"},
+      "default": {"ProcCmd":"", "LaunchCommand": {"LaunchType": "BasicFork"} }
     },
     "EngineTimestep" : {
       "type" : "number",
