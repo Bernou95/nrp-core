@@ -51,10 +51,7 @@ To use the Python JSON engine in an experiment, set `EngineType` to <b>"python_j
 <tr><th>Name<th>Description<th>Type<th>Default<th>Required<th>Array
 <tr><td>EngineName<td>Name of the engine<td>string<td><td>X<td>
 <tr><td>EngineType<td>Engine type. Used by EngineLauncherManager to select the correct engine launcher<td>string<td><td>X<td>
-<tr><td>EngineProcCmd<td>Engine Process Launch command<td>string<td><td><td>
-<tr><td>EngineProcStartParams<td>Engine Process Start Parameters<td>string<td>[]<td><td>X
-<tr><td>EngineEnvParams<td>Engine Process Environment Parameters<td>string<td>[]<td><td>X
-<tr><td>EngineLaunchCommand<td>\ref configuration_schema "LaunchCommand" with parameters that will be used to launch the engine process<td>object<td>{"LaunchType":"BasicFork"}<td><td>
+<tr><td>EngineProcessLauncher<td>Engine process launcher. \ref process_launcher_schema "ProcessLauncher" used to store parameters if are needed to start an Engine<td>object<td>{"ProcCmd":"", "ProcStartParams":[], "ProcEnvParams":[], "LaunchCommand":"BasicFork"}<td><td>
 <tr><td>EngineTimestep<td>Engine Timestep in seconds<td>number<td>0.01<td><td>
 <tr><td>EngineCommandTimeout<td>Engine Timeout (in seconds). It tells how long to wait for the completion of the engine runStep. 0 or negative values are interpreted as no timeout<td>number<td>0.0<td><td>
 </table>
