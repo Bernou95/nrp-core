@@ -9,7 +9,7 @@
       "EngineType": "gazebo_grpc",
       "EngineName": "gazebo",
       "GazeboWorldFile": "husky_world.sdf",
-      "EngineProcStartParams": ["--verbose"]
+      "EngineProcessLauncher":{"ProcStartParams": ["--verbose"]}
     }
   ],
   "ComputationalGraph": ["braitenberg.py", "cam_tf.py", "mot_tf.py"]

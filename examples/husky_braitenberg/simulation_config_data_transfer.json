@@ -7,13 +7,13 @@
 			"EngineType": "gazebo_grpc",
 			"EngineName": "gazebo",
 			"GazeboWorldFile": "husky_world.sdf",
-			"EngineProcStartParams": ["--verbose"]
+			"EngineProcessLauncher": {"ProcStartParams": ["--verbose"]}
 		},
 		{
 			"EngineType": "nest_json",
 			"EngineName": "nest",
 			"NestInitFileName": "braitenberg.py",
-			"EngineEnvParams": ["PYNEST_QUIET=1"]
+			"EngineProcessLauncher": {"ProcEnvParams": ["PYNEST_QUIET=1"]}
 		},
 		{
 			"EngineType": "datatransfer_grpc_engine",
