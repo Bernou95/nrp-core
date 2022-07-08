@@ -26,7 +26,7 @@
 DataTransferEngineGrpcClient::DataTransferEngineGrpcClient(nlohmann::json &config, ProcessLauncherInterface::unique_ptr &&launcher)
     : EngineGrpcClient(config, std::move(launcher))
 {
-    setDefaultProperty<std::string>("EngineProcCmd", DATATRANSFER_GRPC_ENGINE_EXECUTABLE_PATH);
+    setDefaultPropertyEPL<std::string>("ProcCmd", DATATRANSFER_GRPC_ENGINE_EXECUTABLE_PATH);
 }
 
 void DataTransferEngineGrpcClient::initialize()

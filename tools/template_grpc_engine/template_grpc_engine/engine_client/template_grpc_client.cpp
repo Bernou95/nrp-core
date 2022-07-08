@@ -26,7 +26,7 @@
 ${engine_name}EngineGrpcClient::${engine_name}EngineGrpcClient(nlohmann::json &config, ProcessLauncherInterface::unique_ptr &&launcher)
     : EngineGrpcClient(config, std::move(launcher))
 {
-    setDefaultProperty<std::string>("EngineProcCmd", ${engine_name_uppercase}_GRPC_ENGINE_EXECUTABLE_PATH);
+    setDefaultPropertyEPL<std::string>("ProcCmd", ${engine_name_uppercase}_GRPC_ENGINE_EXECUTABLE_PATH);
 }
 
 void ${engine_name}EngineGrpcClient::initialize()

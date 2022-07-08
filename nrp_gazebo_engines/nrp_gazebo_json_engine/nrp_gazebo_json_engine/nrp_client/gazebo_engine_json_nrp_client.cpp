@@ -36,6 +36,7 @@ GazeboEngineJSONNRPClient::GazeboEngineJSONNRPClient(nlohmann::json &config, Pro
     : EngineJSONNRPClient(config, std::move(launcher))
 {
     setDefaultProperty<std::vector<std::string>>("GazeboPlugins", std::vector<std::string>());
+    setDefaultPropertyEPL<std::string>("ProcCmd", GAZEBO_LAUNCH_COMMAND);
 }
 
 void GazeboEngineJSONNRPClient::initialize()

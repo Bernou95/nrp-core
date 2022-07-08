@@ -228,15 +228,15 @@ NestEngineServerNRPClient::NestEngineServerNRPClient(nlohmann::json &config, Pro
     : EngineClient(config, std::move(launcher))
 {
     // Disable RestrictedPython
-    this->engineConfig().at("EngineEnvParams").get<std::vector<std::string>>().emplace_back("NEST_SERVER_RESTRICTION_OFF=1");
+    this->engineConfig().at("EngineProcessLauncher").at("ProcEnvParams").get<std::vector<std::string>>().emplace_back("NEST_SERVER_RESTRICTION_OFF=1");
 
     // set engine command
     int n_mpi = this->engineConfig().at("MPIProcs").get<int>();
     if(n_mpi <= 1)
-        setDefaultProperty<std::string>("EngineProcCmd", NRP_NEST_SERVER_EXECUTABLE_PATH);
+        setDefaultPropertyEPL<std::string>("ProcCmd", NRP_NEST_SERVER_EXECUTABLE_PATH);
     else {
         std::string mpi_cmd = "mpirun -np " + std::to_string(n_mpi) + " " + NRP_NEST_SERVER_MPI_EXECUTABLE_PATH;
-        setDefaultProperty<std::string>("EngineProcCmd", mpi_cmd);
+        setDefaultPropertyEPL<std::string>("ProcCmd", mpi_cmd);
     }
 
     // address
@@ -370,9 +370,9 @@ void NestEngineServerNRPClient::shutdown()
         stopParams.push_back("python3");
 
         nlohmann::json stopConfig;
-        stopConfig["LaunchCommand"] = this->engineConfig().at("EngineLaunchCommand");
+        stopConfig["LaunchCommand"] = this->engineConfig().at("EngineProcessLauncher").at("LaunchCommand");
         stopConfig["ProcCmd"] = NRP_NEST_SERVER_EXECUTABLE_PATH;
-        stopConfig["ProcEnvParams"] = this->engineConfig().at("EngineEnvParams");
+        stopConfig["ProcEnvParams"] = this->engineConfig().at("EngineProcessLauncher").at("ProcEnvParams");
         stopConfig["ProcStartParams"] = stopParams;
 
         NRPLogger::debug("Using parameters for stopping nest server:\n{}", stopConfig.dump(4));

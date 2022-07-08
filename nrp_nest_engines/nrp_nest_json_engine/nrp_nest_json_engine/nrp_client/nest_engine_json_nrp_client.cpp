@@ -35,7 +35,7 @@ NestEngineJSONNRPClient::NestEngineJSONNRPClient(nlohmann::json &config, Process
 {
     NRP_LOGGER_TRACE("{} called", __FUNCTION__);
     
-    setDefaultProperty<std::string>("EngineProcCmd", NRP_NEST_EXECUTABLE_PATH);
+    setDefaultPropertyEPL<std::string>("ProcCmd", NRP_NEST_EXECUTABLE_PATH);
 }
 
 NestEngineJSONNRPClient::~NestEngineJSONNRPClient()

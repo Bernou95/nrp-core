@@ -146,7 +146,7 @@ class EngineJSONNRPClient
         {
             NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
-            std::vector<std::string> startParams = this->engineConfig().at("EngineProcStartParams");
+            std::vector<std::string> startParams = this->engineConfig().at("EngineProcessLauncher").at("ProcStartParams");
 
             std::string name = this->engineConfig().at("EngineName");
             startParams.push_back(std::string("--") + EngineJSONConfigConst::EngineNameArg.data() + "=" + name);

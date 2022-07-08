@@ -26,7 +26,7 @@
 ${engine_name}EngineJSONClient::${engine_name}EngineJSONClient(nlohmann::json &config, ProcessLauncherInterface::unique_ptr &&launcher)
     : EngineJSONNRPClient(config, std::move(launcher))
 {
-    setDefaultProperty<std::string>("EngineProcCmd", ${engine_name_uppercase}_JSON_ENGINE_EXECUTABLE_PATH);
+    setDefaultPropertyEPL<std::string>("ProcCmd", ${engine_name_uppercase}_JSON_ENGINE_EXECUTABLE_PATH);
 }
 
 void ${engine_name}EngineJSONClient::initialize()

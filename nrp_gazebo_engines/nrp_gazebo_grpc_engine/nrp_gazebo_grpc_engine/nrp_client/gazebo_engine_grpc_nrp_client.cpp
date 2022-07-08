@@ -38,6 +38,7 @@ GazeboEngineGrpcNRPClient::GazeboEngineGrpcNRPClient(nlohmann::json &config, Pro
     NRP_LOGGER_TRACE("{} called", __FUNCTION__);
     
     setDefaultProperty<std::vector<std::string>>("GazeboPlugins", std::vector<std::string>());
+    setDefaultPropertyEPL<std::string>("ProcCmd", GAZEBO_LAUNCH_COMMAND);
 }
 
 void GazeboEngineGrpcNRPClient::initialize()

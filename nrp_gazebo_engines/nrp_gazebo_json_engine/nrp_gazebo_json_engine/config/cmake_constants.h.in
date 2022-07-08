@@ -52,4 +52,9 @@
  */
 #define DEFAULT_GAZEBO_LIB_DIRS "@DEFAULT_GAZEBO_LIB_DIRS@"
 
+/*!
+ * \brief Name of NRP Gazebo Server Launch Command
+ */
+#define GAZEBO_LAUNCH_COMMAND "/usr/bin/gzserver"
+
 #endif // NRP_GAZEBO_CMAKE_CONSTANTS_H

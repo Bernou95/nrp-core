@@ -305,8 +305,9 @@ class EngineClient
             json_utils::validateJson(this->engineConfig(), this->engineSchema());
 
             // setting process start and env params to an empty vector since this can't be done from json schema
-            setDefaultProperty<std::vector<std::string>>("EngineProcStartParams", std::vector<std::string>());
-            setDefaultProperty<std::vector<std::string>>("EngineEnvParams", std::vector<std::string>());
+            setDefaultPropertyEPL<nlohmann::json>("LaunchCommand", R"({"LaunchType": "BasicFork"})"_json);
+            setDefaultPropertyEPL<std::vector<std::string>>("ProcStartParams", std::vector<std::string>());
+            setDefaultPropertyEPL<std::vector<std::string>>("ProcEnvParams", std::vector<std::string>());
         }
 
         ~EngineClient() override = default;
@@ -419,6 +420,22 @@ class EngineClient
         void setDefaultProperty(std::string key, T value)
         {
             json_utils::setDefault<T>(this->engineConfig(), key, value);
+        }
+
+        /*!
+        * \brief Attempts to set a default value for a property in the engine process launcher configuration. If the property has been already
+         * set either in the engine configuration file or from the engine schema, its value is not overwritten.
+        * \param key Name of the property to be set
+        * \param value Default value to set
+        */
+        template<class T>
+        void setDefaultPropertyEPL(std::string key, T value)
+        {
+            auto instance = this->engineConfig().at("EngineProcessLauncher");
+            if(instance.contains("ProcCmd") and instance.at("ProcCmd")=="" and key=="ProcCmd" )
+                this->engineConfig().at("EngineProcessLauncher").at(key) = value;
+            else
+                json_utils::setDefault<T>(this->engineConfig().at("EngineProcessLauncher"), key, value);
         }
 
         /*!

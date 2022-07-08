@@ -43,6 +43,7 @@ TEST(TestGazeboJSONEngine, Start)
     config["GazeboWorldFile"] = TEST_EMPTY_WORLD_FILE;
     config["WorldLoadTime"] = 1;
     config["GazeboRNGSeed"] = 12345;
+    config["EngineProcessLauncher"] = R"({"ProcCmd": "/usr/bin/gzserver", "LaunchCommand": {"LaunchType": "BasicFork"}})"_json;
 
     // Launch gazebo server
     GazeboEngineJSONLauncher launcher;
@@ -62,6 +63,7 @@ TEST(TestGazeboJSONEngine, WorldPlugin)
     config["EngineType"] = "gazebo_json";
     config["GazeboWorldFile"] = TEST_WORLD_PLUGIN_FILE;
     config["GazeboRNGSeed"] = 12345;
+    config["EngineProcessLauncher"] = R"({"ProcCmd": "/usr/bin/gzserver", "LaunchCommand": {"LaunchType": "BasicFork"}})"_json;
 
     // Launch gazebo server
     GazeboEngineJSONLauncher launcher;
@@ -85,7 +87,8 @@ TEST(TestGazeboJSONEngine, CameraPlugin)
     config["GazeboWorldFile"] = TEST_CAMERA_PLUGIN_FILE;
     config["GazeboRNGSeed"] = 12345;
     std::vector<std::string> env_params ={"GAZEBO_MODEL_PATH=" TEST_GAZEBO_MODELS_DIR ":$GAZEBO_MODEL_PATH"};
-    config["EngineEnvParams"] = env_params;
+    config["EngineProcessLauncher"] = R"({"ProcCmd": "/usr/bin/gzserver", "LaunchCommand": {"LaunchType": "BasicFork"}})"_json;
+    config["EngineProcessLauncher"].emplace("ProcEnvParams", env_params);
 
     // Launch gazebo server
     GazeboEngineJSONLauncher launcher;
@@ -130,7 +133,8 @@ TEST(TestGazeboJSONEngine, JointPlugin)
     config["GazeboWorldFile"] = TEST_JOINT_PLUGIN_FILE;
     config["GazeboRNGSeed"] = 12345;
     std::vector<std::string> env_params ={"GAZEBO_MODEL_PATH=" TEST_GAZEBO_MODELS_DIR ":$GAZEBO_MODEL_PATH"};
-    config["EngineEnvParams"] = env_params;
+    config["EngineProcessLauncher"] = R"({"ProcCmd": "/usr/bin/gzserver", "LaunchCommand": {"LaunchType": "BasicFork"}})"_json;
+    config["EngineProcessLauncher"].emplace("ProcEnvParams", env_params);
 
     // Launch gazebo server
     GazeboEngineJSONLauncher launcher;
@@ -165,7 +169,8 @@ TEST(TestGazeboJSONEngine, LinkPlugin)
     config["GazeboWorldFile"] = TEST_LINK_PLUGIN_FILE;
     config["GazeboRNGSeed"] = 12345;
     std::vector<std::string> env_params ={"GAZEBO_MODEL_PATH=" TEST_GAZEBO_MODELS_DIR ":$GAZEBO_MODEL_PATH"};
-    config["EngineEnvParams"] = env_params;
+    config["EngineProcessLauncher"] = R"({"ProcCmd": "/usr/bin/gzserver","LaunchCommand": {"LaunchType": "BasicFork"}})"_json;
+    config["EngineProcessLauncher"].emplace("ProcEnvParams", env_params);
 
     // Launch gazebo server
     GazeboEngineJSONLauncher launcher;

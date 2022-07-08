@@ -39,7 +39,7 @@ public:
     {
         NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
-        setDefaultProperty<std::string>("EngineProcCmd", NRP_PYTHON_EXECUTABLE_PATH);
+        setDefaultPropertyEPL<std::string>("ProcCmd", NRP_PYTHON_EXECUTABLE_PATH);
     }
 };
 

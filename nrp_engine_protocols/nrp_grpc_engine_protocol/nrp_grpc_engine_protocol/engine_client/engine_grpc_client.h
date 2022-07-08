@@ -290,7 +290,7 @@ class EngineGrpcClient
         {
             NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
-            std::vector<std::string> startParams = this->engineConfig().at("EngineProcStartParams");
+            std::vector<std::string> startParams = this->engineConfig().at("EngineProcessLauncher").at("ProcStartParams");
 
             std::string name = this->engineConfig().at("EngineName");
             startParams.push_back(std::string("--") + EngineGRPCConfigConst::EngineNameArg.data() + "=" + name);
