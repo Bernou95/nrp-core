@@ -24,11 +24,11 @@ The commands should be run from the NRP-core source root folder.
 
 \code{.sh}
 sudo docker pull eclipse-mosquitto
-sudo docker run -it -p 1883:1883 -p 9010:9001 -v ${PWD}/nrp_datatransfer_grpc_engine/mosquitto.conf:/mosquitto/config/mosquitto.conf
+sudo docker run -it -p 1883:1883 -p 9010:9001 -v ${PWD}/nrp_comm_proxies/nrp_mqtt_proxy/mosquitto.conf:/mosquitto/config/mosquitto.conf
 \endcode
 
 The resulting MQTT broker will be listening to port *1883*. 
-If a different port is wished, it can be specified in *nrp_datatransfer_grpc_engine/mosquitto.conf*. 
+If a different port is wished, it can be specified in *nrp_comm_proxies/nrp_mqtt_proxy/mosquitto.conf*. 
 
 \section datatransfer_engine_datapacks DataPacks
 
