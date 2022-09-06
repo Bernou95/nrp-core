@@ -49,6 +49,7 @@ class OpensimInterface(object):
 
         self.reset_manager()
         self.model.realizeDynamics(self.state)
+        return 0
 
     def shutdown(self):
         pass

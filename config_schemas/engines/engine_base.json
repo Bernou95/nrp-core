@@ -49,6 +49,11 @@
       "type" : "number",
       "default": 0.0,
       "description": "Engine Timeout (in seconds). It tells how long to wait for the completion of the engine runStep. 0 or negative values are interpreted as no timeout"
+    },
+    "EngineDataBuffer" : {
+      "type" : "number",
+      "default": -1,
+      "description": "To set the maximum data buffer of the transceiver function. (-1) is to set the data buffer size as default vale. (N) is to set the data buffer as N bytes."
     }
   },
   "required" : ["EngineName", "EngineType"]

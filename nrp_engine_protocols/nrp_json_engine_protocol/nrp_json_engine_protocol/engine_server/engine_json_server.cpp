@@ -54,6 +54,18 @@ EngineJSONServer::EngineJSONServer(const std::string &engineAddress, const std::
         {
             this->_pEndpoint = enpoint_ptr_t(new Pistache::Http::Endpoint(newEngineAddr));
 
+            int bufferFlag = engineName.find(":");
+            if (bufferFlag > 0){
+                std::string tempEngineName = engineName.substr(0, bufferFlag);
+                std::string bufferSizeStr = engineName.substr(bufferFlag+1);
+                int maxBufferSize = std::stoi(bufferSizeStr);
+
+                this->_engineName = tempEngineName;
+                auto options = Pistache::Http::Endpoint::options()
+                    .maxRequestSize(maxBufferSize)
+                    .maxResponseSize(maxBufferSize);
+                this->_pEndpoint->init(options);
+            }
             // Add routes to endpoint
             this->_pEndpoint->setHandler(this->_router.handler());
 

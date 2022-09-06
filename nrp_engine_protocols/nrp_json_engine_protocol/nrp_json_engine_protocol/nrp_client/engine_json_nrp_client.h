@@ -147,8 +147,14 @@ class EngineJSONNRPClient
             NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
             std::vector<std::string> startParams = this->engineConfig().at("EngineProcStartParams");
-
+            
+            std::string bufferSizeStr = "";
+            int bufferSize = this->engineConfig().at("EngineDataBuffer");
+            if(bufferSize > 0){
+                bufferSizeStr = ":"+ std::to_string(bufferSize);
+            }
             std::string name = this->engineConfig().at("EngineName");
+            name = name + bufferSizeStr;
             startParams.push_back(std::string("--") + EngineJSONConfigConst::EngineNameArg.data() + "=" + name);
 
             // Add JSON Server address (will be used by EngineJSONServer)

@@ -41,6 +41,7 @@ class MujocoInterface(object):
 
 	def reset(self):
 		self.sim.reset()
+		return 0
 
 	def shutdown(self):
 		glfw.destroy_window(self.viewer.window)
