@@ -128,6 +128,8 @@ bool FTILoopSimManager::runSimulationUntilCondition(std::function<bool ()> condi
         this->runSimulationOnce();
     }
 
+    this->_loop->waitForEngines();
+
     return hasCondition;
 }
 
@@ -137,6 +139,11 @@ void FTILoopSimManager::runSimulationOnce()
         this->_loop->runLoop(this->_timeStep);
     else
         throw NRPException::logCreate("Simulation must be initialized before calling runLoop");
+}
+
+const std::string & FTILoopSimManager::getStatus()
+{
+    return this->_loop->getStatus();
 }
 
 FTILoop FTILoopSimManager::createSimLoop()
@@ -177,7 +184,7 @@ FTILoop FTILoopSimManager::createSimLoop()
         }
         catch(std::exception &e)
         {
-            throw NRPException::logCreate(e, "Failed to launch engine interface \"" + engineLauncher->engineType() + "\"");
+            throw NRPException::logCreate(e, "Failed to launch engine:  \"" + engineName + "\"");
         }
     }
 

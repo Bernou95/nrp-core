@@ -23,15 +23,17 @@
 #include "datatransfer_grpc_engine/engine_server/datatransfer_grpc_server.h"
 #include "datatransfer_grpc_engine/engine_server/stream_datapack_controller.h"
 
+#include "nrp_general_library/utils/time_utils.h"
+
 int DataTransferGrpcServer::_iteration = 0;
 SimulationTime DataTransferGrpcServer::_simulationTime = SimulationTime::zero();
 
 DataTransferGrpcServer::DataTransferGrpcServer(const std::string &serverAddress,
-                                     const std::string &engineName,
-                                     const std::string &registrationAddress)
-    : EngineGrpcServer(serverAddress, engineName, registrationAddress),
+                                     const std::string &engineName)
+    : EngineGrpcServer(serverAddress, engineName),
     _engineName(engineName)
 {
+    _dataPacksNames.clear();
 }
 
 SimulationTime DataTransferGrpcServer::runLoopStep(SimulationTime timeStep)
@@ -49,13 +51,7 @@ void DataTransferGrpcServer::initialize(const nlohmann::json &data, EngineGrpcSe
 {
     NRPLogger::info("Initializing Data Transfer Engine");
 
-    const auto t = std::time(nullptr);
-    const auto tm = *std::localtime(&t);
-
-    std::ostringstream oss;
-    oss << std::put_time(&tm, "/%Y%m%d-%H%M%S-") << getpid();
-
-    std::string timeStamp = oss.str();
+    std::string timeStamp = getTimestamp();
 
     bool mqttConnected = false;
 #ifdef MQTT_ON
@@ -83,12 +79,13 @@ void DataTransferGrpcServer::initialize(const nlohmann::json &data, EngineGrpcSe
 #endif
 
     auto &dumps = data.at("dumps");
-    std::string dataDir = std::string(data.at("dataDirectory")) + timeStamp;
+    std::string dataDir = std::string(data.at("dataDirectory")) + "/" + timeStamp;
 
     this->_handleDataPackMessage = data.at("streamDataPackMessage") && mqttConnected;
 
     for(auto &dump : dumps){
         const auto datapackName = dump.at("name");
+        _dataPacksNames.push_back(datapackName);
         const auto netDump = dump.at("network") && mqttConnected;
         const auto fileDump = dump.at("file");
         if (fileDump && !netDump){
@@ -135,6 +132,18 @@ void DataTransferGrpcServer::shutdown(const nlohmann::json &/*data*/)
 void DataTransferGrpcServer::reset()
 {
     NRPLogger::debug("Resetting simulation");
+    this->_simulationTime = SimulationTime::zero();
+
+    for (const auto& datapackName: this->_dataPacksNames){
+        auto controller = dynamic_cast<StreamDataPackController *>(this->getDataPackController(datapackName));
+        if (controller){
+            controller->resetSinks();
+            NRPLogger::debug("The data-transfer streams of the DataPack '{}' were reset.", datapackName);
+        }
+        else {
+            NRPLogger::debug("Data-transfer DataPack '{}' doesn't have associated data streams to be reset.");
+        }
+    }
 }
 
 #ifdef MQTT_ON

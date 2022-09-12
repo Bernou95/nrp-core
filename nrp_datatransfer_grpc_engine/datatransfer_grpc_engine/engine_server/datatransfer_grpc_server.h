@@ -37,7 +37,7 @@ class DataTransferGrpcServer
     : public EngineGrpcServer
 {
     public:
-        DataTransferGrpcServer(const std::string &serverAddress, const std::string &engineName, const std::string &registrationAddress);
+        DataTransferGrpcServer(const std::string &serverAddress, const std::string &engineName);
         ~DataTransferGrpcServer() = default;
 
         /*!
@@ -118,6 +118,11 @@ class DataTransferGrpcServer
          * \brief Name of the engine
          */
         std::string _engineName;
+
+        /*!
+         * \brief The list of the names of the associated DataPacks
+         */
+        std::vector< std::string > _dataPacksNames;
 
 #ifdef MQTT_ON
         /*!

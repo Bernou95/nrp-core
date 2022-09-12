@@ -40,7 +40,10 @@ sudo apt install python3-restrictedpython uwsgi-core uwsgi-plugin-python3
 pip install flask_cors mpi4py docopt
 
 # required by nrp-server, which uses gRPC python bindings
-pip install grpcio-tools pytest psutil
+pip install grpcio-tools pytest psutil docker
+
+# Required for using docker with ssh
+pip install paramiko
    
 # ROS
 
@@ -82,6 +85,7 @@ git clone https://bitbucket.org/hbpneurorobotics/nrp-core.git
 cd nrp-core
 mkdir build
 cd build
+# See the section "Common NRP-core CMake options" in the documentation for the additional ways to configure the project with CMake
 cmake .. -DCMAKE_INSTALL_PREFIX="${NRP_INSTALL_DIR}" -DNRP_DEP_CMAKE_INSTALL_PREFIX="${NRP_DEPS_INSTALL_DIR}"
 mkdir -p "${NRP_INSTALL_DIR}"
 # the installation process might take some time, as it downloads and compiles Nest as well.

@@ -32,10 +32,10 @@ set(LIB_SRC_FILES
     nrp_general_library/process_launchers/process_launcher_basic.cpp
     nrp_general_library/process_launchers/process_launcher_manager.cpp
     nrp_general_library/transceiver_function/from_engine_datapack.cpp
+    nrp_general_library/transceiver_function/status_function.cpp
     nrp_general_library/transceiver_function/transceiver_function.cpp
     nrp_general_library/transceiver_function/transceiver_datapack_interface.cpp
-    nrp_general_library/transceiver_function/transceiver_function_interpreter.cpp
-    nrp_general_library/transceiver_function/transceiver_function_manager.cpp
+    nrp_general_library/transceiver_function/function_manager.cpp
     nrp_general_library/transceiver_function/transceiver_function_sorted_results.cpp
     nrp_general_library/utils/file_finder.cpp
     nrp_general_library/utils/fixed_string.cpp
@@ -51,7 +51,6 @@ set(LIB_SRC_FILES
     nrp_general_library/utils/wchar_t_converter.cpp
     nrp_general_library/utils/zip_container.cpp
     nrp_general_library/utils/pipe_communication.cpp
-
     nrp_general_library/process_launchers/launch_commands/docker_launcher.cpp
 )
 
@@ -71,7 +70,7 @@ set(TEST_SRC_FILES
     tests/engine_launcher_manager.cpp
     tests/plugin_manager.cpp
     tests/test_process_launcher_basic.cpp
-    tests/transceiver_function_interpreter.cpp
+    tests/test_function_manager.cpp
 )
 
 ##########################################
@@ -171,6 +170,8 @@ configure_file("cmake/set_env_exec.sh.in" "${CMAKE_CURRENT_BINARY_DIR}/set_env_e
 # add to nrp env vars
 list(APPEND NRP_ENV_VARS "PATH=${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}:\${PATH}")
 list(APPEND NRP_ENV_VARS "LD_LIBRARY_PATH=${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}:\${LD_LIBRARY_PATH}")
+list(APPEND NRP_ENV_VARS "PATH=${NRP_DEP_CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}:\${PATH}")
+list(APPEND NRP_ENV_VARS "LD_LIBRARY_PATH=${NRP_DEP_CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}:\${LD_LIBRARY_PATH}")
 set(NRP_ENV_VARS ${NRP_ENV_VARS} PARENT_SCOPE)
 
 
@@ -282,7 +283,7 @@ if(${ENABLE_TESTING} AND NOT "${TEST_SRC_FILES}" STREQUAL "")
     # Python Module for testing
     set(TEST_PYTHON_MODULE_NAME "NRPGeneralPythonTestModule")
 
-    add_library(${TEST_PYTHON_MODULE_NAME} SHARED "tests/python_module.cpp" "tests/test_transceiver_function_interpreter.cpp")
+    add_library(${TEST_PYTHON_MODULE_NAME} SHARED "tests/python_module.cpp" "tests/test_transceiver_function_manager.cpp")
     set_target_properties(${TEST_PYTHON_MODULE_NAME} PROPERTIES PREFIX "")
     target_link_libraries(${TEST_PYTHON_MODULE_NAME} ${NAMESPACE_NAME}::${LIBRARY_NAME})
 
@@ -378,7 +379,7 @@ if(TARGET ${PYTHON_MODULE_NAME})
     install(FILES "${CMAKE_CURRENT_BINARY_DIR}/src/__init__.py"
         DESTINATION "${PYTHON_INSTALL_DIR_REL}/${PYTHON_MODULE_NAME}")
 endif()
-install(FILES "${HEADER_DIRECTORY}/python/docker_init.py"
+install(FILES "${HEADER_DIRECTORY}/python/docker_handle.py"
     DESTINATION "${PYTHON_INSTALL_DIR_REL}/${PYTHON_MODULE_NAME}")
 # Install executable files
 if(TARGET ${EXECUTABLE_NAME})
