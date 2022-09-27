@@ -4,7 +4,7 @@ from contextlib import redirect_stdout
 from threading import Thread
 import json
 
-from nrp_server_pb2 import EmptyMessage, RunLoopMessage, InitializeMessage, ResetMessage
+from nrp_server_pb2 import EmptyMessage, RunLoopMessage, InitializeMessage, ResetMessage, ShutdownMessage
 from nrp_server_pb2_grpc import NrpCoreStub
 
 from nrp_core.nrp_server_launchers import *
@@ -211,11 +211,13 @@ class NrpCore:
         message.json = json.dumps(client_data)
         return self._call_rpc(self._stub.reset, message)
 
-    def shutdown(self):
+    def shutdown(self, client_data=None):
         """Calls the shutdown() RPC of the NRP Core Server"""
         with redirect_stdout(self._devnull):
             if self._stub:
-                self._call_rpc(self._stub.shutdown, EmptyMessage())
+                message = ShutdownMessage()
+                message.json = json.dumps(client_data)
+                self._call_rpc(self._stub.shutdown, message)
 
         if self._launcher:
             self._launcher.kill_nrp_process()

@@ -157,7 +157,7 @@ private:
     /*!
      * \brief Callback for the shutdown request coming from the client
      */
-    grpc::Status shutdown(grpc::ServerContext * , const NrpCore::EmptyMessage * , NrpCore::Response * returnMessage) override;
+    grpc::Status shutdown(grpc::ServerContext * , const NrpCore::ShutdownMessage * , NrpCore::Response * returnMessage) override;
 
     //// Synchronization members
 

@@ -195,7 +195,7 @@ grpc::Status NrpCoreServer::runUntilTimeout(grpc::ServerContext * , const NrpCor
     return requestHelper(lock, RequestType::RunUntilTimeout, returnMessage);
 }
 
-grpc::Status NrpCoreServer::shutdown(grpc::ServerContext * , const NrpCore::EmptyMessage * , NrpCore::Response * returnMessage)
+grpc::Status NrpCoreServer::shutdown(grpc::ServerContext * , const NrpCore::ShutdownMessage * , NrpCore::Response * returnMessage)
 {
     std::unique_lock<std::mutex> lock(this->_mutex);
     return requestHelper(lock, RequestType::Shutdown, returnMessage);
