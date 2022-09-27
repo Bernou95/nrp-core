@@ -88,7 +88,7 @@ TEST(FTILoopTest, RunLoop)
 
     FTILoop simLoop(config, {brain, physics});
 
-    ASSERT_NO_THROW(simLoop.initLoop());
+    ASSERT_NO_THROW(simLoop.initLoop(nlohmann::json()));
 
     ASSERT_EQ(simLoop.getSimTime(), SimulationTime::zero());
     ASSERT_NO_THROW(simLoop.runLoop(timestep));

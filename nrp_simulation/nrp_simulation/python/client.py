@@ -4,7 +4,7 @@ from contextlib import redirect_stdout
 from threading import Thread
 import json
 
-from nrp_server_pb2 import EmptyMessage, RunLoopMessage
+from nrp_server_pb2 import EmptyMessage, RunLoopMessage, InitializeMessage, ResetMessage
 from nrp_server_pb2_grpc import NrpCoreStub
 
 from nrp_core.nrp_server_launchers import *
@@ -178,9 +178,11 @@ class NrpCore:
     def current_state(self):
         return self._sim_state
 
-    def initialize(self):
+    def initialize(self, client_data=None):
         """Calls the initialize() RPC of the NRP Core Server"""
-        return self._call_rpc(self._stub.initialize, EmptyMessage())
+        message = InitializeMessage()
+        message.json = json.dumps(client_data)
+        return self._call_rpc(self._stub.initialize, message)
 
     def run_loop(self, num_iterations, run_async=False):
         """Calls the runLoop() RPC of the NRP Core Server"""
@@ -203,9 +205,11 @@ class NrpCore:
         """Calls the stopLoop() RPC of the NRP Core Server"""
         return self._call_rpc(self._stub.stopLoop, EmptyMessage())
 
-    def reset(self):
+    def reset(self, client_data=None):
         """Calls the reset() RPC of the NRP Core Server"""
-        return self._call_rpc(self._stub.reset, EmptyMessage())
+        message = ResetMessage()
+        message.json = json.dumps(client_data)
+        return self._call_rpc(self._stub.reset, message)
 
     def shutdown(self):
         """Calls the shutdown() RPC of the NRP Core Server"""

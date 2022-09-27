@@ -47,7 +47,7 @@ void NrpCoreServer::runServerLoop()
             switch(this->getRequestType())
             {
                 case NrpCoreServer::RequestType::Initialize:
-                    result = _manager->initializeSimulation();
+                    result = _manager->initializeSimulation(this->clientData);
                     break;
                 case NrpCoreServer::RequestType::RunLoop:
                     result = _manager->runSimulation(this->getRequestNumIterations());
@@ -60,7 +60,7 @@ void NrpCoreServer::runServerLoop()
                     result = _manager->stopSimulation();
                     break;
                 case NrpCoreServer::RequestType::Reset:
-                    result = _manager->resetSimulation();
+                    result = _manager->resetSimulation(this->clientData);
                     break;
                 case NrpCoreServer::RequestType::Shutdown:
                     try {
@@ -174,9 +174,10 @@ void NrpCoreServer::setReturnMessageContent(const SimulationManager::RequestResu
     returnMessage->set_errormsg(res.errorMessage);
 }
 
-grpc::Status NrpCoreServer::initialize(grpc::ServerContext * , const NrpCore::EmptyMessage * , NrpCore::Response * returnMessage)
+grpc::Status NrpCoreServer::initialize(grpc::ServerContext * , const NrpCore::InitializeMessage * message, NrpCore::Response * returnMessage)
 {
     std::unique_lock<std::mutex> lock(this->_mutex);
+    this->clientData = nlohmann::json::parse(message->json());
     return requestHelper(lock, RequestType::Initialize, returnMessage);
 }
 
@@ -200,9 +201,10 @@ grpc::Status NrpCoreServer::shutdown(grpc::ServerContext * , const NrpCore::Empt
     return requestHelper(lock, RequestType::Shutdown, returnMessage);
 }
 
-grpc::Status NrpCoreServer::reset(grpc::ServerContext * , const NrpCore::EmptyMessage * , NrpCore::Response * returnMessage)
+grpc::Status NrpCoreServer::reset(grpc::ServerContext * , const NrpCore::ResetMessage * message, NrpCore::Response * returnMessage)
 {
     std::unique_lock<std::mutex> lock(this->_mutex);
+    this->clientData = nlohmann::json::parse(message->json());
     return requestHelper(lock, RequestType::Reset, returnMessage);
 }
 

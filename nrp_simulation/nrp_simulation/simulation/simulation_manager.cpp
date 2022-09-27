@@ -43,11 +43,11 @@ SimulationManager::SimulationManager(const jsonSharedPtr &simulationConfig)
     validateConfig(_simConfig);
 }
 
-SimulationManager::RequestResult SimulationManager::initializeSimulation()
+SimulationManager::RequestResult SimulationManager::initializeSimulation(const nlohmann::json & clientData)
 {
     NRP_LOGGER_TRACE("{} called", __FUNCTION__);
     return processRequest([&]() {
-                              this->initializeCB();
+                              this->initializeCB(clientData);
                               changeState(SimState::Initialized);
                           },
                           {SimState::Created},
@@ -83,11 +83,11 @@ SimulationManager::RequestResult SimulationManager::runSimulationUntilTimeout()
                           "run");
 }
 
-SimulationManager::RequestResult SimulationManager::resetSimulation()
+SimulationManager::RequestResult SimulationManager::resetSimulation(const nlohmann::json & clientData)
 {
     NRP_LOGGER_TRACE("{} called", __FUNCTION__);
     return processRequest([&]() {
-                              if(this->resetCB())
+                              if(this->resetCB(clientData))
                                   changeState(SimState::Initialized);
                           },
                           {SimState::Initialized, SimState::Stopped},

@@ -71,7 +71,7 @@ def initialize(request_json: dict) -> dict:
     script = script_module.Script()
     script._name = request_json["EngineName"]
     script._config = request_json
-    script.initialize()
+    script.initialize(request_json["ClientData"])
     _flush_std()
 
 
@@ -145,7 +145,7 @@ def reset(request_json: dict) -> dict:
     """Calls the reset() method of the Script object"""
     global script
 
-    script.reset()
+    script.reset(request_json)
     _flush_std()
     script._time_ns = 0
 

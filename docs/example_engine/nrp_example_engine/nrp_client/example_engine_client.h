@@ -31,9 +31,9 @@ class ExampleEngineClient
          * execute RPC / REST calls that will prepare the engine server and simulator
          * to run the simulation.
          */
-        void initialize() override;
+        void initialize(const nlohmann::json &) override;
 
-        void reset() override;
+        void reset(const nlohmann::json &) override;
 
         /*!
          * \brief Shutdowns the engine

@@ -42,7 +42,7 @@ class UnityEngineGrpcClient
          * execute RPC / REST calls that will prepare the engine server and simulator
          * to run the simulation.
          */
-        void initialize() override;
+        void initialize(const nlohmann::json &) override;
 
         /*!
          * \brief Shutdowns the engine
@@ -59,7 +59,7 @@ class UnityEngineGrpcClient
          * The function should execute RPC / REST calls that will reset the simulation
          * to its initial state.
          */
-        void reset() override;
+        void reset(const nlohmann::json &) override;
 };
 
 using UnityEngineGrpcLauncher = UnityEngineGrpcClient::EngineLauncher<UnityGrpcConfigConst::EngineType>;

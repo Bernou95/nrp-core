@@ -79,13 +79,13 @@ public:
      * \brief Initialize the simulation
      * \return Simulation state after processing the request
      */
-    RequestResult initializeSimulation();
+    RequestResult initializeSimulation(const nlohmann::json & clientData);
 
     /*!
      * \brief Reset the currently running simulation
      * \return Simulation state after processing the request
      */
-    RequestResult resetSimulation();
+    RequestResult resetSimulation(const nlohmann::json & clientData);
 
     /*!
      * \brief Request to stop the simulation if it was running, if it wasn't the call has no effect.
@@ -132,9 +132,9 @@ protected:
 
     // Callback functions for the different simulation control requests.
     /*! \brief Initialize the simulation */
-    virtual void initializeCB() = 0;
+    virtual void initializeCB(const nlohmann::json & clientData) = 0;
     /*! \brief Resets the simulation, returns true if the simulation was reset false otherwise */
-    virtual bool resetCB() = 0;
+    virtual bool resetCB(const nlohmann::json & clientData) = 0;
     /*! \brief Forward request to stop the simulation. */
     virtual void stopCB() = 0;
     /*! \brief Run the simulation. */

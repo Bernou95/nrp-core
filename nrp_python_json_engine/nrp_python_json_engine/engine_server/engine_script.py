@@ -56,7 +56,7 @@ class EngineScript:
 
         self._datapacks[datapack_name] = data
 
-    def initialize(self) -> None:
+    def initialize(self, client_data: dict) -> None:
         """
         Initializes the simulation.
 
@@ -84,7 +84,7 @@ class EngineScript:
         """
         pass
 
-    def reset(self) -> None:
+    def reset(self, client_data: dict) -> None:
         """
         Resets the simulation.
 

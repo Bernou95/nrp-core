@@ -53,21 +53,21 @@ FTILoopSimManager::~FTILoopSimManager()
     }
 }
 
-void FTILoopSimManager::initializeCB()
+void FTILoopSimManager::initializeCB(const nlohmann::json & clientData)
 {
     if(this->_loop == nullptr)
         this->_loop.reset(new FTILoop(this->createSimLoop()));
     else
         throw NRPException::logCreate("FTILoop already initialized");
 
-    this->_loop->initLoop();
+    this->_loop->initLoop(clientData);
 }
 
-bool FTILoopSimManager::resetCB()
+bool FTILoopSimManager::resetCB(const nlohmann::json & clientData)
 {
     try{
         if(this->_loop != nullptr)
-            this->_loop->resetLoop();
+            this->_loop->resetLoop(clientData);
         else
             throw NRPException::logCreate("Cannot reset simulation, FTI loop has not been created");
     }

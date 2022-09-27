@@ -41,9 +41,9 @@ class GazeboEngineJSONNRPClient
         GazeboEngineJSONNRPClient(nlohmann::json &config, ProcessLauncherInterface::unique_ptr &&launcher);
         virtual ~GazeboEngineJSONNRPClient() override = default;
 
-        virtual void initialize() override;
+        virtual void initialize(const nlohmann::json & clientData = nlohmann::json()) override;
 
-        virtual void reset() override;
+        virtual void reset(const nlohmann::json & clientData = nlohmann::json()) override;
 
         virtual void shutdown() override;
 

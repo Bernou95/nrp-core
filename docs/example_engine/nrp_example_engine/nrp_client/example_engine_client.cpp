@@ -6,12 +6,12 @@ ExampleEngineClient::ExampleEngineClient(nlohmann::json &config, ProcessLauncher
 
 }
 
-void ExampleEngineClient::initialize()
+void ExampleEngineClient::initialize(const nlohmann::json &)
 {
 
 }
 
-void ExampleEngineClient::reset()
+void ExampleEngineClient::reset(const nlohmann::json &)
 {
 
 }

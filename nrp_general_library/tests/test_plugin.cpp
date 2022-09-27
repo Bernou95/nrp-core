@@ -30,6 +30,7 @@ struct TestEngineConfigConst
     static constexpr char EngineSchema[] = "https://neurorobotics.net/engines/engine_base.json#EngineBase";
 };
 
+// TODO This class is duplicated in test_plugin.cpp, move it to a common file
 class TestEngine
         : public EngineClient<TestEngine, TestEngineConfigConst::EngineSchema>
 {
@@ -38,10 +39,10 @@ class TestEngine
             : EngineClient(configHolder, std::move(launcher))
         {}
 
-        virtual void initialize() override
+        virtual void initialize(const nlohmann::json &) override
         {}
 
-        virtual void reset() override
+        virtual void reset(const nlohmann::json &) override
         {}
 
         virtual void shutdown() override

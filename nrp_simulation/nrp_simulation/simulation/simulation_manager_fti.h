@@ -54,8 +54,8 @@ class FTILoopSimManager
     private:
 
         // Callback functions for the different simulation control requests.
-        void initializeCB() override;
-        bool resetCB() override;
+        void initializeCB(const nlohmann::json & clientData) override;
+        bool resetCB(const nlohmann::json & clientData) override;
         void stopCB() override;
         bool runUntilTimeOutCB() override;
         bool runCB(unsigned numIterations) override;

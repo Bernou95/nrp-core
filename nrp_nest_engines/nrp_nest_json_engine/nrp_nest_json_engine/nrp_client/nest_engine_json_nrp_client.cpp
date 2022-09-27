@@ -41,7 +41,7 @@ NestEngineJSONNRPClient::NestEngineJSONNRPClient(nlohmann::json &config, Process
 NestEngineJSONNRPClient::~NestEngineJSONNRPClient()
 {}
 
-void NestEngineJSONNRPClient::initialize()
+void NestEngineJSONNRPClient::initialize(const nlohmann::json &)
 {
     NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
@@ -58,7 +58,7 @@ void NestEngineJSONNRPClient::initialize()
     NRPLogger::debug("NestEngineJSONNRPClient::initialize(...) completed with no errors.");
 }
 
-void NestEngineJSONNRPClient::reset()
+void NestEngineJSONNRPClient::reset(const nlohmann::json &)
 {
     NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 

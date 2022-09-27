@@ -63,7 +63,7 @@ class PythonEngineJSONNRPClientBase
             NRP_LOGGER_TRACE("{} called", __FUNCTION__);
         }
 
-        virtual void initialize() override
+        virtual void initialize(const nlohmann::json & clientData) override
         {
             NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
@@ -72,6 +72,7 @@ class PythonEngineJSONNRPClientBase
 
             nlohmann::json config = this->engineConfig();
             config[PythonConfigConst::SimulationTimeRatio.data()] = { SimulationTime::period::num, SimulationTime::period::den };
+            config["ClientData"] = clientData;
 
             try
             {
@@ -90,13 +91,13 @@ class PythonEngineJSONNRPClientBase
             NRPLogger::debug("PythonEngineJSONNRPClientBase::initialize(...) completed with no errors.");
         }
 
-        virtual void reset() override
+        virtual void reset(const nlohmann::json & clientData) override
         {
             NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
             try
             {
-                nlohmann::json resp = this->sendResetCommand(nlohmann::json("reset"));
+                nlohmann::json resp = this->sendResetCommand(clientData);
                 NRPLogger::debug("NestEngineJSONNRPClient:reset()::resp [ {} ]", resp.dump());
             }
             catch(std::exception &e)

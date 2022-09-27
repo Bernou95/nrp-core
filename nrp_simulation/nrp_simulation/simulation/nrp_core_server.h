@@ -132,7 +132,7 @@ private:
     /*!
      * \brief Callback for the initialization request coming from the client
      */
-    grpc::Status initialize(grpc::ServerContext * , const NrpCore::EmptyMessage * , NrpCore::Response * returnMessage) override;
+    grpc::Status initialize(grpc::ServerContext * , const NrpCore::InitializeMessage * message, NrpCore::Response * returnMessage) override;
 
     /*!
      * \brief Callback for the run loop request coming from the client
@@ -152,7 +152,7 @@ private:
     /*!
      * \brief Callback for the reset request coming from the client
      */
-    grpc::Status reset(grpc::ServerContext * , const NrpCore::EmptyMessage * , NrpCore::Response * returnMessage) override;
+    grpc::Status reset(grpc::ServerContext * , const NrpCore::ResetMessage * message, NrpCore::Response * returnMessage) override;
 
     /*!
      * \brief Callback for the shutdown request coming from the client
@@ -164,10 +164,10 @@ private:
     /*! \brief Mutex used for synchronization of consumer and producer threads with conditional variables */
     std::mutex _mutex;
 
-    /*! \brief Conditional variable used to deliver requests to the consumer  */
+    /*! \brief Conditional variable used to deliver requests to the consumer (the main thread)*/
     std::condition_variable _consumerConditionalVar;
 
-    /*!  \brief Conditional variable used to pass responses back to the producer */
+    /*!  \brief Conditional variable used to pass responses back to the producer (the server)*/
     std::condition_variable _producerConditionalVar;
 
     /*! \brief Lock used by the functions called from the consumer threads */
@@ -191,6 +191,7 @@ private:
     /*! \brief SimulationManager which actually perform actions from requests */
     std::shared_ptr<SimulationManager> _manager;
 
+    nlohmann::json clientData;
 };
 
 #endif // NRP_CORE_SERVER_H

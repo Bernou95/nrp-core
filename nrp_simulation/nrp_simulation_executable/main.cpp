@@ -325,7 +325,7 @@ int main(int argc, char *argv[])
     }
     else if(mode == "standalone")
     {
-        auto res = manager->initializeSimulation();
+        auto res = manager->initializeSimulation(nlohmann::json());
         if(res.currentState != SimulationManager::SimState::Failed)
             manager->runSimulationUntilTimeout();
 

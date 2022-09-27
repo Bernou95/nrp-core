@@ -42,12 +42,12 @@ class FTILoop
         /*!
          * \brief Initialize engines before running loop
          */
-        void initLoop();
+        void initLoop(const nlohmann::json & clientData);
 
         /*!
          * \brief Reset engines of the loop
          */
-        void resetLoop();
+        void resetLoop(const nlohmann::json & clientData);
 
         /*!
          * \brief Shutdown engines

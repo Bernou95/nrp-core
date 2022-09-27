@@ -97,14 +97,14 @@ class TestEngineJSONNRPClient
 
     virtual ~TestEngineJSONNRPClient() override = default;
 
-    void initialize() override
+    void initialize(const nlohmann::json &) override
     {
         auto retVal = this->sendInitCommand("initCommand");
         if(retVal["status"].get<std::string>().compare("initCommand") != 0)
             throw NRPExceptionNonRecoverable("Test init failed");
     }
 
-    void reset() override
+    void reset(const nlohmann::json &) override
     {
         auto retVal = this->sendResetCommand("resetCommand");
         if (retVal["original"].get<std::string>().compare("success") != 0)
@@ -214,12 +214,12 @@ TEST(EngineJSONNRPClientTest, DISABLED_ServerCalls)
 
     // Check timeout if no server is running
     TestEngineJSONNRPClient fakeClient("localhost:" + std::to_string(server.serverPort()), config, ProcessLauncherInterface::unique_ptr(new ProcessLauncherBasic()));
-    ASSERT_THROW(fakeClient.initialize(), NRPExceptionNonRecoverable);
+    ASSERT_THROW(fakeClient.initialize(nlohmann::json()), NRPExceptionNonRecoverable);
 
     // Start server, test init
     server.startServerAsync();
     TestEngineJSONNRPClient client("localhost:" + std::to_string(server.serverPort()), config, ProcessLauncherInterface::unique_ptr(new ProcessLauncherBasic()));
-    ASSERT_NO_THROW(client.initialize());
+    ASSERT_NO_THROW(client.initialize(nlohmann::json()));
 
     ASSERT_NO_THROW(client.runLoopStepAsync(toSimulationTimeFromSeconds(10)));
     ASSERT_NO_THROW(client.runLoopStepAsyncGet(toSimulationTimeFromSeconds(10)));
@@ -271,5 +271,5 @@ TEST(EngineJSONNRPClientTest, DISABLED_ServerCalls)
     ASSERT_EQ(inputDev1.data(), dev1Ctrl.data().data());
     ASSERT_EQ(inputDev2.data(), dev2Ctrl.data().data());*/
 
-    ASSERT_NO_THROW(client.reset());    
+    ASSERT_NO_THROW(client.reset(nlohmann::json()));
 }

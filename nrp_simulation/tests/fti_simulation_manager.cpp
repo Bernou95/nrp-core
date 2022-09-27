@@ -70,7 +70,7 @@ TEST(FTISimManagerTest, FTISimManagerInitialize)
     FTILoopSimManager manager(simConfig, engines, processManager);
 
     // Exception if required engine launchers is not added
-    manager.initializeSimulation();
+    manager.initializeSimulation(nlohmann::json());
     ASSERT_EQ(manager.currentState(), SimulationManager::SimState::Failed);
     manager.shutdownSimulation();
 
@@ -78,7 +78,7 @@ TEST(FTISimManagerTest, FTISimManagerInitialize)
     engines->registerLauncher(EngineLauncherInterfaceSharedPtr(new GazeboEngineGrpcLauncher()));
     engines->registerLauncher(EngineLauncherInterfaceSharedPtr(new NestEngineJSONLauncher()));
 
-    manager.initializeSimulation();
+    manager.initializeSimulation(nlohmann::json());
     ASSERT_EQ(manager.currentState(), SimulationManager::SimState::Initialized);
     ASSERT_NO_THROW(manager.runSimulation(1));
     ASSERT_EQ(manager.currentState(), SimulationManager::SimState::Stopped);
@@ -107,9 +107,9 @@ TEST(FTISimManagerTest, FTISimManagerLoopReset)
     MainProcessLauncherManagerSharedPtr processManager(new MainProcessLauncherManager());
     FTILoopSimManager manager(simConfig, engines, processManager);
 
-    manager.initializeSimulation();
+    manager.initializeSimulation(nlohmann::json());
 
     ASSERT_NO_THROW(manager.runSimulation(1));
-    ASSERT_EQ(manager.resetSimulation().currentState, SimulationManager::SimState::Initialized);
+    ASSERT_EQ(manager.resetSimulation(nlohmann::json()).currentState, SimulationManager::SimState::Initialized);
     ASSERT_NO_THROW(manager.runSimulation(1));
 }

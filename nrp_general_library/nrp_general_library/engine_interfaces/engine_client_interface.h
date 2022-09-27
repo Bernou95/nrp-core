@@ -97,14 +97,14 @@ class EngineClientInterface
          * \return Returns SUCCESS if no error was encountered
          * \throw Throws on error
          */
-        virtual void initialize() = 0;
+        virtual void initialize(const nlohmann::json & clientData) = 0;
 
         /*!
          * \brief Reset engine
          * \return Returns SUCCESS if no error was encountered
          * \throw Throws on error
          */
-        virtual void reset() = 0;
+        virtual void reset(const nlohmann::json & clientData) = 0;
 
         /*!
          * \brief Shutdown engine

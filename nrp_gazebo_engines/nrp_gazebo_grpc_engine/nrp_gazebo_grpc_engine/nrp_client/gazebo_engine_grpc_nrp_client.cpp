@@ -40,7 +40,7 @@ GazeboEngineGrpcNRPClient::GazeboEngineGrpcNRPClient(nlohmann::json &config, Pro
     setDefaultProperty<std::vector<std::string>>("GazeboPlugins", std::vector<std::string>());
 }
 
-void GazeboEngineGrpcNRPClient::initialize()
+void GazeboEngineGrpcNRPClient::initialize(const nlohmann::json &)
 {
     NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
@@ -57,7 +57,7 @@ void GazeboEngineGrpcNRPClient::initialize()
     NRPLogger::debug("GazeboEngineGrpcNRPClient::initialize(...) completed with no errors.");
 }
 
-void GazeboEngineGrpcNRPClient::reset()
+void GazeboEngineGrpcNRPClient::reset(const nlohmann::json &)
 {
     NRP_LOGGER_TRACE("{} called", __FUNCTION__);
     try

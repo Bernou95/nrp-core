@@ -44,8 +44,8 @@ class TestSimManager
             return this->_status;
         }
 
-    MOCK_METHOD(void, initializeCB, (), (override));
-    MOCK_METHOD(bool, resetCB, (), (override));
+    MOCK_METHOD(void, initializeCB, (const nlohmann::json & clientData), (override));
+    MOCK_METHOD(bool, resetCB, (const nlohmann::json & clientData), (override));
     MOCK_METHOD(void, stopCB, (), (override));
     MOCK_METHOD(bool, runUntilTimeOutCB, (), (override));
     MOCK_METHOD(bool, runCB, (unsigned numIterations), (override));

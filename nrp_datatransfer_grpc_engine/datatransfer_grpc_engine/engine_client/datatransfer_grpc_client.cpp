@@ -29,7 +29,7 @@ DataTransferEngineGrpcClient::DataTransferEngineGrpcClient(nlohmann::json &confi
     setDefaultProperty<std::string>("EngineProcCmd", DATATRANSFER_GRPC_ENGINE_EXECUTABLE_PATH);
 }
 
-void DataTransferEngineGrpcClient::initialize()
+void DataTransferEngineGrpcClient::initialize(const nlohmann::json &)
 {
     this->sendInitializeCommand(this->engineConfig());
 }
@@ -39,7 +39,7 @@ void DataTransferEngineGrpcClient::shutdown()
     this->sendShutdownCommand(nlohmann::json());
 }
 
-void DataTransferEngineGrpcClient::reset()
+void DataTransferEngineGrpcClient::reset(const nlohmann::json &)
 {
     this->sendResetCommand();
 }

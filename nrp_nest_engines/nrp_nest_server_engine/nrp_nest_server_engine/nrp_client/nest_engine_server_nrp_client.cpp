@@ -252,7 +252,7 @@ NestEngineServerNRPClient::NestEngineServerNRPClient(nlohmann::json &config, Pro
 NestEngineServerNRPClient::~NestEngineServerNRPClient()
 {}
 
-void NestEngineServerNRPClient::initialize()
+void NestEngineServerNRPClient::initialize(const nlohmann::json &)
 {
     NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
@@ -317,8 +317,8 @@ void NestEngineServerNRPClient::initialize()
     NRPLogger::debug("NestEngineServerNRPClient::initialize(...) completed with no errors.");
 }
 
-void NestEngineServerNRPClient::reset(){
-
+void NestEngineServerNRPClient::reset(const nlohmann::json & clientData)
+{
     try
     {
         nestResetKernel(this->serverAddress());
@@ -332,7 +332,7 @@ void NestEngineServerNRPClient::reset(){
 
     try
     {
-        this->initialize();
+        this->initialize(clientData);
     }
     catch (std::exception &e)
     {

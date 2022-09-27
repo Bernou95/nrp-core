@@ -41,7 +41,7 @@ class ${engine_name}EngineJSONClient
          * execute RPC / REST calls that will prepare the engine server and simulator
          * to run the simulation.
          */
-        void initialize() override;
+        void initialize(const nlohmann::json &) override;
 
         /*!
          * \brief Shutdowns the engine
@@ -58,7 +58,7 @@ class ${engine_name}EngineJSONClient
          * The function should execute RPC / REST calls that will reset the simulation
          * to its initial state.
          */
-        void reset() override;
+        void reset(const nlohmann::json &) override;
 };
 
 using ${engine_name}EngineJSONLauncher = ${engine_name}EngineJSONClient::EngineLauncher<${engine_name}JSONConfigConst::EngineType>;

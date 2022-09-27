@@ -41,7 +41,7 @@ EventLoopSimManager::EventLoopSimManager(const jsonSharedPtr &simulationConfig, 
                   _processLauncherManager(processLauncherManager)
 {}
 
-void EventLoopSimManager::initializeCB()
+void EventLoopSimManager::initializeCB(const nlohmann::json & clientData)
 {
     if(this->_loop == nullptr) {
         // Compute time step and timeout
@@ -68,14 +68,14 @@ void EventLoopSimManager::initializeCB()
         if(this->_simConfig->at("EngineConfigs").size() > 0) {
             _fTILoopSimManager.reset(new FTILoopSimManager(this->_simConfig, this->_engineLauncherManager,
                                                            this->_processLauncherManager));
-            _fTILoopSimManager->initializeSimulation();
+            _fTILoopSimManager->initializeSimulation(clientData);
         }
     }
     else
         throw NRPException::logCreate("EventLoop already initialized");
 }
 
-bool EventLoopSimManager::resetCB()
+bool EventLoopSimManager::resetCB(const nlohmann::json &)
 {
     throw NRPException::logCreate("Reset is not implemented in the EventLoop");
 }

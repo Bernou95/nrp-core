@@ -92,12 +92,12 @@ class TestEngineGrpcClient
             : EngineGrpcClient(config, std::move(launcher))
         {}
 
-        void initialize() override
+        void initialize(const nlohmann::json &) override
         {
             this->sendInitializeCommand("test");
         }
 
-        void reset() override
+        void reset(const nlohmann::json &) override
         {
             this->sendResetCommand();
         }

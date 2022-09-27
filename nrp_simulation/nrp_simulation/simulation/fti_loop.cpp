@@ -71,7 +71,7 @@ FTILoop::FTILoop(jsonSharedPtr config, DataPackProcessor::engine_interfaces_t en
     NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 }
 
-void FTILoop::initLoop()
+void FTILoop::initLoop(const nlohmann::json & clientData)
 {
     NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
@@ -84,7 +84,7 @@ void FTILoop::initLoop()
         try
         {
             this->_engineQueue.emplace(0, engine);
-            engine->initialize();
+            engine->initialize(clientData);
         }
         catch(std::exception &e)
         {
@@ -93,7 +93,7 @@ void FTILoop::initLoop()
     }
 }
 
-void FTILoop::resetLoop()
+void FTILoop::resetLoop(const nlohmann::json & clientData)
 {
     NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
@@ -123,7 +123,7 @@ void FTILoop::resetLoop()
     {
         try
         {
-            engine->reset();
+            engine->reset(clientData);
         }
         catch(std::exception &e)
         {

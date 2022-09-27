@@ -29,7 +29,7 @@ ${engine_name}EngineJSONClient::${engine_name}EngineJSONClient(nlohmann::json &c
     setDefaultProperty<std::string>("EngineProcCmd", ${engine_name_uppercase}_JSON_ENGINE_EXECUTABLE_PATH);
 }
 
-void ${engine_name}EngineJSONClient::initialize()
+void ${engine_name}EngineJSONClient::initialize(const nlohmann::json &)
 {
     nlohmann::json resp = this->sendInitCommand(this->engineConfig());
 }
@@ -39,7 +39,7 @@ void ${engine_name}EngineJSONClient::shutdown()
     nlohmann::json resp = this->sendShutdownCommand(nlohmann::json());
 }
 
-void ${engine_name}EngineJSONClient::reset()
+void ${engine_name}EngineJSONClient::reset(const nlohmann::json &)
 {
     nlohmann::json resp = sendResetCommand(nlohmann::json());
 }
