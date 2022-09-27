@@ -125,6 +125,30 @@ private:
     grpc::Status requestHelper(std::unique_lock<std::mutex> & lock, RequestType requestType, NrpCore::Response * returnMessage);
 
     /*!
+     * \brief Sets client data that can be used by the consumer
+     * \param clientData Extra data coming from the client in JSON format
+     *
+     * This function should be called by all callbacks that allow to pass extra data from the client.
+     */
+    void setClientData(const std::string & clientData);
+
+    /*!
+     * \brief Clears the client data available to the consumer
+     *
+     * This function should be called by all callbacks that don't allow to pass extra data from the client.
+     */
+    void resetClientData();
+
+    /*!
+     * \brief Returns client data set by the producer
+     * \throw If the data has never been set
+     *
+     * This function should be called by the consumer (the main thread) in order to
+     * fetch any extra data coming from the client.
+     */
+    const nlohmann::json & getClientData();
+
+    /*!
      * \brief Set content in rpc return message from SimulationManager RequestResult
      */
     void setReturnMessageContent(const SimulationManager::RequestResult& res, NrpCore::SimStateMessage * returnMessage);
@@ -157,7 +181,7 @@ private:
     /*!
      * \brief Callback for the shutdown request coming from the client
      */
-    grpc::Status shutdown(grpc::ServerContext * , const NrpCore::ShutdownMessage * , NrpCore::Response * returnMessage) override;
+    grpc::Status shutdown(grpc::ServerContext * , const NrpCore::ShutdownMessage * message, NrpCore::Response * returnMessage) override;
 
     //// Synchronization members
 
@@ -191,7 +215,8 @@ private:
     /*! \brief SimulationManager which actually perform actions from requests */
     std::shared_ptr<SimulationManager> _manager;
 
-    nlohmann::json clientData;
+    nlohmann::json _clientData;
+    bool _isClientDataSet = false;
 };
 
 #endif // NRP_CORE_SERVER_H

@@ -47,7 +47,7 @@ void NrpCoreServer::runServerLoop()
             switch(this->getRequestType())
             {
                 case NrpCoreServer::RequestType::Initialize:
-                    result = _manager->initializeSimulation(this->clientData);
+                    result = _manager->initializeSimulation(getClientData());
                     break;
                 case NrpCoreServer::RequestType::RunLoop:
                     result = _manager->runSimulation(this->getRequestNumIterations());
@@ -60,7 +60,7 @@ void NrpCoreServer::runServerLoop()
                     result = _manager->stopSimulation();
                     break;
                 case NrpCoreServer::RequestType::Reset:
-                    result = _manager->resetSimulation(this->clientData);
+                    result = _manager->resetSimulation(getClientData());
                     break;
                 case NrpCoreServer::RequestType::Shutdown:
                     try {
@@ -168,6 +168,28 @@ grpc::Status NrpCoreServer::requestHelper(std::unique_lock<std::mutex> & lock, R
     }
 }
 
+void NrpCoreServer::setClientData(const std::string & clientData)
+{
+    this->_clientData = nlohmann::json::parse(clientData);
+    this->_isClientDataSet = true;
+}
+
+void NrpCoreServer::resetClientData()
+{
+    this->_clientData.clear();
+    this->_isClientDataSet = false;
+}
+
+const nlohmann::json & NrpCoreServer::getClientData()
+{
+    if(!this->_isClientDataSet)
+    {
+        throw NRPException::logCreate("The client data has never been set");
+    }
+
+    return this->_clientData;
+}
+
 void NrpCoreServer::setReturnMessageContent(const SimulationManager::RequestResult& res, NrpCore::SimStateMessage * returnMessage)
 {
     returnMessage->set_currentstate(_manager->printSimState(res.currentState));
@@ -177,7 +199,7 @@ void NrpCoreServer::setReturnMessageContent(const SimulationManager::RequestResu
 grpc::Status NrpCoreServer::initialize(grpc::ServerContext * , const NrpCore::InitializeMessage * message, NrpCore::Response * returnMessage)
 {
     std::unique_lock<std::mutex> lock(this->_mutex);
-    this->clientData = nlohmann::json::parse(message->json());
+    setClientData(message->json());
     return requestHelper(lock, RequestType::Initialize, returnMessage);
 }
 
@@ -186,25 +208,28 @@ grpc::Status NrpCoreServer::runLoop(grpc::ServerContext * , const NrpCore::RunLo
     std::unique_lock<std::mutex> lock(this->_mutex);
 
     this->_numIterations = message->numiterations();
+    resetClientData();
     return requestHelper(lock, RequestType::RunLoop, status);
 }
 
 grpc::Status NrpCoreServer::runUntilTimeout(grpc::ServerContext * , const NrpCore::EmptyMessage * , NrpCore::Response * returnMessage)
 {
     std::unique_lock<std::mutex> lock(this->_mutex);
+    resetClientData();
     return requestHelper(lock, RequestType::RunUntilTimeout, returnMessage);
 }
 
-grpc::Status NrpCoreServer::shutdown(grpc::ServerContext * , const NrpCore::ShutdownMessage * , NrpCore::Response * returnMessage)
+grpc::Status NrpCoreServer::shutdown(grpc::ServerContext * , const NrpCore::ShutdownMessage * message, NrpCore::Response * returnMessage)
 {
     std::unique_lock<std::mutex> lock(this->_mutex);
+    setClientData(message->json());
     return requestHelper(lock, RequestType::Shutdown, returnMessage);
 }
 
 grpc::Status NrpCoreServer::reset(grpc::ServerContext * , const NrpCore::ResetMessage * message, NrpCore::Response * returnMessage)
 {
     std::unique_lock<std::mutex> lock(this->_mutex);
-    this->clientData = nlohmann::json::parse(message->json());
+    setClientData(message->json());
     return requestHelper(lock, RequestType::Reset, returnMessage);
 }
 
