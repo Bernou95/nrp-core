@@ -1,8 +1,14 @@
 #!/bin/bash
 set -e
 
-GREEN='\033[0;32m'
-NC='\033[0m' # No Color
+#Colours
+RED="\033[01;31m"
+GREEN="\033[01;32m"
+PURPLE="\033[01;35m"
+BLUE="\033[01;34m"
+YELLOW="\033[01;33m"
+NC="\033[00m"
+
 
 
 export NRP_INSTALL_DIR="/home/${USER}/.local/nrp"
@@ -17,10 +23,10 @@ sudo sh -c 'echo "deb http://packages.osrfoundation.org/gazebo/ubuntu-stable `ls
 wget https://packages.osrfoundation.org/gazebo.key -O - | sudo apt-key add -
 
 sudo apt update
-sudo apt install git cmake libpistache-dev libboost-python-dev libboost-filesystem-dev libboost-numpy-dev libcurl4-openssl-dev nlohmann-json3-dev libzip-dev cython3 python3-numpy libgrpc++-dev protobuf-compiler-grpc libprotobuf-dev doxygen libgsl-dev libopencv-dev python3-opencv python3-pil python3-pip libgmock-dev
+sudo apt install -y git cmake libpistache-dev libboost-python-dev libboost-filesystem-dev libboost-numpy-dev libcurl4-openssl-dev nlohmann-json3-dev libzip-dev cython3 python3-numpy libgrpc++-dev protobuf-compiler-grpc libprotobuf-dev doxygen libgsl-dev libopencv-dev python3-opencv python3-pil python3-pip libgmock-dev
 
 # required by gazebo engine
-sudo apt install libgazebo11-dev gazebo11 gazebo11-plugin-base
+sudo apt install -y libgazebo11-dev gazebo11 gazebo11-plugin-base
 
 # Remove flask if it was installed to ensure it is installed from pip
 sudo apt remove python3-flask python3-flask-cors
@@ -32,7 +38,7 @@ sudo apt remove python3-flask python3-flask-cors
 pip install flask gunicorn
 
 # required by nest-server (which is built and installed along with nrp-core)
-sudo apt install python3-restrictedpython uwsgi-core uwsgi-plugin-python3
+sudo apt install -y python3-restrictedpython uwsgi-core uwsgi-plugin-python3
 pip install flask_cors mpi4py docopt
 
 # required by nrp-server, which uses gRPC python bindings
@@ -46,7 +52,7 @@ pip install paramiko
 sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
 curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add -
 sudo apt update
-sudo apt install ros-noetic-ros-base
+sudo apt install -y ros-noetic-ros-base
 
 
 #Tell nrp-core where your catkin workspace is located: export a variable CATKIN_WS pointing to an existing catkin workspace root folder. If the variable does not exist, a new catkin workspace will be created at `${HOME}/catkin_ws`.
@@ -86,10 +92,14 @@ mkdir build
 cd build
 # See the section "Common NRP-core CMake options" in the documentation for the additional ways to configure the project with CMake
 . /opt/ros/noetic/setup.bash
+
+echo -e "${BLUE}Running cmake ... ${NC}"
+
 cmake .. -DCMAKE_INSTALL_PREFIX="${NRP_INSTALL_DIR}" -DNRP_DEP_CMAKE_INSTALL_PREFIX="${NRP_DEPS_INSTALL_DIR}"
 mkdir -p "${NRP_INSTALL_DIR}"
 # the installation process might take some time, as it downloads and compiles Nest as well.
 # If you haven't installed MQTT libraries, add ENABLE_MQTT=OFF definition to cmake (-DENABLE_MQTT=OFF).
+echo -e "${BLUE}Running make ... ${NC}"
 make -j8
 make install
 # just in case of wanting to build the documentation. Documentation can then be found in a new doxygen folder
