@@ -28,46 +28,33 @@ class TestServer(unittest.TestCase):
 
     engine_name = "test_engine"
     time_step = 20000000
-    ratio = [1, 1000000000]
+
+    # Dictionary used for initialize() requests.
+    init_json = {"PythonFileName": None,
+                 "TimeRatio": None,
+                 "EngineName": engine_name,
+                 "ClientData": None}
+
+    # Paths with different EngineScript implementations:
+    # valid - contains a path to valid EngineScript class
+    # fake - the Script class doesn't inherit from EngineScript
+    # raise - Methods of the EngineScript class included in PythonFileName raise exceptions
+    # reset_raise - The reset() method of EngineScript class included in PythonFileName raises an exception
+    # srr - all methods except initialize() raise exceptions
+    filenames = {"valid": "test_files/test_script.py",
+                 "fake": "test_files/test_script_fake.py",
+                 "raise": "test_files/test_script_raise.py",
+                 "reset_raise": "test_files/test_script_reset_raise.py",
+                 "srr": "test_files/test_script_srr_raise.py"}
 
     # Dictionary used for run_loop() requests
     run_loop_json = {"time_step": time_step}
 
-    # Dictionary used for initialize() requests
-    # Contains a path to valid EngineScript class
-    init_json = {"PythonFileName": "test_files/test_script.py",
-                 "TimeRatio": ratio,
-                 "EngineName": engine_name}
+    # Dictionary used for reset() requests.
+    reset_json = {"ClientData": None}
 
-    # Dictionary used for initialize() requests
-    # Contains unsupported time ratio
-    init_json_unsupported_ratio = {"PythonFileName": "test_files/test_script.py",
-                                   "TimeRatio": [1, 1000000],
-                                   "EngineName": engine_name}
-
-    # Dictionary used for initialize() requests.
-    # Methods of the EngineScript class included in PythonFileName raise exceptions
-    init_json_raise = {"PythonFileName": "test_files/test_script_raise.py",
-                       "TimeRatio": ratio,
-                       "EngineName": engine_name}
-
-    # Dictionary used for initialize() requests.
-    # The reset() method of EngineScript class included in PythonFileName raises an exception
-    init_json_reset_raise = {"PythonFileName": "test_files/test_script_reset_raise.py",
-                             "TimeRatio": ratio,
-                             "EngineName": engine_name}
-
-    # Dictionary used for initialize() requests.
-    # The Script class doesn't inherit from EngineScript
-    init_json_fake = {"PythonFileName": "test_files/test_script_fake.py",
-                      "TimeRatio": ratio,
-                      "EngineName": engine_name}
-
-    # Dictionary used for initialize() requests.
-    # The initialize() method of EngineScript class included in PythonFileName is the only method that does not raises an exception
-    init_json_srr_raise = {"PythonFileName": "test_files/test_script_srr_raise.py",
-                      "TimeRatio": ratio,
-                      "EngineName": engine_name}
+    # Dictionary used for shutdown() requests.
+    shutdown_json = {"ClientData": None}
 
     # Dictionary used for set_datapack() requests
     set_datapack_json = {}
@@ -78,15 +65,28 @@ class TestServer(unittest.TestCase):
     # Dictrionary used for get_datapack() requests
     get_datapack_json = {"test_datapack": {"engine_name": engine_name, "type": JsonDataPack.getType()}}
 
+
+    def select_config(self, key, ratio=None):
+        """Helper function that prepares the config for the initialize() method"""
+        init_json = self.init_json.copy()
+        init_json["PythonFileName"] = self.filenames[key]
+
+        if ratio:
+            init_json["TimeRatio"] = ratio
+        else:
+            init_json["TimeRatio"] = [1, 1000000000]
+
+        return init_json
+
+
     def test_initialize(self):
         """
         Initialize the Script class using proper callback.
-        The initialize() method of EngineScript class should succeed
-        and the callback should return True.
+        The initialize() method of EngineScript class should succeed.
         """
-        server_callbacks.initialize(self.init_json)
+        server_callbacks.initialize(self.select_config("valid"))
         self.assertEqual(server_callbacks.script._name, self.init_json["EngineName"])
-        self.assertEqual(server_callbacks.script._config, self.init_json)
+        self.assertEqual(server_callbacks.script._config, self.select_config("valid"))
 
 
     def test_initialize_script_inheritance(self):
@@ -96,7 +96,7 @@ class TestServer(unittest.TestCase):
         and the callback should return False and an error message
         """
         with self.assertRaisesRegex(Exception, "Script class must inherit from EngineScript class"):
-            server_callbacks.initialize(self.init_json_fake)
+            server_callbacks.initialize(self.select_config("fake"))
 
 
     def test_initialize_failure(self):
@@ -106,7 +106,7 @@ class TestServer(unittest.TestCase):
         and the callback should return False and an error message.
         """
         with self.assertRaisesRegex(Exception, "Initialization failed"):
-            server_callbacks.initialize(self.init_json_raise)
+            server_callbacks.initialize(self.select_config("raise"))
 
 
     def test_initialize_unsupported_ratio(self):
@@ -116,7 +116,7 @@ class TestServer(unittest.TestCase):
         and return False and an error message.
         """
         with self.assertRaisesRegex(Exception, "PythonJSONEngine only support nanoseconds"):
-            server_callbacks.initialize(self.init_json_unsupported_ratio)
+            server_callbacks.initialize(self.select_config("valid", ratio=[1, 1000000]))
 
 
     def test_shutdown(self):
@@ -125,9 +125,9 @@ class TestServer(unittest.TestCase):
         The shutdown() method of EngineScript class should succeed
         and increment a counter.
         """
-        server_callbacks.initialize(self.init_json)
+        server_callbacks.initialize(self.select_config("valid"))
         self.assertEqual(server_callbacks.script.shutdown_num_execs, 0)
-        server_callbacks.shutdown({})
+        server_callbacks.shutdown(self.shutdown_json)
         self.assertEqual(server_callbacks.script.shutdown_num_execs, 1)
 
 
@@ -136,9 +136,9 @@ class TestServer(unittest.TestCase):
         Shutdown the Script class using proper callback.
         The shutdown() method of EngineScript class should raise an exception.
         """
-        server_callbacks.initialize(self.init_json_srr_raise)
+        server_callbacks.initialize(self.select_config("srr"))
         with self.assertRaisesRegex(Exception, "Shutdown failed"):
-            server_callbacks.shutdown({})
+            server_callbacks.shutdown(self.shutdown_json)
 
 
     def test_reset(self):
@@ -147,11 +147,11 @@ class TestServer(unittest.TestCase):
         The reset() method of EngineScript class should succeed,
         the time should be set to 0 and the callback should return True.
         """
-        server_callbacks.initialize(self.init_json)
+        server_callbacks.initialize(self.select_config("valid"))
         server_callbacks.run_loop(self.run_loop_json)
         self.assertEqual(server_callbacks.script._time_ns, self.time_step)
 
-        server_callbacks.reset({})
+        server_callbacks.reset(self.reset_json)
         self.assertEqual(server_callbacks.script._time_ns, 0)
 
 
@@ -162,12 +162,12 @@ class TestServer(unittest.TestCase):
         and the callback should return False and an error message.
         The simulation time should not be reset!
         """
-        server_callbacks.initialize(self.init_json_reset_raise)
+        server_callbacks.initialize(self.select_config("reset_raise"))
         server_callbacks.run_loop(self.run_loop_json)
         self.assertEqual(server_callbacks.script._time_ns, self.time_step)
 
         with self.assertRaisesRegex(Exception, "Reset failed"):
-            server_callbacks.reset({})
+            server_callbacks.reset(self.reset_json)
         self.assertEqual(server_callbacks.script._time_ns, self.time_step)
 
 
@@ -177,7 +177,7 @@ class TestServer(unittest.TestCase):
         The runLoop() method of EngineScript class should succeed and increment a counter,
         and the callback should return an integrated simulation time.
         """
-        server_callbacks.initialize(self.init_json)
+        server_callbacks.initialize(self.select_config("valid"))
 
         self.assertEqual(server_callbacks.script.run_loop_num_execs, 0)
         self.assertEqual(server_callbacks.script.timestep, 0)
@@ -199,7 +199,7 @@ class TestServer(unittest.TestCase):
         Run loop step of the Script class using proper callback.
         The runLoop() method of EngineScript class should raise an exception.
         """
-        server_callbacks.initialize(self.init_json_srr_raise)
+        server_callbacks.initialize(self.select_config("srr"))
         with self.assertRaisesRegex(Exception, "RunLoop failed"):
             server_callbacks.run_loop(self.run_loop_json)
 
@@ -210,7 +210,7 @@ class TestServer(unittest.TestCase):
         The data passed to set_datapack() and retrieved from get_datapack()
         callbacks should match.
         """
-        server_callbacks.initialize(self.init_json)
+        server_callbacks.initialize(self.select_config("valid"))
 
         # Test get_datapack with empty request
         self.assertEqual(server_callbacks.get_datapack({}), {})
@@ -239,7 +239,7 @@ class TestServer(unittest.TestCase):
         The _setDataPack method of EngineScript class should raise an exception
         because of unregistered datapack name.
         """
-        server_callbacks.initialize(self.init_json_srr_raise)
+        server_callbacks.initialize(self.select_config("srr"))
         with self.assertRaisesRegex(Exception, "Attempting to set data on an unregistered DataPack .*"):
             server_callbacks.set_datapack(self.set_datapack_json)
 
@@ -250,7 +250,7 @@ class TestServer(unittest.TestCase):
         The _setDataPack method of EngineScript class should raise an exception
         because of datapack type missing in the request.
         """
-        server_callbacks.initialize(self.init_json_srr_raise)
+        server_callbacks.initialize(self.select_config("srr"))
         request_json = {}
         request_json["test_datapack"] = {"engine_name": self.engine_name,
                                          "data": {"test_int": 1}}
@@ -265,7 +265,7 @@ class TestServer(unittest.TestCase):
         The _getDataPack method of EngineScript class should raise an exception
         because of unregistered datapack name.
         """
-        server_callbacks.initialize(self.init_json_srr_raise)
+        server_callbacks.initialize(self.select_config("srr"))
         with self.assertRaisesRegex(Exception, "Attempting to get data from an unregistered DataPack .*"):
             server_callbacks.get_datapack(self.get_datapack_json)
 
@@ -276,7 +276,7 @@ class TestServer(unittest.TestCase):
         The _getDataPack method of EngineScript class should raise an exception
         because of engine name in the request not matching the actual engine name.
         """
-        server_callbacks.initialize(self.init_json_srr_raise)
+        server_callbacks.initialize(self.select_config("srr"))
         request_json = {}
         request_json["test_datapack"] = {"engine_name": "other_engine_name",
                                          "type": JsonDataPack.getType()}
