@@ -16,7 +16,7 @@ export NRP_DEPS_INSTALL_DIR="/home/${USER}/.local/nrp_deps"
 
 # Start of dependencies installation
 # Pistache REST Server
-sudo add-apt-repository ppa:pistache+team/unstable
+sudo add-apt-repository -y ppa:pistache+team/unstable
 
 # Gazebo repository
 sudo sh -c 'echo "deb http://packages.osrfoundation.org/gazebo/ubuntu-stable `lsb_release -cs` main" > /etc/apt/sources.list.d/gazebo-stable.list'
