@@ -65,7 +65,7 @@ export CATKIN_WS=${HOME}/catkin_ws
 # MQTT Paho C library
 pushd ${HOME}
 
-git clone https://github.com/eclipse/paho.mqtt.c.git
+[ ! -d 'paho.mqtt.c' ] && git clone https://github.com/eclipse/paho.mqtt.c.git
 pushd paho.mqtt.c >/dev/null
 git checkout v1.3.8
 cmake -Bbuild -H. -DPAHO_ENABLE_TESTING=OFF -DPAHO_BUILD_STATIC=OFF -DPAHO_BUILD_SHARED=ON -DPAHO_WITH_SSL=ON -DPAHO_HIGH_PERFORMANCE=ON
@@ -75,7 +75,7 @@ popd >/dev/null
 
 
 # MQTT Paho CPP
-git clone https://github.com/eclipse/paho.mqtt.cpp
+[ ! -d 'paho.mqtt.cpp' ] && git clone https://github.com/eclipse/paho.mqtt.cpp
 pushd paho.mqtt.cpp >/dev/null
 git checkout v1.2.0
 cmake -Bbuild -H. -DPAHO_BUILD_STATIC=OFF -DPAHO_BUILD_SHARED=ON -DCMAKE_INSTALL_PREFIX="${NRP_DEPS_INSTALL_DIR}" -DCMAKE_PREFIX_PATH="${NRP_DEPS_INSTALL_DIR}"
