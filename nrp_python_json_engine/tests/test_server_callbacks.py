@@ -102,7 +102,7 @@ class TestServer(unittest.TestCase):
         """
         Initialize the Script class using proper callback.
         The Script class doesn't inherit from EngineScript
-        and the callback should return False and an error message
+        and the callback should raise an exception.
         """
         with self.assertRaisesRegex(Exception, "Script class must inherit from EngineScript class"):
             server_callbacks.initialize(self.select_config("fake"))
@@ -111,8 +111,7 @@ class TestServer(unittest.TestCase):
     def test_initialize_failure(self):
         """
         Initialize the Script class using proper callback.
-        The initialize() method of EngineScript class should raise an exception
-        and the callback should return False and an error message.
+        The initialize() method of EngineScript class should raise an exception.
         """
         with self.assertRaisesRegex(Exception, "Initialization failed"):
             server_callbacks.initialize(self.select_config("raise"))
@@ -121,8 +120,7 @@ class TestServer(unittest.TestCase):
     def test_initialize_unsupported_ratio(self):
         """
         Initialize the Script class using proper callback.
-        The initialize() callback should raise an exception (because of unsupported time units)
-        and return False and an error message.
+        The initialize() callback should raise an exception (because of unsupported time units).
         """
         with self.assertRaisesRegex(Exception, "PythonJSONEngine only support nanoseconds"):
             server_callbacks.initialize(self.select_config("valid", ratio=[1, 1000000]))
@@ -167,8 +165,7 @@ class TestServer(unittest.TestCase):
     def test_reset(self):
         """
         Reset the Script class using proper callback.
-        The reset() method of EngineScript class should succeed,
-        the time should be set to 0 and the callback should return True.
+        The reset() method of EngineScript class should succeed and the time should be set to 0.
         """
         server_callbacks.initialize(self.select_config("valid"))
         server_callbacks.run_loop(self.run_loop_json)
@@ -200,8 +197,7 @@ class TestServer(unittest.TestCase):
     def test_reset_failure(self):
         """
         Reset the Script class using proper callback.
-        The reset() method of EngineScript class should raise an exception
-        and the callback should return False and an error message.
+        The reset() method of EngineScript class should raise an exception.
         The simulation time should not be reset!
         """
         server_callbacks.initialize(self.select_config("reset_raise"))
