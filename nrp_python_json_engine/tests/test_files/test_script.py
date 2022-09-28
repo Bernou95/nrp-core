@@ -29,19 +29,22 @@ class Script(EngineScript):
         self.run_loop_num_execs = 0
         self.shutdown_num_execs = 0
         self.timestep = 0
+        self.client_data = None
 
     def initialize(self):
         self._registerDataPack("test_datapack")
+        self.client_data = self._client_data
         pass
 
     def shutdown(self):
         self.shutdown_num_execs = self.shutdown_num_execs + 1
+        self.client_data = self._client_data
 
     def runLoop(self, timestep):
         self.run_loop_num_execs = self.run_loop_num_execs + 1
         self.timestep = timestep
 
     def reset(self):
-        pass
+        self.client_data = self._client_data
 
 # EOF
