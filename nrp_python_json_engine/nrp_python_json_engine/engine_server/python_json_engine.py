@@ -69,7 +69,7 @@ def all_exception_handler(error):
 
 @app.route('/initialize', methods=["POST"])
 def initialize():
-    return jsonify(server_callbacks.initialize(request.json))
+    return jsonify(server_callbacks.initialize(request.json["Config"], request.json["ClientData"]))
 
 
 @app.route('/run_loop', methods=["POST"])
@@ -89,12 +89,12 @@ def get_datapack():
 
 @app.route('/reset', methods=["POST"])
 def reset():
-    return jsonify(server_callbacks.reset(request.json))
+    return jsonify(server_callbacks.reset(request.json["ClientData"]))
 
 
 @app.route('/shutdown', methods=["POST"])
 def shutdown():
-    return jsonify(server_callbacks.shutdown(request.json))
+    return jsonify(server_callbacks.shutdown(request.json["ClientData"]))
 
 
 def parse_arguments() -> Namespace:

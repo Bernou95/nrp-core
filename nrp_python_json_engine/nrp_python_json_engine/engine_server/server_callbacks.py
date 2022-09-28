@@ -46,7 +46,7 @@ def _flush_std():
     sys.stderr.flush()
 
 
-def initialize(request_json: dict) -> dict:
+def initialize(config: dict, client_data: dict) -> dict:
     """Imports module containing the Script class, instantiates it, and runs its initialize() method"""
     global script
 
@@ -54,7 +54,7 @@ def initialize(request_json: dict) -> dict:
     # the server is using correct time units.
     # Currently only nanoseconds are supported
 
-    (num, den) = request_json["TimeRatio"]
+    (num, den) = config["TimeRatio"]
 
     if num != 1 or den != 1000000000:
         raise Exception(f"NRP-Core was compiled with SimulationTime units different from nanoseconds (i.e. ratio "
@@ -62,16 +62,16 @@ def initialize(request_json: dict) -> dict:
 
     # Load the python script module and check if the Script class inherits from EngineScript
 
-    script_module = _import_python_script(request_json["PythonFileName"])
+    script_module = _import_python_script(config["PythonFileName"])
     if not issubclass(script_module.Script, EngineScript):
         raise Exception("Script class must inherit from EngineScript class")
 
     # Instantiate the Script class and run its initialize() method
 
     script = script_module.Script()
-    script._name = request_json["EngineName"]
-    script._config = request_json
-    script._client_data = request_json["ClientData"]
+    script._name = config["EngineName"]
+    script._config = config
+    script._client_data = client_data
     script.initialize()
     _flush_std()
 
@@ -142,24 +142,24 @@ def get_datapack(request_json: dict) -> dict:
     return return_data
 
 
-def reset(request_json: dict) -> dict:
+def reset(client_data: dict) -> dict:
     """Calls the reset() method of the Script object"""
     global script
 
-    script._client_data = request_json["ClientData"]
+    script._client_data = client_data
     script.reset()
     _flush_std()
     script._time_ns = 0
 
 
-def shutdown(request_json: dict) -> None:
+def shutdown(client_data: dict) -> None:
     """Calls the shutdown() method of the Script object"""
     global script
 
     # It may happen that the script was never created, because the initialize() function failed
 
     if script:
-        script._client_data = request_json["ClientData"]
+        script._client_data = client_data
         script.shutdown()
     _flush_std()
 

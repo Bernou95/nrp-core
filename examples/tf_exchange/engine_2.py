@@ -3,7 +3,7 @@
 from nrp_core.engines.python_json import EngineScript
 
 class Script(EngineScript):
-    def initialize(self, client_data):
+    def initialize(self):
         """Initialize datapack1 with empty time"""
         print("Engine 2 is initializing. Registering datapack...")
         self._registerDataPack("rec_datapack2")
