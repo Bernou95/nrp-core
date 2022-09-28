@@ -40,14 +40,14 @@ GazeboEngineGrpcNRPClient::GazeboEngineGrpcNRPClient(nlohmann::json &config, Pro
     setDefaultProperty<std::vector<std::string>>("GazeboPlugins", std::vector<std::string>());
 }
 
-void GazeboEngineGrpcNRPClient::initialize(const nlohmann::json &)
+void GazeboEngineGrpcNRPClient::initialize(const nlohmann::json & clientData)
 {
     NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
     // Wait for Gazebo to load world
     try
     {
-        this->sendInitializeCommand(this->engineConfig());
+        this->sendInitializeCommand(this->engineConfig(), clientData);
     }
     catch(std::exception& e)
     {
@@ -57,12 +57,12 @@ void GazeboEngineGrpcNRPClient::initialize(const nlohmann::json &)
     NRPLogger::debug("GazeboEngineGrpcNRPClient::initialize(...) completed with no errors.");
 }
 
-void GazeboEngineGrpcNRPClient::reset(const nlohmann::json &)
+void GazeboEngineGrpcNRPClient::reset(const nlohmann::json & clientData)
 {
     NRP_LOGGER_TRACE("{} called", __FUNCTION__);
     try
     {
-        this->sendResetCommand();
+        this->sendResetCommand(clientData);
     }
     catch(std::exception& e)
     {
@@ -74,13 +74,13 @@ void GazeboEngineGrpcNRPClient::reset(const nlohmann::json &)
     this->resetEngineTime();
 }
 
-void GazeboEngineGrpcNRPClient::shutdown()
+void GazeboEngineGrpcNRPClient::shutdown(const nlohmann::json & clientData)
 {
     NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
     try
     {
-        this->sendShutdownCommand(nlohmann::json());
+        this->sendShutdownCommand(clientData);
     }
     catch(std::exception &e)
     {

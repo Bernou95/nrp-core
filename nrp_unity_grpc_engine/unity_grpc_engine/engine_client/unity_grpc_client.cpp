@@ -29,19 +29,19 @@ UnityEngineGrpcClient::UnityEngineGrpcClient(nlohmann::json &config, ProcessLaun
     setDefaultProperty<std::string>("EngineProcCmd", UNITY_GRPC_ENGINE_EXECUTABLE_PATH);
 }
 
-void UnityEngineGrpcClient::initialize(const nlohmann::json &)
+void UnityEngineGrpcClient::initialize(const nlohmann::json & clientData)
 {
-    this->sendInitializeCommand(this->engineConfig());
+    this->sendInitializeCommand(this->engineConfig(), clientData);
 }
 
-void UnityEngineGrpcClient::shutdown()
+void UnityEngineGrpcClient::shutdown(const nlohmann::json & clientData)
 {
-    this->sendShutdownCommand(nlohmann::json());
+    this->sendShutdownCommand(clientData);
 }
 
-void UnityEngineGrpcClient::reset(const nlohmann::json &)
+void UnityEngineGrpcClient::reset(const nlohmann::json & clientData)
 {
-    this->sendResetCommand();
+    this->sendResetCommand(clientData);
 }
 
 // EOF

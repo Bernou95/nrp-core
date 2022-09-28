@@ -106,7 +106,7 @@ class EngineGrpcClient
             }
         }
 
-        void sendInitializeCommand(const nlohmann::json & data)
+        void sendInitializeCommand(const nlohmann::json & config, const nlohmann::json & clientData)
         {
             NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
@@ -115,6 +115,10 @@ class EngineGrpcClient
             grpc::ClientContext           context;
 
             prepareRpcContext(&context);
+
+            nlohmann::json data;
+            data["Config"]     = config;
+            data["ClientData"] = clientData;
 
             request.set_json(data.dump());
 
@@ -128,7 +132,7 @@ class EngineGrpcClient
             }
         }
 
-        void sendResetCommand()
+        void sendResetCommand(const nlohmann::json & clientData)
         {
             NRP_LOGGER_TRACE("{} called", __FUNCTION__);
             EngineGrpc::ResetRequest  request;
@@ -136,6 +140,11 @@ class EngineGrpcClient
             grpc::ClientContext       context;
 
             prepareRpcContext(&context);
+
+            nlohmann::json data;
+            data["ClientData"] = clientData;
+
+            request.set_json(data.dump());
 
             NRPLogger::debug("Sending reset command to server [ {} ]", this->engineName());
             grpc::Status status = _stub->reset(&context, request, &reply);
@@ -149,7 +158,7 @@ class EngineGrpcClient
             resetEngineTime();
         }
 
-        void sendShutdownCommand(const nlohmann::json & data)
+        void sendShutdownCommand(const nlohmann::json & clientData)
         {
             NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
@@ -158,6 +167,9 @@ class EngineGrpcClient
             grpc::ClientContext         context;
 
             prepareRpcContext(&context);
+
+            nlohmann::json data;
+            data["ClientData"] = clientData;
 
             request.set_json(data.dump());
 

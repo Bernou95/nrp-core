@@ -45,7 +45,7 @@ class GazeboEngineJSONNRPClient
 
         virtual void reset(const nlohmann::json & clientData = nlohmann::json()) override;
 
-        virtual void shutdown() override;
+        virtual void shutdown(const nlohmann::json & clientData = nlohmann::json()) override;
 
         virtual const std::vector<std::string> engineProcStartParams() const override;
 };

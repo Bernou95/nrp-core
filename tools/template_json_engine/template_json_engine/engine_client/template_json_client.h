@@ -36,29 +36,32 @@ class ${engine_name}EngineJSONClient
 
         /*!
          * \brief Initializes the engine
+         * \param clientData Extra data coming from the NRP Core Python Client
          *
          * The function will be called at the start of the simulation. It should
          * execute RPC / REST calls that will prepare the engine server and simulator
          * to run the simulation.
          */
-        void initialize(const nlohmann::json &) override;
+        void initialize(const nlohmann::json & clientData) override;
 
         /*!
          * \brief Shutdowns the engine
+         * \param clientData Extra data coming from the NRP Core Python Client
          *
          * The function will be called at the end of the simulation. It should
          * execute RPC / REST calls that will shutdown the simulator and engine
          * server gracefully.
          */
-        void shutdown() override;
+        void shutdown(const nlohmann::json & clientData) override;
 
         /*!
          * \brief Resets the engine
+         * \param clientData Extra data coming from the NRP Core Python Client
          *
          * The function should execute RPC / REST calls that will reset the simulation
          * to its initial state.
          */
-        void reset(const nlohmann::json &) override;
+        void reset(const nlohmann::json & clientData) override;
 };
 
 using ${engine_name}EngineJSONLauncher = ${engine_name}EngineJSONClient::EngineLauncher<${engine_name}JSONConfigConst::EngineType>;

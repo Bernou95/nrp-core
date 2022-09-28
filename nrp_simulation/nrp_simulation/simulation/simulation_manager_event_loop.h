@@ -61,7 +61,7 @@ class EventLoopSimManager
         void stopCB() override;
         bool runUntilTimeOutCB() override;
         bool runCB(unsigned numIterations) override;
-        void shutdownCB() override;
+        void shutdownCB(const nlohmann::json &) override;
 
         bool runUntilMilliseconds(const std::chrono::milliseconds& eTout);
 

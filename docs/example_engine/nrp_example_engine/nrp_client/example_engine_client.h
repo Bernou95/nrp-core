@@ -42,7 +42,7 @@ class ExampleEngineClient
          * execute RPC / REST calls that will shutdown the simulator and engine
          * server gracefully.
          */
-        void shutdown() override;
+        void shutdown(const nlohmann::json &) override;
 
         void sendDataPacksToEngine(const datapacks_ptr_t &datapacksArray) override;
         datapacks_set_t getDataPacksFromEngine(const datapack_identifiers_set_t &datapackIdentifiers) override;

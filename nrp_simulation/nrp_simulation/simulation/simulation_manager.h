@@ -114,7 +114,7 @@ public:
      * \brief Shuts down the simulation.
      * \return Simulation state after processing the request
      */
-    RequestResult shutdownSimulation();
+    RequestResult shutdownSimulation(const nlohmann::json & clientData);
 
     /*!
      * \brief returns the current state of the simulation
@@ -142,7 +142,7 @@ protected:
     /*! \brief Run the simulation. */
     virtual bool runCB(unsigned numIterations) = 0;
     /*! \brief Shutdown the simulation. */
-    virtual void shutdownCB() = 0;
+    virtual void shutdownCB(const nlohmann::json & clientData) = 0;
 
     /*!
      * \brief Simulation Configuration

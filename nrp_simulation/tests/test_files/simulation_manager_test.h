@@ -49,7 +49,7 @@ class TestSimManager
     MOCK_METHOD(void, stopCB, (), (override));
     MOCK_METHOD(bool, runUntilTimeOutCB, (), (override));
     MOCK_METHOD(bool, runCB, (unsigned numIterations), (override));
-    MOCK_METHOD(void, shutdownCB, (), (override));
+    MOCK_METHOD(void, shutdownCB, (const nlohmann::json & clientData), (override));
 
     std::string _status = "";
 };

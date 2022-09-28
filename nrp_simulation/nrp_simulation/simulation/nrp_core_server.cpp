@@ -64,7 +64,7 @@ void NrpCoreServer::runServerLoop()
                     break;
                 case NrpCoreServer::RequestType::Shutdown:
                     try {
-                        result = _manager->shutdownSimulation();
+                        result = _manager->shutdownSimulation(getClientData());
                     }
                     catch (std::logic_error&) {
                         // it's ok the server is going to be closed anyways

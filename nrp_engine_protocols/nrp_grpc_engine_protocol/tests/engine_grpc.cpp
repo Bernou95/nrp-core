@@ -94,15 +94,15 @@ class TestEngineGrpcClient
 
         void initialize(const nlohmann::json &) override
         {
-            this->sendInitializeCommand("test");
+            this->sendInitializeCommand("test", "test");
         }
 
         void reset(const nlohmann::json &) override
         {
-            this->sendResetCommand();
+            this->sendResetCommand("test");
         }
 
-        void shutdown() override
+        void shutdown(const nlohmann::json &) override
         {
             this->sendShutdownCommand("test");
         }
@@ -220,20 +220,20 @@ TEST(EngineGrpc, InitCommand)
 
     // The gRPC server isn't running, so the init command should fail
 
-    ASSERT_THROW(client.sendInitializeCommand(jsonMessage), std::runtime_error);
+    ASSERT_THROW(client.sendInitializeCommand(jsonMessage, ""), std::runtime_error);
 
     // Start the server and send the init command. It should succeed
 
     server.startServer();
     // TODO Investigate why this is needed. It seems to be caused by the previous call to sendInitCommand function
     testSleep(1500);
-    client.sendInitializeCommand(jsonMessage);
+    client.sendInitializeCommand(jsonMessage, "");
 
     // Force the server to return an error from the rpc
     // Check if the client receives an error response on command handling failure
 
     jsonMessage["throw"] = true;
-    ASSERT_THROW(client.sendInitializeCommand(jsonMessage), std::runtime_error);
+    ASSERT_THROW(client.sendInitializeCommand(jsonMessage, ""), std::runtime_error);
 }
 
 TEST(EngineGrpc, InitCommandTimeout)
@@ -254,7 +254,7 @@ TEST(EngineGrpc, InitCommandTimeout)
 
     server.startServer();
     server.timeoutOnNextCommand();
-    ASSERT_THROW(client.sendInitializeCommand(jsonMessage), std::runtime_error);
+    ASSERT_THROW(client.sendInitializeCommand(jsonMessage, ""), std::runtime_error);
 }
 
 TEST(EngineGrpc, ShutdownCommand)
@@ -386,20 +386,20 @@ TEST(EngineGrpc, ResetCommand)
 
     // The gRPC server isn't running, so the reset command should fail
 
-    ASSERT_THROW(client.sendResetCommand(), std::runtime_error);
+    ASSERT_THROW(client.sendResetCommand(""), std::runtime_error);
 
     // Start the server and send the reset command. It should succeed
 
     server.startServer();
     // TODO Investigate why this is needed. It seems to be caused by the previous call to sendInitCommand function
     testSleep(1500);
-    ASSERT_NO_THROW(client.sendResetCommand());
+    ASSERT_NO_THROW(client.sendResetCommand(""));
 
     // Normal loop execution, the reset should return time to zero
 
     SimulationTime timeStep = floatToSimulationTime(0.1f);
     ASSERT_NO_THROW(client.runLoopStepCallback(timeStep));
-    ASSERT_NO_THROW(client.sendResetCommand());
+    ASSERT_NO_THROW(client.sendResetCommand(""));
     ASSERT_EQ(client.getEngineTime().count(), 0);
 }
 
@@ -417,7 +417,7 @@ TEST(EngineGrpc, ResetCommandTimeout)
 
     server.startServer();
     server.timeoutOnNextCommand();
-    ASSERT_THROW(client.sendResetCommand(), std::runtime_error);
+    ASSERT_THROW(client.sendResetCommand(""), std::runtime_error);
 }
 
 TEST(EngineGrpc, RegisterDataPacks)

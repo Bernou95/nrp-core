@@ -49,9 +49,9 @@ class NestEngineServerNRPClient
         NestEngineServerNRPClient(nlohmann::json &config, ProcessLauncherInterface::unique_ptr &&launcher);
         virtual ~NestEngineServerNRPClient() override;
 
-        virtual void initialize(const nlohmann::json & clientData) override;
+        virtual void initialize(const nlohmann::json &) override;
         virtual void reset(const nlohmann::json &) override;
-        virtual void shutdown() override;
+        virtual void shutdown(const nlohmann::json &) override;
 
         SimulationTime runLoopStepCallback(SimulationTime timeStep) override;
 

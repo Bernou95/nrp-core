@@ -29,19 +29,19 @@ ${engine_name}EngineGrpcClient::${engine_name}EngineGrpcClient(nlohmann::json &c
     setDefaultProperty<std::string>("EngineProcCmd", ${engine_name_uppercase}_GRPC_ENGINE_EXECUTABLE_PATH);
 }
 
-void ${engine_name}EngineGrpcClient::initialize(const nlohmann::json &)
+void ${engine_name}EngineGrpcClient::initialize(const nlohmann::json & clientData)
 {
-    this->sendInitializeCommand(this->engineConfig());
+    this->sendInitializeCommand(this->engineConfig(), clientData);
 }
 
-void ${engine_name}EngineGrpcClient::shutdown()
+void ${engine_name}EngineGrpcClient::shutdown(const nlohmann::json & clientData)
 {
-    this->sendShutdownCommand(nlohmann::json());
+    this->sendShutdownCommand(clientData);
 }
 
-void ${engine_name}EngineGrpcClient::reset(const nlohmann::json &)
+void ${engine_name}EngineGrpcClient::reset(const nlohmann::json & clientData)
 {
-    this->sendResetCommand();
+    this->sendResetCommand(clientData);
 }
 
 // EOF

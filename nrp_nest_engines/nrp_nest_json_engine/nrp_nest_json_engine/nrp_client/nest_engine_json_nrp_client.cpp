@@ -41,11 +41,11 @@ NestEngineJSONNRPClient::NestEngineJSONNRPClient(nlohmann::json &config, Process
 NestEngineJSONNRPClient::~NestEngineJSONNRPClient()
 {}
 
-void NestEngineJSONNRPClient::initialize(const nlohmann::json &)
+void NestEngineJSONNRPClient::initialize(const nlohmann::json & clientData)
 {
     NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
-    nlohmann::json resp = this->sendInitCommand(this->engineConfig());
+    nlohmann::json resp = this->sendInitCommand(this->engineConfig(), clientData);
     if(!resp.at(NestConfigConst::InitFileExecStatus.data()).get<bool>())
     {
         // Write the error message
@@ -58,11 +58,11 @@ void NestEngineJSONNRPClient::initialize(const nlohmann::json &)
     NRPLogger::debug("NestEngineJSONNRPClient::initialize(...) completed with no errors.");
 }
 
-void NestEngineJSONNRPClient::reset(const nlohmann::json &)
+void NestEngineJSONNRPClient::reset(const nlohmann::json & clientData)
 {
     NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
-    nlohmann::json resp = this->sendResetCommand(nlohmann::json("reset"));
+    nlohmann::json resp = this->sendResetCommand(clientData);
 
     if(!resp.at(NestConfigConst::ResetExecStatus.data()).get<bool>())
     {
@@ -80,9 +80,9 @@ void NestEngineJSONNRPClient::reset(const nlohmann::json &)
     NRPLogger::debug("NestEngineJSONNRPClient::reset() engine time: {}", this->getEngineTime().count());
 }
 
-void NestEngineJSONNRPClient::shutdown()
+void NestEngineJSONNRPClient::shutdown(const nlohmann::json & clientData)
 {
     NRP_LOGGER_TRACE("{} called", __FUNCTION__);
     
-    this->sendShutdownCommand(nlohmann::json());
+    this->sendShutdownCommand(clientData);
 }

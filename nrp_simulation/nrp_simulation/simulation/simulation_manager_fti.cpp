@@ -46,7 +46,7 @@ FTILoopSimManager::~FTILoopSimManager()
 {
     NRP_LOGGER_TRACE("{} called", __FUNCTION__);
     try {
-        this->shutdownSimulation();
+        this->shutdownSimulation(nlohmann::json());
     }
     catch (const std::exception &e) {
         // It's ok, the simulation manager is being destroyed anyways
@@ -103,10 +103,10 @@ bool FTILoopSimManager::runCB(unsigned numIterations)
     return runSimulationUntilCondition(condition);
 }
 
-void FTILoopSimManager::shutdownCB()
+void FTILoopSimManager::shutdownCB(const nlohmann::json & clientData)
 {
     if(this->_loop != nullptr) {
-        this->_loop->shutdownLoop();
+        this->_loop->shutdownLoop(clientData);
         this->_loop.reset();
     }
 }

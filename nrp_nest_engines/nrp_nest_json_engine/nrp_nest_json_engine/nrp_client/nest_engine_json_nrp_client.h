@@ -51,7 +51,7 @@ class NestEngineJSONNRPClient
 
         virtual void reset(const nlohmann::json &) override;
 
-        virtual void shutdown() override;
+        virtual void shutdown(const nlohmann::json &) override;
 
     private:
         /*!

@@ -16,7 +16,7 @@ void ExampleEngineClient::reset(const nlohmann::json &)
 
 }
 
-void ExampleEngineClient::shutdown()
+void ExampleEngineClient::shutdown(const nlohmann::json &)
 {
 
 }

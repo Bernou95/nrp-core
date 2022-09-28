@@ -139,7 +139,7 @@ void FTILoop::resetLoop(const nlohmann::json & clientData)
     this->_simTime = SimulationTime::zero();
 }
 
-void FTILoop::shutdownLoop()
+void FTILoop::shutdownLoop(const nlohmann::json & clientData)
 {
     NRP_LOGGER_TRACE("{} called", __FUNCTION__);
     
@@ -147,7 +147,7 @@ void FTILoop::shutdownLoop()
     {
         try
         {
-            engine->shutdown();
+            engine->shutdown(clientData);
         }
         catch(std::exception &e)
         {

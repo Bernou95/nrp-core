@@ -99,7 +99,7 @@ class TestEngineJSONNRPClient
 
     void initialize(const nlohmann::json &) override
     {
-        auto retVal = this->sendInitCommand("initCommand");
+        auto retVal = this->sendInitCommand("initCommand", "clientData");
         if(retVal["status"].get<std::string>().compare("initCommand") != 0)
             throw NRPExceptionNonRecoverable("Test init failed");
     }
@@ -111,7 +111,7 @@ class TestEngineJSONNRPClient
             throw NRPExceptionNonRecoverable("Test reset failed");
     };
 
-    void shutdown() override
+    void shutdown(const nlohmann::json &) override
     {
         auto retVal = this->sendShutdownCommand("shutdownCommand");
         if (retVal["original"].get<std::string>().compare("shutdownCommand") != 0)

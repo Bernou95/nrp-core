@@ -52,7 +52,7 @@ class FTILoop
         /*!
          * \brief Shutdown engines
          */
-        void shutdownLoop();
+        void shutdownLoop(const nlohmann::json & clientData);
 
         /*!
          * \brief Blocks until all running Engines finishe their execution

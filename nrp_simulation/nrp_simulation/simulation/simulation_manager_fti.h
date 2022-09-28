@@ -59,7 +59,7 @@ class FTILoopSimManager
         void stopCB() override;
         bool runUntilTimeOutCB() override;
         bool runCB(unsigned numIterations) override;
-        void shutdownCB() override;
+        void shutdownCB(const nlohmann::json & clientData) override;
 
         /*! \brief engineLauncherManager */
         EngineLauncherManagerConstSharedPtr  _engineLauncherManager;

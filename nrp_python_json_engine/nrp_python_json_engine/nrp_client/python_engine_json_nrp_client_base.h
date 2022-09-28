@@ -72,11 +72,10 @@ class PythonEngineJSONNRPClientBase
 
             nlohmann::json config = this->engineConfig();
             config[PythonConfigConst::SimulationTimeRatio.data()] = { SimulationTime::period::num, SimulationTime::period::den };
-            config["ClientData"] = clientData;
 
             try
             {
-                nlohmann::json resp = this->sendInitCommand(config);
+                nlohmann::json resp = this->sendInitCommand(config, clientData);
             }
             catch(std::exception &e)
             {
@@ -112,11 +111,11 @@ class PythonEngineJSONNRPClientBase
             this->resetEngineTime();
         }
 
-        virtual void shutdown() override
+        virtual void shutdown(const nlohmann::json & clientData) override
         {
             NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
-            this->sendShutdownCommand(nlohmann::json());
+            this->sendShutdownCommand(clientData);
         }
 
     private:

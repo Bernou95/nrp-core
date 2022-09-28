@@ -72,7 +72,7 @@ TEST(FTISimManagerTest, FTISimManagerInitialize)
     // Exception if required engine launchers is not added
     manager.initializeSimulation(nlohmann::json());
     ASSERT_EQ(manager.currentState(), SimulationManager::SimState::Failed);
-    manager.shutdownSimulation();
+    manager.shutdownSimulation(nlohmann::json());
 
     // Add launchers
     engines->registerLauncher(EngineLauncherInterfaceSharedPtr(new GazeboEngineGrpcLauncher()));

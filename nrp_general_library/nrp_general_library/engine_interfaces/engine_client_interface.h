@@ -111,7 +111,7 @@ class EngineClientInterface
          * \return Return SUCCESS if no error was encountered
          * \throw Throws on error
          */
-        virtual void shutdown() = 0;
+        virtual void shutdown(const nlohmann::json & clientData) = 0;
 
         /*!
          * \brief Get engine timestep

@@ -190,9 +190,13 @@ protected:
          * \param data Data that should be passed to the engine
          * \return Returns init data from engine
          */
-        nlohmann::json sendInitCommand(const nlohmann::json &data)
+        nlohmann::json sendInitCommand(const nlohmann::json & config, const nlohmann::json & clientData)
         {
             NRP_LOGGER_TRACE("{} called", __FUNCTION__);
+
+            nlohmann::json data;
+            data["Config"]     = config;
+            data["ClientData"] = clientData;
 
             NRPLogger::debug("EngineJSONNRPClient::sendInitCommand [ data: {} ]", data.dump());
 

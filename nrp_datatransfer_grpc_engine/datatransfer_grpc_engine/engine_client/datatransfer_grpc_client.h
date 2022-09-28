@@ -52,7 +52,7 @@ class DataTransferEngineGrpcClient
          * execute RPC / REST calls that will shutdown the simulator and engine
          * server gracefully.
          */
-        void shutdown() override;
+        void shutdown(const nlohmann::json & clientData = nlohmann::json()) override;
 
         /*!
          * \brief Resets the engine

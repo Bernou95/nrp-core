@@ -120,14 +120,14 @@ bool EventLoopSimManager::runCB(unsigned numIterations)
     return runUntilMilliseconds(_timestep * numIterations);
 }
 
-void EventLoopSimManager::shutdownCB()
+void EventLoopSimManager::shutdownCB(const nlohmann::json & clientData)
 {
     if(this->_loop != nullptr) {
         this->_loop->shutdown();
         this->_loop.reset();
     }
     if(_fTILoopSimManager) {
-        _fTILoopSimManager->shutdownSimulation();
+        _fTILoopSimManager->shutdownSimulation(clientData);
         _fTILoopSimManager.reset();
     }
 }

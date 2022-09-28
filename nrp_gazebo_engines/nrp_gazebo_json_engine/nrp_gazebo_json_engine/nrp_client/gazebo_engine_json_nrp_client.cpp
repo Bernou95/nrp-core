@@ -38,14 +38,14 @@ GazeboEngineJSONNRPClient::GazeboEngineJSONNRPClient(nlohmann::json &config, Pro
     setDefaultProperty<std::vector<std::string>>("GazeboPlugins", std::vector<std::string>());
 }
 
-void GazeboEngineJSONNRPClient::initialize(const nlohmann::json &)
+void GazeboEngineJSONNRPClient::initialize(const nlohmann::json & clientData)
 {
     NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
     try
     {
         // Wait for Gazebo to load world
-        const nlohmann::json initRes = this->sendInitCommand(this->engineConfig());
+        const nlohmann::json initRes = this->sendInitCommand(this->engineConfig(), clientData);
         if(!initRes[0].get<bool>())
             throw NRPExceptionNonRecoverable("Received initialization fail message from Engine \"" + this->engineName() + "\"");
     }
@@ -57,13 +57,13 @@ void GazeboEngineJSONNRPClient::initialize(const nlohmann::json &)
     NRPLogger::debug("GazeboEngineJSONNRPClient::initialize(...) completed with no errors.");
 }
 
-void GazeboEngineJSONNRPClient::reset(const nlohmann::json &)
+void GazeboEngineJSONNRPClient::reset(const nlohmann::json & clientData)
 {
     NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
     try
     {
-        const nlohmann::json resetRes = this->sendResetCommand(nlohmann::json());
+        const nlohmann::json resetRes = this->sendResetCommand(clientData);
         
         if(!resetRes[0].get<bool>()){
             throw NRPExceptionNonRecoverable("Received reset fail message from Engine \"" + this->engineName() + "\"");
@@ -77,13 +77,13 @@ void GazeboEngineJSONNRPClient::reset(const nlohmann::json &)
     }
 }
 
-void GazeboEngineJSONNRPClient::shutdown()
+void GazeboEngineJSONNRPClient::shutdown(const nlohmann::json & clientData)
 {
     NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
     try
     {
-        this->sendShutdownCommand(nlohmann::json());
+        this->sendShutdownCommand(clientData);
     }
     catch(std::exception &e)
     {

@@ -59,7 +59,7 @@ TEST(SimulationManagerTest, StateTransitions)
     // Current state
     ASSERT_EQ(manager.currentState(), SimulationManager::SimState::Failed);
     // Valid actions
-    ASSERT_NO_THROW(manager.shutdownSimulation());
+    ASSERT_NO_THROW(manager.shutdownSimulation(""));
 
     //// CREATED
     // Current state
@@ -69,7 +69,7 @@ TEST(SimulationManagerTest, StateTransitions)
     ASSERT_THROW(manager.stopSimulation(), std::logic_error);
     ASSERT_THROW(manager.runSimulation(1), std::logic_error);
     ASSERT_THROW(manager.runSimulationUntilTimeout(), std::logic_error);
-    ASSERT_THROW(manager.shutdownSimulation(), std::logic_error);
+    ASSERT_THROW(manager.shutdownSimulation(""), std::logic_error);
     // Current state
     ASSERT_EQ(manager.currentState(), SimulationManager::SimState::Created);
     // Valid actions
@@ -90,6 +90,6 @@ TEST(SimulationManagerTest, StateTransitions)
     manager.resetSimulation(nlohmann::json());
     ASSERT_EQ(manager.currentState(), SimulationManager::SimState::Initialized);
     // Shutdown
-    ASSERT_NO_THROW(manager.shutdownSimulation());
+    ASSERT_NO_THROW(manager.shutdownSimulation(""));
     ASSERT_EQ(manager.currentState(), SimulationManager::SimState::Created);
 }

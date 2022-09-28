@@ -329,7 +329,7 @@ int main(int argc, char *argv[])
         if(res.currentState != SimulationManager::SimState::Failed)
             manager->runSimulationUntilTimeout();
 
-        manager->shutdownSimulation();
+        manager->shutdownSimulation(nlohmann::json());
     }
     else
     {

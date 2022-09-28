@@ -107,11 +107,11 @@ SimulationManager::RequestResult SimulationManager::stopSimulation()
                           false);
 }
 
-SimulationManager::RequestResult SimulationManager::shutdownSimulation()
+SimulationManager::RequestResult SimulationManager::shutdownSimulation(const nlohmann::json & clientData)
 {
     NRP_LOGGER_TRACE("{} called", __FUNCTION__);
     return processRequest([&]() {
-                       this->shutdownCB();
+                       this->shutdownCB(clientData);
                        changeState(SimState::Created);
         },
                    {SimState::Initialized, SimState::Stopped, SimState::Running, SimState::Failed},
