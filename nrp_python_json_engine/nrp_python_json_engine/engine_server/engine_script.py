@@ -27,6 +27,7 @@ class EngineScript:
         self._time_ns = 0
         self._name = ""
         self._config = None
+        self._client_data = None
 
     def _advanceTime(self, timestep_ns: int) -> None:
         """Advances the simulation time by given timestep"""

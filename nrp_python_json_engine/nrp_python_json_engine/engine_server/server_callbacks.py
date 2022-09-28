@@ -71,7 +71,8 @@ def initialize(request_json: dict) -> dict:
     script = script_module.Script()
     script._name = request_json["EngineName"]
     script._config = request_json
-    script.initialize(request_json["ClientData"])
+    script._client_data = request_json["ClientData"]
+    script.initialize()
     _flush_std()
 
 
@@ -145,7 +146,8 @@ def reset(request_json: dict) -> dict:
     """Calls the reset() method of the Script object"""
     global script
 
-    script.reset(request_json)
+    script._client_data = request_json["ClientData"]
+    script.reset()
     _flush_std()
     script._time_ns = 0
 
@@ -157,6 +159,7 @@ def shutdown(request_json: dict) -> None:
     # It may happen that the script was never created, because the initialize() function failed
 
     if script:
+        script._client_data = request_json["ClientData"]
         script.shutdown()
     _flush_std()
 
