@@ -45,9 +45,9 @@ class NestJSONServer
         bool initRunFlag() const;
 
         virtual SimulationTime runLoopStep(SimulationTime timeStep) override;
-        virtual nlohmann::json initialize(const nlohmann::json &data, EngineJSONServer::lock_t &datapackLock) override;
-        virtual nlohmann::json reset(EngineJSONServer::lock_t &datapackLock) override;
-        virtual nlohmann::json shutdown(const nlohmann::json &data) override;
+        virtual nlohmann::json initialize(const nlohmann::json &config, const nlohmann::json &clientData, EngineJSONServer::lock_t &datapackLock) override;
+        virtual nlohmann::json reset(const nlohmann::json &clientData, EngineJSONServer::lock_t &datapackLock) override;
+        virtual nlohmann::json shutdown(const nlohmann::json &clientData) override;
 
     private:
         /*!

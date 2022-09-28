@@ -56,20 +56,20 @@ class TestEngineJSONServer
         return curTime;
     }
 
-    nlohmann::json initialize(const nlohmann::json &data, EngineJSONServer::lock_t&) override
+    nlohmann::json initialize(const nlohmann::json &config, const nlohmann::json &/*clientData*/, EngineJSONServer::lock_t&) override
     {
-        return nlohmann::json({{"status", "success"}, {"original", data}});
+        return nlohmann::json({{"status", "success"}, {"original", config}});
     }
 
-    nlohmann::json reset(EngineJSONServer::lock_t&) override
+    nlohmann::json reset(const nlohmann::json &/*clientData*/, EngineJSONServer::lock_t&) override
     {
         return nlohmann::json({{"status", "success"}});
     }
 
     // TODO: Test shutdown
-    nlohmann::json shutdown(const nlohmann::json &data) override
+    nlohmann::json shutdown(const nlohmann::json &clientData) override
     {
-        return nlohmann::json({{"status", "shutdown"}, {"original", data}});
+        return nlohmann::json({{"status", "shutdown"}, {"original", clientData}});
     }
 
     template<class EXCEPTION = std::exception>
@@ -169,7 +169,8 @@ TEST(EngineJSONServerTest, HttpRequests)
 
     // Init command
     nlohmann::json data;
-    data.emplace("init", nlohmann::json());
+    data["Config"] = "init";
+    data["ClientData"] = "";
     auto resp = RestClient::post(address + "/" + EngineJSONConfigConst::EngineServerInitializeRoute.data(), EngineJSONConfigConst::EngineServerContentType.data(), data.dump());
     nlohmann::json retData = nlohmann::json::parse(resp.body);
     ASSERT_STREQ(retData["status"].get<std::string>().data(), "success");

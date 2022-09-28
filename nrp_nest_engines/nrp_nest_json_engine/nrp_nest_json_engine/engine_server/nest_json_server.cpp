@@ -101,11 +101,11 @@ SimulationTime NestJSONServer::runLoopStep(SimulationTime timeStep)
     }
 }
 
-nlohmann::json NestJSONServer::initialize(const nlohmann::json &data, EngineJSONServer::lock_t&)
+nlohmann::json NestJSONServer::initialize(const nlohmann::json &config, const nlohmann::json &/*clientData*/, EngineJSONServer::lock_t&)
 {
     NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
-    _initData = data;
+    _initData = config;
 
     PythonGILLock lock(this->_pyGILState, true);
     try
@@ -135,7 +135,7 @@ nlohmann::json NestJSONServer::initialize(const nlohmann::json &data, EngineJSON
     this->_devMap.clear();
 
     // Read init file if present
-    const std::string &initFileName = data.at("NestInitFileName");
+    const std::string &initFileName = config.at("NestInitFileName");
     NRPLogger::debug("NestJSONServer: reading init file: {}", initFileName);
     if(!initFileName.empty())
     {
@@ -186,7 +186,7 @@ nlohmann::json NestJSONServer::initialize(const nlohmann::json &data, EngineJSON
             NRPLogger::debug("NestJSONServer: registering datapack {:d} {}", i, devName);
 
             auto devController = std::shared_ptr<NestEngineJSONDataPackController>(new
-                        NestEngineJSONDataPackController(JsonDataPack::createID(devName, data.at("EngineName")),
+                        NestEngineJSONDataPackController(JsonDataPack::createID(devName, config.at("EngineName")),
                                                  devNodes, this->_pyNest));
 
             this->_datapackControllerPtrs.push_back(devController);
@@ -199,7 +199,7 @@ nlohmann::json NestJSONServer::initialize(const nlohmann::json &data, EngineJSON
         const auto kernelDataPackName = "kernel";
 
         auto devController = std::shared_ptr<NestKernelDataPackController>(new
-                        NestKernelDataPackController(JsonDataPack::createID(kernelDataPackName, data.at("EngineName")), this->_pyNest));
+                        NestKernelDataPackController(JsonDataPack::createID(kernelDataPackName, config.at("EngineName")), this->_pyNest));
 
         this->_datapackControllerPtrs.push_back(devController);
         this->registerDataPackNoLock(kernelDataPackName, devController.get());
@@ -226,7 +226,7 @@ nlohmann::json NestJSONServer::initialize(const nlohmann::json &data, EngineJSON
     return nlohmann::json({{NestConfigConst::InitFileExecStatus, true}, {NestConfigConst::InitFileParseDevMap, jsonDevMap}});
 }
 
-nlohmann::json NestJSONServer::reset(EngineJSONServer::lock_t &simLock)
+nlohmann::json NestJSONServer::reset(const nlohmann::json &clientData, EngineJSONServer::lock_t &simLock)
 {
     NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
@@ -239,8 +239,8 @@ nlohmann::json NestJSONServer::reset(EngineJSONServer::lock_t &simLock)
 
     try
     {   
-        this->shutdown(_initData);
-        this->initialize(_initData, simLock);
+        this->shutdown(clientData);
+        this->initialize(_initData, clientData, simLock);
 
         return nlohmann::json({{NestConfigConst::ResetExecStatus, true}});
     }
@@ -252,7 +252,7 @@ nlohmann::json NestJSONServer::reset(EngineJSONServer::lock_t &simLock)
     }
 }
 
-nlohmann::json NestJSONServer::shutdown(const nlohmann::json &)
+nlohmann::json NestJSONServer::shutdown(const nlohmann::json &/*clientData*/)
 {
     NRP_LOGGER_TRACE("{} called", __FUNCTION__);
     

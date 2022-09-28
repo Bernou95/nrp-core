@@ -137,21 +137,21 @@ class EngineJSONServer
          * \param datapackLock DataPack Lock. Prevents access to _datapacksControllers
          * \return Returns data about initialization status
          */
-        virtual nlohmann::json initialize(const nlohmann::json &data, EngineJSONServer::lock_t &datapackLock) = 0;
+        virtual nlohmann::json initialize(const nlohmann::json &config, const nlohmann::json &clientData, EngineJSONServer::lock_t &datapackLock) = 0;
 
         /*!
          * \brief Engine reset routine
          * \param datapackLock DataPack Lock. Prevents access to _datapacksControllers
          * \return Returns data about initialization status
          */
-        virtual nlohmann::json reset(EngineJSONServer::lock_t &datapackLock) = 0;
+        virtual nlohmann::json reset(const nlohmann::json &clientData, EngineJSONServer::lock_t &datapackLock) = 0;
 
         /*!
          * \brief Engine Shutdown routine
          * \param data Shutdown data
          * \return Returns data about shutdown status
          */
-        virtual nlohmann::json shutdown(const nlohmann::json &data) = 0;
+        virtual nlohmann::json shutdown(const nlohmann::json &clientData) = 0;
 
         /*!
          * \brief Has a shutdown command been received?

@@ -121,24 +121,24 @@ class TestEngineGrpcServer
 
         virtual ~TestEngineGrpcServer() override = default;
 
-        void initialize(const nlohmann::json &data, EngineGrpcServer::lock_t &) override
+        void initialize(const nlohmann::json &config, const nlohmann::json & /*clientData*/, EngineGrpcServer::lock_t &) override
         {
             specialBehaviour();
 
-            if(data.at("throw"))
+            if(config.at("throw"))
             {
                 throw std::runtime_error("Init failed");
             }
         }
 
-        void reset() override
+        void reset(const nlohmann::json & /*clientData*/) override
         {
             specialBehaviour();
 
             this->resetEngineTime();
         }
 
-        void shutdown(const nlohmann::json &data) override
+        void shutdown(const nlohmann::json & data) override
         {
             specialBehaviour();
 

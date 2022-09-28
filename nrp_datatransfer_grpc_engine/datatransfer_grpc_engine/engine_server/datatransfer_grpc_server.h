@@ -71,7 +71,7 @@ class DataTransferGrpcServer
          *
          * \param[in] data Engine configuration data in form of JSON object
          */
-        void initialize(const nlohmann::json &data, EngineGrpcServer::lock_t &datapackLock) override;
+        void initialize(const nlohmann::json &config, const nlohmann::json &clientData, lock_t &datapackLock) override;
 
         /*!
          * \brief Shutdowns the engine
@@ -82,7 +82,7 @@ class DataTransferGrpcServer
          *
          * \param[in] data Additional arguments passed from the client
          */
-        void shutdown(const nlohmann::json &data) override;
+        void shutdown(const nlohmann::json &clientData) override;
 
         /*!
          * \brief Resets the engine
@@ -90,7 +90,7 @@ class DataTransferGrpcServer
          * The function should perform all actions needed to reset the simulation
          * to its initial state.
          */
-        void reset() override;
+        void reset(const nlohmann::json &clientData) override;
 
         /*!
          * \brief The iteration number

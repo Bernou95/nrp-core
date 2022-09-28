@@ -235,19 +235,19 @@ class EngineGrpcServer : public EngineGrpcService::Service
          * \param[in] data       Simulation configuration data
          * \param[in] datapackLock ???
          */
-        virtual void initialize(const nlohmann::json &data, EngineGrpcServer::lock_t &datapackLock) = 0;
+        virtual void initialize(const nlohmann::json &config, const nlohmann::json &clientData, EngineGrpcServer::lock_t &datapackLock) = 0;
 
         /*!
          * \brief Resets the simulation
          */
-        virtual void reset() = 0;
+        virtual void reset(const nlohmann::json &clientData) = 0;
 
         /*!
          * \brief Shutdowns the simulation
          *
          * \param[in] data Additional data
          */
-        virtual void shutdown(const nlohmann::json &data) = 0;
+        virtual void shutdown(const nlohmann::json &clientData) = 0;
 
         /*!
          * \brief Runs a single simulation loop step
@@ -283,7 +283,7 @@ class EngineGrpcServer : public EngineGrpcService::Service
 
                 // Run engine-specific initialization function
 
-                this->initialize(requestJson, lock);
+                this->initialize(requestJson["Config"], requestJson["ClientData"], lock);
             }
             catch(const std::exception &e)
             {
@@ -308,7 +308,7 @@ class EngineGrpcServer : public EngineGrpcService::Service
          * \return gRPC request status
          */
         grpc::Status reset(      grpc::ServerContext      * /*context*/,
-                           const EngineGrpc::ResetRequest * /*request*/,
+                           const EngineGrpc::ResetRequest * request,
                                  EngineGrpc::ResetReply   * /*reply*/) override
         {
             NRP_LOGGER_TRACE("{} called", __FUNCTION__);
@@ -316,8 +316,10 @@ class EngineGrpcServer : public EngineGrpcService::Service
             {
                 EngineGrpcServer::lock_t lock(this->_datapackLock);
 
+                nlohmann::json requestJson = nlohmann::json::parse(request->json());
+
                 // Run engine-specific reset function
-                this->reset();
+                this->reset(requestJson["ClientData"]);
             }
             catch(const std::exception &e)
             {
@@ -351,9 +353,9 @@ class EngineGrpcServer : public EngineGrpcService::Service
 
                 nlohmann::json requestJson = nlohmann::json::parse(request->json());
 
-                // Run engine-specifi shutdown function
+                // Run engine-specific shutdown function
 
-                this->shutdown(requestJson);
+                this->shutdown(requestJson["ClientData"]);
             }
             catch(const std::exception &e)
             {

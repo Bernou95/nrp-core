@@ -72,9 +72,9 @@ SimulationTime NRPCommunicationController::runLoopStep(SimulationTime timeStep)
     }
 }
 
-void NRPCommunicationController::initialize(const json &data, lock_t &lock)
+void NRPCommunicationController::initialize(const json & config, const json & clientData, lock_t &lock)
 {
-    double waitTime = data.at("WorldLoadTime");
+    double waitTime = config.at("WorldLoadTime");
     if(waitTime <= 0)
         waitTime = std::numeric_limits<double>::max();
 
@@ -92,8 +92,8 @@ void NRPCommunicationController::initialize(const json &data, lock_t &lock)
         {
             lock.lock();
 
-            const auto errMsg = "Gazebo Engine was unable to load world file \"" + data.at("GazeboWorldFile").get<std::string>() +
-                    "\" before the specified timeout of " + std::to_string(data.at("WorldLoadTime").get<int>()) +
+            const auto errMsg = "Gazebo Engine was unable to load world file \"" + config.at("GazeboWorldFile").get<std::string>() +
+                    "\" before the specified timeout of " + std::to_string(config.at("WorldLoadTime").get<int>()) +
                     " seconds. Check for gazebo errors in the output log or set a larger timeout if needed";
             throw std::runtime_error(errMsg);
         }
@@ -102,7 +102,7 @@ void NRPCommunicationController::initialize(const json &data, lock_t &lock)
     lock.lock();
 }
 
-void NRPCommunicationController::reset()
+void NRPCommunicationController::reset(const json &)
 {
     NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
@@ -124,7 +124,7 @@ void NRPCommunicationController::reset()
     }
 }
 
-void NRPCommunicationController::shutdown(const json&)
+void NRPCommunicationController::shutdown(const json &)
 {
     // Do nothing
 }

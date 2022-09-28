@@ -75,11 +75,11 @@ SimulationTime NRPCommunicationController::runLoopStep(SimulationTime timeStep)
     }
 }
 
-json NRPCommunicationController::initialize(const json &data, EngineJSONServer::lock_t &lock)
+json NRPCommunicationController::initialize(const json &config, const nlohmann::json &/*clientData*/, EngineJSONServer::lock_t &lock)
 {
     NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
-    double waitTime = data.at("WorldLoadTime");
+    double waitTime = config.at("WorldLoadTime");
     if(waitTime <= 0)
         waitTime = std::numeric_limits<double>::max();
 
@@ -105,7 +105,7 @@ json NRPCommunicationController::initialize(const json &data, EngineJSONServer::
     return nlohmann::json({true});
 }
 
-json NRPCommunicationController::reset(EngineJSONServer::lock_t &lock)
+json NRPCommunicationController::reset(const nlohmann::json &/*clientData*/, EngineJSONServer::lock_t &lock)
 {
     NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 

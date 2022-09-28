@@ -136,11 +136,11 @@ class NRPCommunicationController
 
         virtual SimulationTime runLoopStep(SimulationTime timeStep) override;
 
-        virtual void initialize(const nlohmann::json &data, lock_t &datapackLock) override;
+        virtual void initialize(const nlohmann::json &config, const nlohmann::json &clientData, lock_t &datapackLock) override;
 
-        virtual void reset() override;
+        virtual void reset(const nlohmann::json & clientData) override;
 
-        virtual void shutdown(const nlohmann::json &data) override;
+        virtual void shutdown(const nlohmann::json & clientData) override;
 
         /*!
          * \brief Make private for singleton

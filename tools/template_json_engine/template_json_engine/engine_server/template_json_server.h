@@ -64,7 +64,7 @@ class ${engine_name}JSONServer
          *
          * \param[in] data Engine configuration data in form of JSON object
          */
-        nlohmann::json initialize(const nlohmann::json &data, EngineJSONServer::lock_t &datapackLock) override;
+        nlohmann::json initialize(const nlohmann::json &config, const nlohmann::json &clientData, EngineJSONServer::lock_t &datapackLock) override;
 
         /*!
          * \brief Shutdowns the engine
@@ -75,7 +75,7 @@ class ${engine_name}JSONServer
          *
          * \param[in] data Additional arguments passed from the client
          */
-        nlohmann::json shutdown(const nlohmann::json &data) override;
+        nlohmann::json shutdown(const nlohmann::json &clientData) override;
 
         /*!
          * \brief Resets the engine
@@ -83,7 +83,7 @@ class ${engine_name}JSONServer
          * The function should perform all actions needed to reset the simulation
          * to its initial state.
          */
-        nlohmann::json reset(EngineJSONServer::lock_t &datapackLock) override;
+        nlohmann::json reset(const nlohmann::json &clientData, EngineJSONServer::lock_t &datapackLock) override;
 
     private:
 

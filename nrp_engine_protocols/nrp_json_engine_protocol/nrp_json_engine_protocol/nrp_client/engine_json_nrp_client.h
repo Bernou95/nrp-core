@@ -211,9 +211,12 @@ protected:
          * \param data Data that should be passed to the engine
          * \return Returns reset data from engine
          */
-        nlohmann::json sendResetCommand(const nlohmann::json &data)
+        nlohmann::json sendResetCommand(const nlohmann::json &clientData)
         {
             NRP_LOGGER_TRACE("{} called", __FUNCTION__);
+
+            nlohmann::json data;
+            data["ClientData"] = clientData;
 
             NRPLogger::debug("EngineJSONNRPClient::sendResetCommand [ data: {} ]", data.dump());
 
@@ -228,9 +231,12 @@ protected:
          * \param data Data that should be passed to the engine
          * \return Returns init data from engine
          */
-        nlohmann::json sendShutdownCommand(const nlohmann::json &data)
+        nlohmann::json sendShutdownCommand(const nlohmann::json &clientData)
         {
             NRP_LOGGER_TRACE("{} called", __FUNCTION__);
+
+            nlohmann::json data;
+            data["ClientData"] = clientData;
 
             NRPLogger::debug("EngineJSONNRPClient::sendShutdownCommand [ data: {} ]", data.dump());
 

@@ -47,7 +47,7 @@ SimulationTime ${engine_name}JSONServer::runLoopStep(SimulationTime timeStep)
     return simulationTime;
 }
 
-nlohmann::json ${engine_name}JSONServer::initialize(const nlohmann::json &/*data*/, EngineJSONServer::lock_t &/*datapackLock*/)
+nlohmann::json ${engine_name}JSONServer::initialize(const nlohmann::json &/*config*/, const nlohmann::json &/*clientData*/, EngineJSONServer::lock_t &/*datapackLock*/)
 {
     std::cout << "Initializing simulation" << std::endl;
 
@@ -65,7 +65,7 @@ nlohmann::json ${engine_name}JSONServer::initialize(const nlohmann::json &/*data
     return "";
 }
 
-nlohmann::json ${engine_name}JSONServer::shutdown(const nlohmann::json &/*data*/)
+nlohmann::json ${engine_name}JSONServer::shutdown(const nlohmann::json &/*clientData*/)
 {
     std::cout << "Shutting down simulation" << std::endl;
 
@@ -75,7 +75,7 @@ nlohmann::json ${engine_name}JSONServer::shutdown(const nlohmann::json &/*data*/
     return "";
 }
 
-nlohmann::json ${engine_name}JSONServer::reset(EngineJSONServer::lock_t &/*datapackLock*/)
+nlohmann::json ${engine_name}JSONServer::reset(const nlohmann::json &/*clientData*/, EngineJSONServer::lock_t &/*datapackLock*/)
 {
     std::cout << "Resetting simulation" << std::endl;
     return "";

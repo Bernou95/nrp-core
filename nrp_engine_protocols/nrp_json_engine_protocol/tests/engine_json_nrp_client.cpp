@@ -63,19 +63,19 @@ class TestEngineJSONServer
         return curTime;
     }
 
-    nlohmann::json initialize(const nlohmann::json &data, EngineJSONServer::lock_t&) override
+    nlohmann::json initialize(const nlohmann::json &config, const nlohmann::json &/*clientData*/, EngineJSONServer::lock_t&) override
     {
-        return nlohmann::json({{"status", "success"}, {"original", data}});
+        return nlohmann::json({{"status", "success"}, {"original", config}});
     }
 
-    nlohmann::json reset(EngineJSONServer::lock_t&) override
+    nlohmann::json reset(const nlohmann::json &/*clientData*/, EngineJSONServer::lock_t&) override
     {
         return nlohmann::json({{"status", "success"}});
     }
 
-    nlohmann::json shutdown(const nlohmann::json &data) override
+    nlohmann::json shutdown(const nlohmann::json & clientData) override
     {
-        return nlohmann::json({{"shutdown", "success"}, {"original", data}});
+        return nlohmann::json({{"shutdown", "success"}, {"original", clientData}});
     }
 
     template<class EXCEPTION = std::exception>

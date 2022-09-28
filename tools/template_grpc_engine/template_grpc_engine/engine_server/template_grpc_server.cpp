@@ -42,7 +42,7 @@ SimulationTime ${engine_name}GrpcServer::runLoopStep(SimulationTime timeStep)
     return simulationTime;
 }
 
-void ${engine_name}GrpcServer::initialize(const nlohmann::json &/*data*/, EngineGrpcServer::lock_t & /*datapackLock*/)
+void ${engine_name}GrpcServer::initialize(const nlohmann::json &/*config*/, const nlohmann::json &/*clientData*/, EngineGrpcServer::lock_t & /*datapackLock*/)
 {
     std::cout << "Initializing simulation" << std::endl;
 
@@ -53,13 +53,13 @@ void ${engine_name}GrpcServer::initialize(const nlohmann::json &/*data*/, Engine
     this->_initRunFlag = true;
 }
 
-void ${engine_name}GrpcServer::shutdown(const nlohmann::json &/*data*/)
+void ${engine_name}GrpcServer::shutdown(const nlohmann::json &/*clientData*/)
 {
     std::cout << "Shutting down simulation" << std::endl;
     this->_shutdownFlag = true;
 }
 
-void ${engine_name}GrpcServer::reset()
+void ${engine_name}GrpcServer::reset(const nlohmann::json &/*clientData*/)
 {
     std::cout << "Resetting simulation" << std::endl;
 }

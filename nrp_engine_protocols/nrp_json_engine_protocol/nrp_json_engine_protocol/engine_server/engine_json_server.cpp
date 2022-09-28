@@ -364,7 +364,7 @@ void EngineJSONServer::initializeHandler(const Pistache::Rest::Request &req, Pis
         EngineJSONServer::lock_t lock(this->_datapackLock);
 
         // Run initialization function
-        jresp = this->initialize(jrequest, lock);
+        jresp = this->initialize(jrequest["Config"], jrequest["ClientData"], lock);
     }
     catch(std::exception &e)
     {
@@ -389,7 +389,7 @@ void EngineJSONServer::resetHandler(const Pistache::Rest::Request &req, Pistache
         EngineJSONServer::lock_t lock(this->_datapackLock);
 
         // Run initialization function
-        jresp = this->reset(lock);
+        jresp = this->reset(jrequest["ClientData"], lock);
     }
     catch(std::exception &e)
     {
@@ -425,7 +425,7 @@ void EngineJSONServer::shutdownHandler(const Pistache::Rest::Request &req, Pista
         EngineJSONServer::lock_t lock(this->_datapackLock);
 
         // Run shutdown function
-        jresp = this->shutdown(jrequest);
+        jresp = this->shutdown(jrequest["ClientData"]);
     }
     catch(std::exception &e)
     {

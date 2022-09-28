@@ -110,7 +110,10 @@ TEST(TestNestExecutable, TestNest)
         sleep(2);
 
         // Send init call
-        RestClient::Response resp = RestClient::post(server_address + "/" + EngineJSONConfigConst::EngineServerInitializeRoute.data(), EngineJSONConfigConst::EngineServerContentType.data(), config.dump());
+        nlohmann::json data;
+        data["Config"    ] = config;
+        data["ClientData"] = "";
+        RestClient::Response resp = RestClient::post(server_address + "/" + EngineJSONConfigConst::EngineServerInitializeRoute.data(), EngineJSONConfigConst::EngineServerContentType.data(), data.dump());
         ASSERT_EQ(resp.code, 200);
 
         ASSERT_EQ(commCtP.readP(&rec, 1, 5, 1), 1);
@@ -125,7 +128,9 @@ TEST(TestNestExecutable, TestNest)
         ASSERT_EQ(commPtC.writeP(&send, 1, 5, 1), 1);
 
         // Test shutdown
-        resp = RestClient::post(server_address + "/" + EngineJSONConfigConst::EngineServerShutdownRoute.data(), EngineJSONConfigConst::EngineServerContentType.data(), nlohmann::json().dump());
+        data.clear();
+        data["ClientData"] = "";
+        resp = RestClient::post(server_address + "/" + EngineJSONConfigConst::EngineServerShutdownRoute.data(), EngineJSONConfigConst::EngineServerContentType.data(), data.dump());
 
         ASSERT_EQ(commCtP.readP(&rec, 1, 5, 1), 1);
         ASSERT_EQ(rec, 4);

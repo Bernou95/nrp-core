@@ -47,7 +47,7 @@ SimulationTime DataTransferGrpcServer::runLoopStep(SimulationTime timeStep)
     return _simulationTime;
 }
 
-void DataTransferGrpcServer::initialize(const nlohmann::json &data, EngineGrpcServer::lock_t & /*datapackLock*/)
+void DataTransferGrpcServer::initialize(const nlohmann::json &config, const nlohmann::json &/*clientData*/, EngineGrpcServer::lock_t & /*datapackLock*/)
 {
     NRPLogger::info("Initializing Data Transfer Engine");
 
@@ -58,7 +58,7 @@ void DataTransferGrpcServer::initialize(const nlohmann::json &data, EngineGrpcSe
     nlohmann::json mqtt_config;
     // If client doesn't exist yet, then create one
     if (!_mqttClient){
-        mqtt_config["MQTTBroker"] = data.at("MQTTBroker");
+        mqtt_config["MQTTBroker"] = config.at("MQTTBroker");
         mqtt_config["ClientName"] = _engineName;
         _mqttClient = std::make_shared<NRPMQTTClient>(mqtt_config);
     }
@@ -78,10 +78,10 @@ void DataTransferGrpcServer::initialize(const nlohmann::json &data, EngineGrpcSe
     NRPLogger::info("No MQTT support. Network streaming disabled.");
 #endif
 
-    auto &dumps = data.at("dumps");
-    std::string dataDir = std::string(data.at("dataDirectory")) + "/" + timeStamp;
+    auto &dumps = config.at("dumps");
+    std::string dataDir = std::string(config.at("dataDirectory")) + "/" + timeStamp;
 
-    this->_handleDataPackMessage = data.at("streamDataPackMessage") && mqttConnected;
+    this->_handleDataPackMessage = config.at("streamDataPackMessage") && mqttConnected;
 
     for(auto &dump : dumps){
         const auto datapackName = dump.at("name");
@@ -109,7 +109,7 @@ void DataTransferGrpcServer::initialize(const nlohmann::json &data, EngineGrpcSe
     this->_initRunFlag = true;
 }
 
-void DataTransferGrpcServer::shutdown(const nlohmann::json &/*data*/)
+void DataTransferGrpcServer::shutdown(const nlohmann::json & /*clientData*/)
 {
     NRPLogger::debug("Shutting down simulation");
 
@@ -129,7 +129,7 @@ void DataTransferGrpcServer::shutdown(const nlohmann::json &/*data*/)
     this->_shutdownFlag = true;
 }
 
-void DataTransferGrpcServer::reset()
+void DataTransferGrpcServer::reset(const nlohmann::json & /*clientData*/)
 {
     NRPLogger::debug("Resetting simulation");
     this->_simulationTime = SimulationTime::zero();

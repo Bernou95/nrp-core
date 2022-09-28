@@ -56,7 +56,7 @@ TEST(TestNestJSONServer, DISABLED_TestFunc)
 
     EngineJSONServer::mutex_t fakeMutex;
     EngineJSONServer::lock_t fakeLock(fakeMutex);
-    nlohmann::json respParse = server.initialize(config, fakeLock);
+    nlohmann::json respParse = server.initialize(config, "", fakeLock);
 
     const auto execResult = respParse[NestConfigConst::InitFileExecStatus.data()].get<bool>();
     ASSERT_EQ(execResult, true);
@@ -104,7 +104,7 @@ TEST(TestNestJSONServer, TestInitError)
 
     EngineJSONServer::mutex_t fakeMutex;
     EngineJSONServer::lock_t fakeLock(fakeMutex);
-    nlohmann::json respParse = server.initialize(config, fakeLock);
+    nlohmann::json respParse = server.initialize(config, "", fakeLock);
 
     pyState.endAllowThreads();
 }
