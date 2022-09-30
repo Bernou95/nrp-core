@@ -35,6 +35,9 @@
 #include <pistache/endpoint.h>
 #include <nlohmann/json.hpp>
 
+#include <boost/interprocess/managed_shared_memory.hpp>
+using namespace boost::interprocess;
+
 /*!
  *  \brief Manages communication with the NRP. Uses a REST server to send/receive data. Singleton class.
  */
@@ -310,6 +313,8 @@ class EngineJSONServer
 
         friend class EngineJSONServerTest_Functions_Test;
         friend class TestEngineJSONServer;
+
+    managed_shared_memory _segment;
 };
 
 #endif // ENGINE_JSON_SERVER_H

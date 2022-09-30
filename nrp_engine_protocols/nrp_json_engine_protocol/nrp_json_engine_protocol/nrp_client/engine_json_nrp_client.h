@@ -37,6 +37,10 @@
 #include <iostream>
 #include <restclient-cpp/restclient.h>
 
+#include <boost/interprocess/managed_shared_memory.hpp>
+#include "nrp_json_engine_protocol/nrp_client/json_shr_memory.h"
+using namespace boost::interprocess;
+
 /*!
  *  \brief NRP - Gazebo Communicator on the NRP side. Converts DataPackInterface classes from/to JSON objects
  *  \tparam ENGINE_INTERFACE Class derived from GeneralInterface. Currently either PhysicsInterface or BrainInterface
@@ -53,7 +57,8 @@ class EngineJSONNRPClient
          */
         EngineJSONNRPClient(nlohmann::json &config, ProcessLauncherInterface::unique_ptr &&launcher)
             : EngineClient<ENGINE, SCHEMA>(config, std::move(launcher)),
-              _serverAddress(this->engineConfig().at("ServerAddress"))
+              _serverAddress(this->engineConfig().at("ServerAddress")),
+              _segment(create_only, this->engineName().c_str(), 65536)
         {
             NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
@@ -68,7 +73,8 @@ class EngineJSONNRPClient
          */
         EngineJSONNRPClient(const std::string &serverAddress, nlohmann::json &config, ProcessLauncherInterface::unique_ptr &&launcher)
             : EngineClient<ENGINE, SCHEMA>(config, std::move(launcher)),
-              _serverAddress(serverAddress)
+              _serverAddress(serverAddress),
+              _segment(create_only, this->engineName().c_str(), 65536)
         {
             NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
@@ -76,7 +82,8 @@ class EngineJSONNRPClient
             RestClientSetup::ensureInstance();
         }
 
-        virtual ~EngineJSONNRPClient() override = default;
+        virtual ~EngineJSONNRPClient() override
+        { shared_memory_object::remove(this->engineName().c_str()); }
 
         virtual pid_t launchEngine() override
         {
@@ -122,15 +129,18 @@ class EngineJSONNRPClient
 
                     // We get ownership of the datapack's data
                     // We'll have to delete the object after we're done
-                    nlohmann::json * data = (dynamic_cast<JsonDataPack *>(curDataPack))->releaseData();
+//                    nlohmann::json * data = (dynamic_cast<JsonDataPack *>(curDataPack))->releaseData();
 
                     const auto & name = curDataPack->name();
 
                     request[name]["engine_name"] = curDataPack->engineName();
                     request[name]["type"]        = curDataPack->type();
-                    request[name]["data"].swap(*data);
+//                    request[name]["data"].swap(*data);
 
-                    delete data;
+//                    delete data;
+
+                    // Store datapack in shared memory
+                    json_shared_memory::datapackShrConstructOrWrite(_segment, curDataPack->name(), (dynamic_cast<const JsonDataPack*>(curDataPack))->getData());
                 }
             }
 
@@ -344,7 +354,7 @@ protected:
          * \param datapacks JSON data of datapacks
          * \return Returns list of datapacks
          */
-        typename EngineClientInterface::datapacks_set_t getDataPackInterfacesFromJSON(const nlohmann::json &datapacks) const
+        typename EngineClientInterface::datapacks_set_t getDataPackInterfacesFromJSON(const nlohmann::json &datapacks)
         {
             NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
@@ -380,34 +390,26 @@ protected:
          * \return Returns pointer to created datapack
          */
 
-        inline DataPackInterfaceConstSharedPtr getSingleDataPackInterfaceFromJSON(const nlohmann::json::const_iterator &datapackData, DataPackIdentifier &datapackID) const
+        inline DataPackInterfaceConstSharedPtr getSingleDataPackInterfaceFromJSON(const nlohmann::json::const_iterator &datapackData, DataPackIdentifier &datapackID)
         {
             NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
             if(datapackID.Type == JsonDataPack::getType())
             {
                 // Check whether the requested datapack has new data
-                // A datapack that has no data will contain two JSON objects with "engine_name" and "type" keys (parts of datapack ID)
-
-                if(datapackData->size() == 2)
-                {
-                    // There's no meaningful data in the datapack, so create an empty datapack with datapack ID only
-
+                if(datapackData->at("isEmpty").get<bool>())
                     return DataPackInterfaceSharedPtr(new DataPackInterface(std::move(datapackID)));
-                }
 
-                nlohmann::json * data = new nlohmann::json(std::move((*datapackData)["data"]));
-
-                DataPackInterfaceSharedPtr newDataPack(new JsonDataPack(datapackID.Name, datapackID.EngineName, data));
-                newDataPack->setEngineName(this->engineName());
-
-                return newDataPack;
+                auto datapack = new JsonDataPack(datapackID.Name, this->engineName(), json_shared_memory::datapackShrRead(_segment, datapackID.Name));
+                return DataPackInterfaceSharedPtr(datapack);
             }
             else
             {
                 throw NRPException::logCreate("DataPack type \"" + datapackID.Type + "\" cannot be handled by the \"" + this->engineName() + "\" engine");
             }
         }
+
+    managed_shared_memory _segment;
 };
 
 

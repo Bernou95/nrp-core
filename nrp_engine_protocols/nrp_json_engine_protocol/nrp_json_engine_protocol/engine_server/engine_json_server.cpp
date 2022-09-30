@@ -28,13 +28,16 @@
 #include <nlohmann/json.hpp>
 #include <pistache/listener.h>
 
+#include "nrp_json_engine_protocol/nrp_client/json_shr_memory.h"
+
 using json = nlohmann::json;
 
 EngineJSONServer::EngineJSONServer(const std::string &engineAddress, const std::string &engineName, const std::string &clientAddress)
     : _serverAddress(engineAddress),
       _router(EngineJSONServer::setRoutes(this)),
       _engineName(engineName),
-      _loggerCfg(engineName)
+      _loggerCfg(engineName),
+      _segment(open_only, engineName.c_str())
 {
     NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
@@ -194,7 +197,8 @@ nlohmann::json EngineJSONServer::getDataPackData(const nlohmann::json &reqData)
             }
             else
             {
-                jres.update(*dev);
+                json_shared_memory::datapackShrConstructOrWrite(_segment, devName, *dev);
+                jres.update(devInterface->second->getNotEmptyDataPack());
             }
         }
         else
@@ -218,8 +222,11 @@ void EngineJSONServer::setDataPackData(const nlohmann::json &reqData)
 
         try
         {
-            if(devInterface != this->_datapacksControllers.end())
-                devInterface->second->handleDataPackData(*devDataIterator);
+            if(devInterface != this->_datapacksControllers.end()) {
+                auto data = json_shared_memory::datapackShrRead(_segment, devName);
+                devInterface->second->handleDataPackData(*data);
+                delete data;
+            }
         }
         catch(std::exception &e)
         {
