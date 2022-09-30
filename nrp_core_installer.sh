@@ -88,7 +88,7 @@ popd >/dev/null
 
 # Start of installation
 
-mkdir build
+mkdir -p build
 cd build
 # See the section "Common NRP-core CMake options" in the documentation for the additional ways to configure the project with CMake
 . /opt/ros/noetic/setup.bash
@@ -100,7 +100,9 @@ mkdir -p "${NRP_INSTALL_DIR}"
 # the installation process might take some time, as it downloads and compiles Nest as well.
 # If you haven't installed MQTT libraries, add ENABLE_MQTT=OFF definition to cmake (-DENABLE_MQTT=OFF).
 echo -e "${BLUE}Running make ... ${NC}"
-make -j8
+export PATH=$PATH:"${NRP_INSTALL_DIR}"/bin:"${NRP_DEPS_INSTALL_DIR}"/bin
+export LD_LIBRARY_PATH="${NRP_INSTALL_DIR}"/lib:"${NRP_DEPS_INSTALL_DIR}"/lib:${NRP_INSTALL_DIR}/lib/nrp_gazebo_plugins:$LD_LIBRARY_PATH
+make
 make install
 # just in case of wanting to build the documentation. Documentation can then be found in a new doxygen folder
 make nrp_doxygen
