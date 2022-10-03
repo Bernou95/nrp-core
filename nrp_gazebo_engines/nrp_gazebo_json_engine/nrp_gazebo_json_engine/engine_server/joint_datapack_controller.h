@@ -50,19 +50,16 @@ namespace gazebo
 
             void handleDataPackData(const nlohmann::json &data) override
             {
-                setCachedData(data);
-
                 const auto &jointName = this->_datapackId.Name;
-                const auto cachedData = getCachedData();
 
-                if(!(*cachedData)["position"].is_null())
-                    this->_jointController->SetPositionTarget(jointName, (*cachedData)["position"].get<float>());
+                if(data.contains("position"))
+                    this->_jointController->SetPositionTarget(jointName, data["position"].get<float>());
 
-                if(!(*cachedData)["velocity"].is_null())
-                    this->_jointController->SetVelocityTarget(jointName, (*cachedData)["velocity"].get<float>());
+                if(data.contains("velocity"))
+                    this->_jointController->SetVelocityTarget(jointName, data["velocity"].get<float>());
 
-                if(!(*cachedData)["effort"].is_null())
-                    this->_joint->SetForce(0, (*cachedData)["effort"].get<float>());
+                if(data.contains("effort"))
+                    this->_joint->SetForce(0, data["effort"].get<float>());
             }
 
             nlohmann::json * getDataPackInformation() override

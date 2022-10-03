@@ -49,6 +49,11 @@ class JsonDataPackController
             return this->_emptyDataPack;
         }
 
+    const nlohmann::json & getNotEmptyDataPack() const
+    {
+        return this->_notEmptyDataPack;
+    }
+
     protected:
 
         /*!
@@ -62,12 +67,13 @@ class JsonDataPackController
                 throw NRPException::logCreate("DataPack type \"" + datapackId.Type + "\" cannot be handled by JsonDataPackController");
             }
 
-            this->_data[this->_datapackId.Name]["type"       ] = this->_datapackId.Type;
-            this->_data[this->_datapackId.Name]["engine_name"] = this->_datapackId.EngineName;
-            this->_data[this->_datapackId.Name]["data"       ] = nullptr;
-
             this->_emptyDataPack[this->_datapackId.Name]["type"       ] = this->_datapackId.Type;
             this->_emptyDataPack[this->_datapackId.Name]["engine_name"] = this->_datapackId.EngineName;
+            this->_emptyDataPack[this->_datapackId.Name]["isEmpty"] = true;
+
+            this->_notEmptyDataPack[this->_datapackId.Name]["type"       ] = this->_datapackId.Type;
+            this->_notEmptyDataPack[this->_datapackId.Name]["engine_name"] = this->_datapackId.EngineName;
+            this->_notEmptyDataPack[this->_datapackId.Name]["isEmpty"] = false;
         }
 
         /*!
@@ -80,7 +86,7 @@ class JsonDataPackController
             // TODO Check name, type and engine name
             // TODO Format of the received JSON data is different than the data cached by the controller
             //      (the <datapack_name> label is missing). Try to change that.
-            this->_data[this->_datapackId.Name]["data"] = data["data"];
+            this->_data = data;
         }
 
         /*!
@@ -88,7 +94,7 @@ class JsonDataPackController
          */
         nlohmann::json * getCachedData()
         {
-            return &this->_data[this->_datapackId.Name].at("data");
+            return &this->_data;
         }
 
         DataPackIdentifier _datapackId;
@@ -101,6 +107,7 @@ class JsonDataPackController
          */
         nlohmann::json _data;
         nlohmann::json _emptyDataPack;
+        nlohmann::json _notEmptyDataPack;
 };
 
 #endif // JSON_DATAPACK_CONTROLLER_H

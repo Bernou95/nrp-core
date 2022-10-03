@@ -36,9 +36,7 @@ NestEngineJSONDataPackController::NestEngineJSONDataPackController(const DataPac
 
 void NestEngineJSONDataPackController::handleDataPackData(const nlohmann::json &data)
 {
-    setCachedData(data);
-
-    this->_nest["SetStatus"](this->_nodeCollection, boost::python::handle<>(json_converter::convertJsonToPyObject(*(getCachedData()))));
+    this->_nest["SetStatus"](this->_nodeCollection, boost::python::handle<>(json_converter::convertJsonToPyObject(data)));
 }
 
 nlohmann::json *NestEngineJSONDataPackController::getDataPackInformation()

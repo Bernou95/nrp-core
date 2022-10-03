@@ -58,7 +58,7 @@ class EngineJSONNRPClient
         EngineJSONNRPClient(nlohmann::json &config, ProcessLauncherInterface::unique_ptr &&launcher)
             : EngineClient<ENGINE, SCHEMA>(config, std::move(launcher)),
               _serverAddress(this->engineConfig().at("ServerAddress")),
-              _segment(create_only, this->engineName().c_str(), 65536)
+              _segment(create_only, this->engineName().c_str(), 65536 * 1024) // TODO: memory segment size should be estimated from registered datapacks, not hardcoded
         {
             NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
@@ -74,7 +74,7 @@ class EngineJSONNRPClient
         EngineJSONNRPClient(const std::string &serverAddress, nlohmann::json &config, ProcessLauncherInterface::unique_ptr &&launcher)
             : EngineClient<ENGINE, SCHEMA>(config, std::move(launcher)),
               _serverAddress(serverAddress),
-              _segment(create_only, this->engineName().c_str(), 65536)
+              _segment(create_only, this->engineName().c_str(), 65536 * 1024)
         {
             NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
@@ -396,6 +396,7 @@ protected:
 
             if(datapackID.Type == JsonDataPack::getType())
             {
+                std::string s = datapackData->dump();
                 // Check whether the requested datapack has new data
                 if(datapackData->at("isEmpty").get<bool>())
                     return DataPackInterfaceSharedPtr(new DataPackInterface(std::move(datapackID)));
