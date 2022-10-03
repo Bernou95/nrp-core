@@ -68,7 +68,7 @@ pushd ${HOME}
 [ ! -d 'paho.mqtt.c' ] && git clone https://github.com/eclipse/paho.mqtt.c.git
 pushd paho.mqtt.c >/dev/null
 git checkout v1.3.8
-cmake -Bbuild -H. -DPAHO_ENABLE_TESTING=OFF -DPAHO_BUILD_STATIC=OFF -DPAHO_BUILD_SHARED=ON -DPAHO_WITH_SSL=ON -DPAHO_HIGH_PERFORMANCE=ON
+cmake -Bbuild -H. -DPAHO_ENABLE_TESTING=OFF -DPAHO_BUILD_STATIC=OFF -DPAHO_BUILD_SHARED=ON -DPAHO_WITH_SSL=ON -DPAHO_HIGH_PERFORMANCE=ON -DCMAKE_PREFIX_PATH="${NRP_DEPS_INSTALL_DIR}"
 sudo cmake --build build/ --target install
 sudo ldconfig
 popd >/dev/null
@@ -100,8 +100,7 @@ mkdir -p "${NRP_INSTALL_DIR}"
 # the installation process might take some time, as it downloads and compiles Nest as well.
 # If you haven't installed MQTT libraries, add ENABLE_MQTT=OFF definition to cmake (-DENABLE_MQTT=OFF).
 echo -e "${BLUE}Running make ... ${NC}"
-export PATH=$PATH:"${NRP_INSTALL_DIR}"/bin:"${NRP_DEPS_INSTALL_DIR}"/bin
-export LD_LIBRARY_PATH="${NRP_INSTALL_DIR}"/lib:"${NRP_DEPS_INSTALL_DIR}"/lib:${NRP_INSTALL_DIR}/lib/nrp_gazebo_plugins:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH="${NRP_DEPS_INSTALL_DIR}"/lib:$LD_LIBRARY_PATH
 make
 make install
 # just in case of wanting to build the documentation. Documentation can then be found in a new doxygen folder
