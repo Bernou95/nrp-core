@@ -140,7 +140,7 @@ class EngineJSONNRPClient
 //                    delete data;
 
                     // Store datapack in shared memory
-                    json_shared_memory::datapackShrConstructOrWrite(_segment, curDataPack->name(), (dynamic_cast<const JsonDataPack*>(curDataPack))->getData());
+                    json_shared_memory::datapackShrSerialize(_segment, curDataPack->name(), (dynamic_cast<const JsonDataPack*>(curDataPack))->getData());
                 }
             }
 
@@ -401,7 +401,7 @@ protected:
                 if(datapackData->at("isEmpty").get<bool>())
                     return DataPackInterfaceSharedPtr(new DataPackInterface(std::move(datapackID)));
 
-                auto datapack = new JsonDataPack(datapackID.Name, this->engineName(), json_shared_memory::datapackShrRead(_segment, datapackID.Name));
+                auto datapack = new JsonDataPack(datapackID.Name, this->engineName(), json_shared_memory::datapackShrDeserialize(_segment, datapackID.Name));
                 return DataPackInterfaceSharedPtr(datapack);
             }
             else

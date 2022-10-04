@@ -197,7 +197,7 @@ nlohmann::json EngineJSONServer::getDataPackData(const nlohmann::json &reqData)
             }
             else
             {
-                json_shared_memory::datapackShrConstructOrWrite(_segment, devName, *dev);
+                json_shared_memory::datapackShrSerialize(_segment, devName, *dev);
                 jres.update(devInterface->second->getNotEmptyDataPack());
             }
         }
@@ -223,7 +223,7 @@ void EngineJSONServer::setDataPackData(const nlohmann::json &reqData)
         try
         {
             if(devInterface != this->_datapacksControllers.end()) {
-                auto data = json_shared_memory::datapackShrRead(_segment, devName);
+                auto data = json_shared_memory::datapackShrDeserialize(_segment, devName);
                 devInterface->second->handleDataPackData(*data);
                 delete data;
             }

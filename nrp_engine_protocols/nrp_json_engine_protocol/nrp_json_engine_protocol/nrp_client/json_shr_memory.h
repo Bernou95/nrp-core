@@ -404,6 +404,31 @@ namespace json_shared_memory
 
 //// main accessors
 
+    inline void datapackShrSerialize(managed_shared_memory& segment, const std::string& name, const nlohmann::json& data)
+    {
+        auto s = data.dump();
+        char* shr_s = segment.construct<char>(name.c_str())[s.size()+1]();
+        strcpy(shr_s, s.c_str());
+        NRPLogger::info("Serializing " + name);
+    }
+
+    inline nlohmann::json* datapackShrDeserialize(managed_shared_memory& segment, const std::string& datapackName)
+    {
+        auto shr_s = segment.find<char>(datapackName.c_str());
+        if(!shr_s.first)
+            throw NRPException::logCreate("Can't read datapack " + datapackName + ". Can't be found in shared memory");
+
+        NRPLogger::info("Deserializing " + datapackName);
+        try {
+            auto t = nlohmann::json::parse(shr_s.first, shr_s.first + shr_s.second);
+            segment.destroy<char>(datapackName.c_str());
+            return new nlohmann::json(std::move(t));
+        }
+        catch (const nlohmann::json::exception& e) {
+            throw NRPException::logCreate("Failed to deserialize " + datapackName + ", error: " + e.what());
+        }
+    }
+
 // Writes or construct a datapack to shared memory
     inline void datapackShrConstructOrWrite(managed_shared_memory& segment, const std::string& name, const nlohmann::json& data)
     {

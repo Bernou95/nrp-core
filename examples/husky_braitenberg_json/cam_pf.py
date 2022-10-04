@@ -26,7 +26,7 @@ def detect_red(camera):
     """
 
     red_left = red_right = green_blue = 0
-    if not camera.isEmpty():
+    if not camera.isEmpty() and camera.data["image_data"]:
 
         # Set to True to display camera image data and pause for 10 s
         show_image = False
