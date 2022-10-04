@@ -67,12 +67,11 @@ class TestServer(unittest.TestCase):
     get_datapack_json = {"test_datapack": {"engine_name": engine_name, "type": JsonDataPack.getType()}}
 
 
-    def select_config(self, key, ratio=[1, 1000000000], client_data=None):
+    def select_config(self, key, ratio=[1, 1000000000]):
         """Helper function that prepares the config for the initialize() method"""
         init_json = self.init_json.copy()
         init_json["PythonFileName"] = self.filenames[key]
         init_json["TimeRatio"] = ratio
-        init_json["ClientData"] = client_data
 
         return init_json
 
@@ -90,12 +89,11 @@ class TestServer(unittest.TestCase):
     def test_initialize_client_data(self):
         """
         Tests the ability to pass client data into the reset() callback
-        The data should be included in the argument to the callback under ClientData key.
-        After the call they should be available in client_data variable
+        After the call they should be available in _client_data variable of the script
         """
         client_data = {"test_init": "test"}
-        server_callbacks.initialize(self.select_config("valid", client_data=client_data))
-        self.assertEqual(server_callbacks.script.client_data, client_data)
+        server_callbacks.initialize(self.select_config("valid"), client_data=client_data)
+        self.assertEqual(server_callbacks.script._client_data, client_data)
 
 
     def test_initialize_script_inheritance(self):
@@ -141,15 +139,13 @@ class TestServer(unittest.TestCase):
     def test_shutdown_client_data(self):
         """
         Tests the ability to pass client data into the shutdown() callback
-        The data should be included in the argument to the callback under ClientData key.
-        After the call they should be available in client_data variable
+        After the call they should be available in _client_data variable of the script
         """
         server_callbacks.initialize(self.select_config("valid"))
 
         client_data = {"test_shutdown": 123}
-        shutdown_json = {"ClientData": client_data}
-        server_callbacks.shutdown(shutdown_json)
-        self.assertEqual(server_callbacks.script.client_data, client_data)
+        server_callbacks.shutdown(client_data)
+        self.assertEqual(server_callbacks.script._client_data, client_data)
 
 
     def test_shutdown_failure(self):
@@ -178,20 +174,17 @@ class TestServer(unittest.TestCase):
     def test_reset_client_data(self):
         """
         Tests the ability to pass client data into the reset() callback
-        The data should be included in the argument to the callback under ClientData key.
-        After the call they should be available in client_data variable
+        After the call they should be available in _client_data variable of the script
         """
         server_callbacks.initialize(self.select_config("valid"))
 
         client_data = {"test": 123}
-        reset_json = {"ClientData": client_data}
-        server_callbacks.reset(reset_json)
-        self.assertEqual(server_callbacks.script.client_data, client_data)
+        server_callbacks.reset(client_data)
+        self.assertEqual(server_callbacks.script._client_data, client_data)
 
         client_data = None
-        reset_json = {"ClientData": client_data}
-        server_callbacks.reset(reset_json)
-        self.assertEqual(server_callbacks.script.client_data, client_data)
+        server_callbacks.reset(client_data)
+        self.assertEqual(server_callbacks.script._client_data, client_data)
 
 
     def test_reset_failure(self):

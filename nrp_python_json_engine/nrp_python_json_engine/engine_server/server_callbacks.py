@@ -46,7 +46,7 @@ def _flush_std():
     sys.stderr.flush()
 
 
-def initialize(config: dict, client_data: dict) -> dict:
+def initialize(config: dict, client_data: dict = None) -> None:
     """Imports module containing the Script class, instantiates it, and runs its initialize() method"""
     global script
 
@@ -142,7 +142,7 @@ def get_datapack(request_json: dict) -> dict:
     return return_data
 
 
-def reset(client_data: dict) -> dict:
+def reset(client_data: dict = None) -> dict:
     """Calls the reset() method of the Script object"""
     global script
 
@@ -152,7 +152,7 @@ def reset(client_data: dict) -> dict:
     script._time_ns = 0
 
 
-def shutdown(client_data: dict) -> None:
+def shutdown(client_data: dict = None) -> None:
     """Calls the shutdown() method of the Script object"""
     global script
 
