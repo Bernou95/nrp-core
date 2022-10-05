@@ -25,6 +25,7 @@
 #include "nest_server_executable/nest_server_executable.h"
 #include "nrp_general_library/utils/nrp_logger.h"
 #include "nrp_general_library/utils/pipe_communication.h"
+#include "nrp_general_library/engine_interfaces/engine_request_utils.h"
 #include "nrp_nest_json_engine/config/nest_config.h"
 #include "tests/test_env_cmake.h"
 
@@ -111,8 +112,7 @@ TEST(TestNestExecutable, TestNest)
 
         // Send init call
         nlohmann::json data;
-        data["Config"    ] = config;
-        data["ClientData"] = "";
+        EngineRequestUtils::prepareRequestData(&data, "", config);
         RestClient::Response resp = RestClient::post(server_address + "/" + EngineJSONConfigConst::EngineServerInitializeRoute.data(), EngineJSONConfigConst::EngineServerContentType.data(), data.dump());
         ASSERT_EQ(resp.code, 200);
 
@@ -129,7 +129,7 @@ TEST(TestNestExecutable, TestNest)
 
         // Test shutdown
         data.clear();
-        data["ClientData"] = "";
+        EngineRequestUtils::prepareRequestData(&data, "");
         resp = RestClient::post(server_address + "/" + EngineJSONConfigConst::EngineServerShutdownRoute.data(), EngineJSONConfigConst::EngineServerContentType.data(), data.dump());
 
         ASSERT_EQ(commCtP.readP(&rec, 1, 5, 1), 1);

@@ -25,6 +25,7 @@
 #include "nrp_json_engine_protocol/config/engine_json_config.h"
 #include "nrp_json_engine_protocol/engine_server/engine_json_server.h"
 #include "nrp_json_engine_protocol/datapack_interfaces/json_datapack.h"
+#include "nrp_general_library/engine_interfaces/engine_request_utils.h"
 
 #include "tests/test_engine_json_datapack_controllers.h"
 
@@ -169,8 +170,7 @@ TEST(EngineJSONServerTest, HttpRequests)
 
     // Init command
     nlohmann::json data;
-    data["Config"] = "init";
-    data["ClientData"] = "";
+    EngineRequestUtils::prepareRequestData(&data, "", "init");
     auto resp = RestClient::post(address + "/" + EngineJSONConfigConst::EngineServerInitializeRoute.data(), EngineJSONConfigConst::EngineServerContentType.data(), data.dump());
     nlohmann::json retData = nlohmann::json::parse(resp.body);
     ASSERT_STREQ(retData["status"].get<std::string>().data(), "success");
