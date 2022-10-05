@@ -121,7 +121,7 @@ class TestEngineGrpcServer
 
         virtual ~TestEngineGrpcServer() override = default;
 
-        void initialize(const nlohmann::json &config, const nlohmann::json & /*clientData*/, EngineGrpcServer::lock_t &) override
+        void initialize(const nlohmann::json &config, const nlohmann::json & clientData, EngineGrpcServer::lock_t &) override
         {
             specialBehaviour();
 
@@ -129,23 +129,28 @@ class TestEngineGrpcServer
             {
                 throw std::runtime_error("Init failed");
             }
+
+            this->clientData = clientData;
         }
 
-        void reset(const nlohmann::json & /*clientData*/) override
+        void reset(const nlohmann::json & clientData) override
         {
             specialBehaviour();
 
             this->resetEngineTime();
+            this->clientData = clientData;
         }
 
-        void shutdown(const nlohmann::json & data) override
+        void shutdown(const nlohmann::json & clientData) override
         {
             specialBehaviour();
 
-            if(data.at("throw"))
+            if(clientData.at("throw"))
             {
                 throw std::runtime_error("Shutdown failed");
             }
+
+            this->clientData = clientData;
         }
 
         void timeoutOnNextCommand(int sleepTimeMs = 1500)
@@ -171,6 +176,8 @@ class TestEngineGrpcServer
         {
             return this->_time;
         }
+
+        nlohmann::json clientData;
 
     private:
 
@@ -227,7 +234,10 @@ TEST(EngineGrpc, InitCommand)
     server.startServer();
     // TODO Investigate why this is needed. It seems to be caused by the previous call to sendInitCommand function
     testSleep(1500);
-    client.sendInitializeCommand(jsonMessage, "");
+    nlohmann::json clientData;
+    clientData["test"] = 55;
+    client.sendInitializeCommand(jsonMessage, clientData);
+    ASSERT_EQ(server.clientData["test"], clientData["test"]);
 
     // Force the server to return an error from the rpc
     // Check if the client receives an error response on command handling failure
@@ -277,9 +287,12 @@ TEST(EngineGrpc, ShutdownCommand)
     // Start the server and send the shutdown command. It should succeed
 
     server.startServer();
+    
     // TODO Investigate why this is needed. It seems to be caused by the previous call to sendInitCommand function
     testSleep(1500);
     ASSERT_NO_THROW(client.sendShutdownCommand(jsonMessage));
+    ASSERT_EQ(server.clientData["shutdown"], true);
+    ASSERT_EQ(server.clientData["throw"], false);
 
     // Force the server to return an error from the rpc
     // Check if the client receives an error response on command handling failure
@@ -380,10 +393,6 @@ TEST(EngineGrpc, ResetCommand)
     TestEngineGrpcServer server("localhost:9004");
     TestEngineGrpcClient client(config, ProcessLauncherInterface::unique_ptr(new ProcessLauncherBasic()));
 
-    nlohmann::json jsonMessage;
-    jsonMessage["init"]    = true;
-    jsonMessage["throw"]   = false;
-
     // The gRPC server isn't running, so the reset command should fail
 
     ASSERT_THROW(client.sendResetCommand(""), std::runtime_error);
@@ -393,7 +402,10 @@ TEST(EngineGrpc, ResetCommand)
     server.startServer();
     // TODO Investigate why this is needed. It seems to be caused by the previous call to sendInitCommand function
     testSleep(1500);
-    ASSERT_NO_THROW(client.sendResetCommand(""));
+    nlohmann::json clientData;
+    clientData["test_reset"] = 383838;
+    ASSERT_NO_THROW(client.sendResetCommand(clientData));
+    ASSERT_EQ(server.clientData["test_reset"], clientData["test_reset"]);
 
     // Normal loop execution, the reset should return time to zero
 
