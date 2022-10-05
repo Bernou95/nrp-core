@@ -24,6 +24,7 @@ set(LIB_SRC_FILES
     nrp_general_library/engine_interfaces/datapack_controller.cpp
     nrp_general_library/engine_interfaces/engine_client_interface.cpp
     nrp_general_library/engine_interfaces/engine_launcher_manager.cpp
+    nrp_general_library/engine_interfaces/engine_request_utils.cpp
     nrp_general_library/plugin_system/plugin.cpp
     nrp_general_library/plugin_system/plugin_manager.cpp
     nrp_general_library/process_launchers/launch_commands/basic_fork.cpp

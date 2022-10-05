@@ -28,6 +28,7 @@
 #include "nrp_json_engine_protocol/datapack_interfaces/json_datapack.h"
 #include "nrp_general_library/utils/nrp_exceptions.h"
 #include "nrp_general_library/utils/restclient_setup.h"
+#include "nrp_general_library/engine_interfaces/engine_request_utils.h"
 
 #include <nlohmann/json.hpp>
 #include <list>
@@ -185,6 +186,7 @@ class EngineJSONNRPClient
         }
 
 protected:
+
         /*!
          * \brief Send an initialization command
          * \param data Data that should be passed to the engine
@@ -195,8 +197,7 @@ protected:
             NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
             nlohmann::json data;
-            data["Config"]     = config;
-            data["ClientData"] = clientData;
+            EngineRequestUtils::prepareRequestData(&data, clientData, config);
 
             NRPLogger::debug("EngineJSONNRPClient::sendInitCommand [ data: {} ]", data.dump());
 
@@ -216,7 +217,7 @@ protected:
             NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
             nlohmann::json data;
-            data["ClientData"] = clientData;
+            EngineRequestUtils::prepareRequestData(&data, clientData);
 
             NRPLogger::debug("EngineJSONNRPClient::sendResetCommand [ data: {} ]", data.dump());
 
@@ -236,7 +237,7 @@ protected:
             NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
             nlohmann::json data;
-            data["ClientData"] = clientData;
+            EngineRequestUtils::prepareRequestData(&data, clientData);
 
             NRPLogger::debug("EngineJSONNRPClient::sendShutdownCommand [ data: {} ]", data.dump());
 

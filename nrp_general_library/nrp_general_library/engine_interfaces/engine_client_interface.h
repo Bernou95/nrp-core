@@ -28,6 +28,7 @@
 #include "nrp_general_library/utils/time_utils.h"
 #include "nrp_general_library/utils/json_schema_utils.h"
 #include "nrp_general_library/datapack_interface/datapack_interface.h"
+#include "nrp_general_library/engine_interfaces/engine_request_utils.h"
 
 #include <set>
 #include <vector>

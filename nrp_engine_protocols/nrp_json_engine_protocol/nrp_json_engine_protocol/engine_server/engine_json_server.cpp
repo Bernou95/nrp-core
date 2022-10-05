@@ -21,6 +21,7 @@
 //
 
 #include "nrp_json_engine_protocol/engine_server/engine_json_server.h"
+#include "nrp_general_library/engine_interfaces/engine_request_utils.h"
 #include "nrp_json_engine_protocol/config/engine_json_config.h"
 #include "nrp_json_engine_protocol/nrp_client/engine_json_registration_server.h"
 #include "nrp_general_library/utils/restclient_setup.h"
@@ -364,7 +365,9 @@ void EngineJSONServer::initializeHandler(const Pistache::Rest::Request &req, Pis
         EngineJSONServer::lock_t lock(this->_datapackLock);
 
         // Run initialization function
-        jresp = this->initialize(jrequest["Config"], jrequest["ClientData"], lock);
+        jresp = this->initialize(EngineRequestUtils::getConfigFromRequest(jrequest),
+                                 EngineRequestUtils::getClientDataFromRequest(jrequest),
+                                 lock);
     }
     catch(std::exception &e)
     {
@@ -389,7 +392,7 @@ void EngineJSONServer::resetHandler(const Pistache::Rest::Request &req, Pistache
         EngineJSONServer::lock_t lock(this->_datapackLock);
 
         // Run initialization function
-        jresp = this->reset(jrequest["ClientData"], lock);
+        jresp = this->reset(EngineRequestUtils::getClientDataFromRequest(jrequest), lock);
     }
     catch(std::exception &e)
     {
@@ -425,7 +428,7 @@ void EngineJSONServer::shutdownHandler(const Pistache::Rest::Request &req, Pista
         EngineJSONServer::lock_t lock(this->_datapackLock);
 
         // Run shutdown function
-        jresp = this->shutdown(jrequest["ClientData"]);
+        jresp = this->shutdown(EngineRequestUtils::getClientDataFromRequest(jrequest));
     }
     catch(std::exception &e)
     {

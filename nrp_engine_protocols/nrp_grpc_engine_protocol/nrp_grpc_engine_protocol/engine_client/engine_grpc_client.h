@@ -117,8 +117,7 @@ class EngineGrpcClient
             prepareRpcContext(&context);
 
             nlohmann::json data;
-            data["Config"]     = config;
-            data["ClientData"] = clientData;
+            EngineRequestUtils::prepareRequestData(&data, clientData, config);
 
             request.set_json(data.dump());
 
@@ -142,7 +141,7 @@ class EngineGrpcClient
             prepareRpcContext(&context);
 
             nlohmann::json data;
-            data["ClientData"] = clientData;
+            EngineRequestUtils::prepareRequestData(&data, clientData);
 
             request.set_json(data.dump());
 
@@ -169,7 +168,7 @@ class EngineGrpcClient
             prepareRpcContext(&context);
 
             nlohmann::json data;
-            data["ClientData"] = clientData;
+            EngineRequestUtils::prepareRequestData(&data, clientData);
 
             request.set_json(data.dump());
 

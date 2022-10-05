@@ -32,6 +32,7 @@
 
 #include "nrp_protobuf/engine_grpc.grpc.pb.h"
 #include "nrp_general_library/engine_interfaces/datapack_controller.h"
+#include "nrp_general_library/engine_interfaces/engine_request_utils.h"
 #include "nrp_general_library/utils/time_utils.h"
 #include "proto_python_bindings/proto_field_ops.h"
 #include "nrp_protobuf/protobuf_utils.h"
@@ -283,7 +284,9 @@ class EngineGrpcServer : public EngineGrpcService::Service
 
                 // Run engine-specific initialization function
 
-                this->initialize(requestJson["Config"], requestJson["ClientData"], lock);
+                this->initialize(EngineRequestUtils::getConfigFromRequest(requestJson),
+                                 EngineRequestUtils::getClientDataFromRequest(requestJson),
+                                 lock);
             }
             catch(const std::exception &e)
             {
@@ -319,7 +322,7 @@ class EngineGrpcServer : public EngineGrpcService::Service
                 nlohmann::json requestJson = nlohmann::json::parse(request->json());
 
                 // Run engine-specific reset function
-                this->reset(requestJson["ClientData"]);
+                this->reset(EngineRequestUtils::getClientDataFromRequest(requestJson));
             }
             catch(const std::exception &e)
             {
@@ -355,7 +358,7 @@ class EngineGrpcServer : public EngineGrpcService::Service
 
                 // Run engine-specific shutdown function
 
-                this->shutdown(requestJson["ClientData"]);
+                this->shutdown(EngineRequestUtils::getClientDataFromRequest(requestJson));
             }
             catch(const std::exception &e)
             {
