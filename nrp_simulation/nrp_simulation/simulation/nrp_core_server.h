@@ -126,25 +126,22 @@ private:
 
     /*!
      * \brief Sets client data that can be used by the consumer
-     * \param clientData Extra data coming from the client in JSON format
+     * \param clientData Extra data coming from the client in JSON format.
+     *                   Should be an empty JSON if no data were specified by the user.
+     * \throw If the previously set data was not acquired by getClientData()
      *
      * This function should be called by all callbacks that allow to pass extra data from the client.
+     * This function should be always called in tandem with getClientData()!
      */
     void setClientData(const std::string & clientData);
 
     /*!
-     * \brief Clears the client data available to the consumer
-     *
-     * This function should be called by all callbacks that don't allow to pass extra data from the client.
-     */
-    void resetClientData();
-
-    /*!
      * \brief Returns client data set by the producer
-     * \throw If the data has never been set
+     * \throw If the data has never been set by setClientData()
      *
      * This function should be called by the consumer (the main thread) in order to
      * fetch any extra data coming from the client.
+     * This function should be always called in tandem with setClientData()!
      */
     const nlohmann::json & getClientData();
 
