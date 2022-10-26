@@ -1,7 +1,7 @@
 {
 	"SimulationName": "husky_simulation",
 	"SimDescription": "Launches a Gazebo simulation with a Husky robot and a Nest sim with a Braitenberg model which controls the robot",
-	"SimulationTimeout": 20,
+	"SimulationTimeout": 10,
 	"EngineConfigs": [
 		{
 			"EngineType": "gazebo_grpc",
