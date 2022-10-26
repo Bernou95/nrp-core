@@ -7,8 +7,6 @@ amplitude = 0.3
 center = {'x': 0, 'y': 2.42, 'z': 1.2}
 t = 0
 
-# with open('target.csv', 'w') as f:
-#     pass
 
 @TransceiverFunction("gazebo")
 def robot_control():
@@ -18,9 +16,6 @@ def robot_control():
     target.data.position.append(center['x'] + sin(t * frequency * 2 * pi) * (amplitude / 2))
     target.data.position.append(center['y'])
     target.data.position.append(center['z'])
-
-    # with open('target.csv', 'a') as f:
-    #     f.write('{},{}\n'.format(t, target.data.position[0]))
 
     t += 0.01
 

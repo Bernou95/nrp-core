@@ -1,8 +1,6 @@
 from nrp_core import *
 from nrp_core.data.nrp_json import *
 import numpy as np
-from PIL import Image
-import time
 import cv2
 import math
 
@@ -71,9 +69,6 @@ def pixel2angle(u, v):
     return a, e
 
 
-# with open('input.csv', 'w') as f:
-#     pass
-
 @EngineDataPack(keyword='camera', id=DataPackIdentifier('camera_left::camera_left', 'gazebo'))
 @TransceiverFunction("nest")
 def eye_sensor_transmit(camera):
@@ -90,11 +85,5 @@ def eye_sensor_transmit(camera):
     lpg.data['rate'] = 1000.0 * red / 76800.0
     rpg.data['rate'] = 1000.0 * red / 76800.0
     gpg.data['rate'] = 1000.0 * (76800.0 - red) / 76800.0
-
-    # global t
-    # with open('input.csv', 'a') as f:
-    #     f.write('{},{},{}\n'.format(t, lpg.data['rate'], gpg.data['rate']))
-
-    # print('INPUT: {} {} {} {}'.format(red, lpg.data['rate'], rpg.data['rate'], gpg.data['rate']))
 
     return [lpg, rpg, gpg]

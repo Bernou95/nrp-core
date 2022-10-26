@@ -6,9 +6,10 @@ This file contains the setup of the neuronal network running the Husky experimen
 
 import nest
 from nrp_core.engines.nest_json import RegisterDataPack, CreateDataPack
+from nrp_core.engines.nest_json import brain_devices as bd
 
 SENSORPARAMS = {'E_L': -60.5,
-                'C_m': 25.0, # 85.0 improves the output
+                'C_m': 25.0,
                 'g_L': 25.0 / 10.,
                 't_ref': 10.0,
                 'tau_syn_ex': 2.5,
@@ -30,18 +31,6 @@ GO_ON_PARAMS = {'E_L': -60.5,
                 'tau_syn_ex': 2.5,
                 'tau_syn_in': 2.5,
                 'V_m': -60.5}
-
-LEAKY_PARAMS = {
-    'V_th': 1e10,
-    'C_m': 1000.0,
-    'tau_m': 10.0,
-    'tau_syn_ex': 2.,
-    'tau_syn_in': 2.,
-    'E_L': 0.0,
-    'V_reset': 0.0,
-    't_ref': 0.1,
-    'I_e': 0.0
-}
 
 nest.set_verbosity("M_WARNING")
 nest.ResetKernel()
@@ -79,83 +68,13 @@ SYN = {'synapse_model': 'base_synapse', 'weight': WEIGHT_GO_ON_TO_RIGHT_ACTOR, '
 nest.Connect(CIRCUIT[5:6], CIRCUIT[7:8], 'all_to_all', SYN)
 
 # Left side poisson generator
-lpg = CreateDataPack('lpg', 'poisson_generator')
+bd.PoissonSpikeGenerator(nest, 'lpg', CIRCUIT[slice(0, 3, 2)])
 
 # Right side poisson generator
-rpg = CreateDataPack('rpg', 'poisson_generator')
+bd.PoissonSpikeGenerator(nest, 'rpg', CIRCUIT[slice(1, 4, 2)])
 
 # Go poisson generator
-gpg = CreateDataPack('gpg', 'poisson_generator')
-
-# Connect datapacks
-nest.Connect(lpg, CIRCUIT[slice(0, 3, 2)])
-nest.Connect(rpg, CIRCUIT[slice(1, 4, 2)])
-nest.Connect(gpg, CIRCUIT[4])
+bd.PoissonSpikeGenerator(nest, 'gpg', CIRCUIT[4])
 
 # Create and connect leaky integrator cells
-leaky_cells = nest.Create('iaf_psc_alpha', 2, LEAKY_PARAMS)
-nest.SetStatus(leaky_cells, {'V_m': LEAKY_PARAMS['E_L']})
-
-nest.Connect(CIRCUIT[6],
-             leaky_cells[0],
-             conn_spec='all_to_all',
-             syn_spec={'synapse_model': 'static_synapse', 'weight': 10.0, 'delay': 0.1})
-
-nest.Connect(CIRCUIT[7],
-             leaky_cells[1],
-             conn_spec='all_to_all',
-             syn_spec={'synapse_model': 'static_synapse', 'weight': 10.0, 'delay': 0.1})
-
-# Register network outputs
-RegisterDataPack('actors', leaky_cells)
-
-# sd = nest.Create('spike_recorder')
-# nest.Connect(CIRCUIT[6:8], sd)
-# RegisterDataPack('spiker', sd)
-
-# Simulate
-# import numpy as np
-# import nest.raster_plot
-# import matplotlib.pyplot as plt
-# i1 = np.genfromtxt("input.csv", delimiter=',', skip_header=0)
-# sd1 = nest.Create('spike_recorder')
-# nest.Connect(CIRCUIT[6:8], sd1)
-# # sd2 = nest.Create('spike_recorder')
-# # nest.Connect(CIRCUIT[7], sd2)
-#
-# x = []
-# v = []
-# v2 = []
-# v3 = []
-# v4 = []
-# v5 = []
-#
-# # nest.SetStatus(lpg,{'rate': 1000.0})
-# # nest.SetStatus(rpg,{'rate': 1000.0})
-# # nest.SetStatus(gpg,{'rate': 1000.0})
-# for i in range(len(i1[:,0])):
-#     nest.SetStatus(lpg,{'rate': i1[i,1]})
-#     nest.SetStatus(rpg,{'rate': i1[i,1]})
-#     nest.SetStatus(gpg,{'rate': i1[i,2]})
-#     nest.Simulate(10)
-#     x.append(i * 10)
-#     v.append(CIRCUIT[6].get('V_m'))
-#     v2.append(CIRCUIT[7].get('V_m'))
-#     v3.append(leaky_cells[0].get('V_m'))
-#     v4.append(leaky_cells[1].get('V_m'))
-#     v5.append(v4[i]-v3[i])
-#
-# # sp1 = nest.GetStatus(sd1)[0]['events']['times']
-# # xp1 = np.zeros(len(sp1))
-#
-# # sp2 = nest.GetStatus(sd2)[0]['events']['times']
-# # xp2 = np.ones(len(sp2))
-#
-# nest.raster_plot.from_device(sd1, hist=True)
-# # plt.plot(x,v)
-# # plt.plot(x,v2)
-# # plt.plot(x,v3, 'b')
-# # plt.plot(x,v4, 'r')
-# # plt.scatter(sp1,xp1, color='tab:green')
-# # plt.scatter(sp2,xp2, color='tab:red')
-# plt.show()
+bd.LeakyIntegratorAlpha(nest, 'actors', CIRCUIT[6:8], n=2, conn_spec='one_to_one')
