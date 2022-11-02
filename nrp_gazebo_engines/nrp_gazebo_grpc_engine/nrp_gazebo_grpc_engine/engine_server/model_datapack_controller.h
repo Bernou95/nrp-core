@@ -50,9 +50,8 @@ namespace gazebo
 
             virtual void handleDataPackData(const google::protobuf::Message &data) override
             {
-                // TODO: add a gazebo.Model protobuf msg
                 // throws bad_cast
-                const auto &l = dynamic_cast<const Gazebo::Link &>(data);
+                const auto &l = dynamic_cast<const Gazebo::Model &>(data);
 
                 // Set Pose
                 if(l.position_size() || l.rotation_size()) {
@@ -103,8 +102,7 @@ namespace gazebo
 
             virtual google::protobuf::Message *getDataPackInformation() override
             {
-                // TODO: add a gazebo.Model protobuf msg
-                auto l = new Gazebo::Link();
+                auto l = new Gazebo::Model();
 
                 const auto &pose = this->_model->WorldPose();
                 l->add_position(ToFloat(pose.Pos().X()));

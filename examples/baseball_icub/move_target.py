@@ -1,5 +1,5 @@
 from nrp_core import *
-from nrp_core.data.nrp_protobuf import GazeboLinkDataPack
+from nrp_core.data.nrp_protobuf import GazeboModelDataPack
 
 
 @EngineDataPack(keyword='target', id=DataPackIdentifier('target::Target', 'gazebo'))
@@ -7,7 +7,7 @@ from nrp_core.data.nrp_protobuf import GazeboLinkDataPack
 def robot_control(target):
 
     if target.data.position[2] < 0.1:
-        target_ret = GazeboLinkDataPack("target::Target", "gazebo")
+        target_ret = GazeboModelDataPack("target::Target", "gazebo")
         target_ret.data.position.append(3.)
         target_ret.data.position.append(-0.28)
         target_ret.data.position.append(0.7)

@@ -1,5 +1,5 @@
 from nrp_core import *
-from nrp_core.data.nrp_protobuf import GazeboLinkDataPack
+from nrp_core.data.nrp_protobuf import GazeboModelDataPack
 from math import sin, pi
 
 frequency = 0.3
@@ -12,7 +12,7 @@ t = 0
 def robot_control():
     global t
 
-    target = GazeboLinkDataPack("target::Target", "gazebo")
+    target = GazeboModelDataPack("target::Target", "gazebo")
     target.data.position.append(center['x'] + sin(t * frequency * 2 * pi) * (amplitude / 2))
     target.data.position.append(center['y'])
     target.data.position.append(center['z'])
