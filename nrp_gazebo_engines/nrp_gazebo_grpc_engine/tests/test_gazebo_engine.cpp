@@ -165,13 +165,13 @@ TEST(TestGazeboGrpcEngine, JointPlugin)
     ASSERT_NO_THROW(engine->sendDataPacksToEngine({&dev}));
 }
 
-TEST(TestGazeboGrpcEngine, LinkPlugin)
+TEST(TestGazeboGrpcEngine, LinkAndModelPlugin)
 {
     // Setup config
     nlohmann::json config;
     config["EngineName"] = "engine";
     config["EngineType"] = "gazebo_grpc";
-    config["GazeboWorldFile"] = TEST_LINK_PLUGIN_FILE;
+    config["GazeboWorldFile"] = TEST_LINK_AND_MODEL_PLUGIN_FILE;
     config["GazeboRNGSeed"] = 12345;
     std::vector<std::string> env_params ={"GAZEBO_MODEL_PATH=" TEST_GAZEBO_MODELS_DIR ":$GAZEBO_MODEL_PATH"};
     config["EngineEnvParams"] = env_params;
@@ -186,7 +186,7 @@ TEST(TestGazeboGrpcEngine, LinkPlugin)
 
     ASSERT_NO_THROW(engine->initialize());
 
-    // Test datapack data getting
+    // Test link datapack data getting
     auto datapacks = engine->updateDataPacksFromEngine({DataPackIdentifier("link_youbot::base_footprint",
                                                     engine->engineName(), "irrelevant_type")});
     ASSERT_EQ(datapacks.size(), 1);
@@ -194,5 +194,13 @@ TEST(TestGazeboGrpcEngine, LinkPlugin)
     const auto *pLinkDev = dynamic_cast<const DataPack<Gazebo::Link> *>(datapacks[0].get());
     ASSERT_NE(pLinkDev, nullptr);
 
-    // TODO: Check that link state is correct
+    // Test model datapack data getting
+    datapacks = engine->updateDataPacksFromEngine({DataPackIdentifier("model_youbot::youbot",
+                                                                           engine->engineName(), "irrelevant_type")});
+    ASSERT_EQ(datapacks.size(), 1);
+
+    const auto *pModelDev = dynamic_cast<const DataPack<Gazebo::Model> *>(datapacks[0].get());
+    ASSERT_NE(pModelDev, nullptr);
+
+    // TODO: Check that link and model state are correct
 }

@@ -162,7 +162,7 @@ TEST(TestGazeboJSONEngine, LinkPlugin)
     nlohmann::json config;
     config["EngineName"] = "engine";
     config["EngineType"] = "gazebo_json";
-    config["GazeboWorldFile"] = TEST_LINK_PLUGIN_FILE;
+    config["GazeboWorldFile"] = TEST_LINK_AND_MODEL_PLUGIN_FILE;
     config["GazeboRNGSeed"] = 12345;
     std::vector<std::string> env_params ={"GAZEBO_MODEL_PATH=" TEST_GAZEBO_MODELS_DIR ":$GAZEBO_MODEL_PATH"};
     config["EngineEnvParams"] = env_params;

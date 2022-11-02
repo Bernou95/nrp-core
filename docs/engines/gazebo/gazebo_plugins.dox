@@ -67,4 +67,16 @@ In contrast to the plugins described above, when using NRPGazeboGrpcJointPlugin 
 </model>
 \endcode
 
+\section NRPGazeboGrpcModelPlugin
+Adds a GazeboModelDataPack datapack for the model in which the plugin is used. It can be accessed with the plugin name followed by the model name (e.g. "model_plugin_name::model_name" in the example below)
+
+\code{.xml}
+<model name="model_name">
+	...
+	<plugin name="model_plugin_name" filename="NRPGazeboGrpcModelControllerPlugin.so" />
+</model>
+\endcode
+
+The created datapack can both be retrieved from the Engine, which will contain the current position and velocity of the model in the simulation, or sent to the Engine. In the latter case the datapack is used to set the position and/or velocity of the model. It depends on which fields of the datapack protobuf message are field (position, rotation, linearVelocity, angularVelocity).
+
  */
