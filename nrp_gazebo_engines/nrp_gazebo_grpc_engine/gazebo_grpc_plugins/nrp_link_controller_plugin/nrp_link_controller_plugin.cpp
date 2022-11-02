@@ -40,7 +40,7 @@ void gazebo::NRPLinkControllerPlugin::Load(gazebo::physics::ModelPtr model, sdf:
     {
         const auto datapackName = NRPCommunicationController::createDataPackName(*this, link->GetName());
 
-        NRPLogger::info("Registering link controller for link [ {} ]", datapackName);
+        NRPLogger::info("Registering Link datapack [ {} ]", datapackName);
 
         this->_linkInterfaces.push_back(LinkGrpcDataPackController(datapackName, link));
         commControl.registerDataPack(datapackName, &(this->_linkInterfaces.back()));

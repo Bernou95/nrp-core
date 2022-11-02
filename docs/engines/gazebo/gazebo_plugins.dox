@@ -20,21 +20,22 @@ General communication plugin. Sets up a gRPC server and waits for NRP commands
 
 \section NRPGazeboGrpcCameraPlugin
 
-Adds a GazeboCameraDataPack datapack. The example below registers a datapack called 'camera_datapack'. This can then be accessed by TransceiverFunctions under that name
+Adds a GazeboCameraDataPack datapack. The example below registers a datapack called 'camera_plugin_name::camera_sensor_name'. This can then be accessed by TransceiverFunctions under that name
 \code{.xml}
-<sensor name='camera' type='camera'>
+<sensor name='camera_sensor_name' type='camera'>
 	...
-	<plugin name='camera_datapack' filename='NRPGazeboGrpcCameraControllerPlugin.so'/>
+	<plugin name='camera_plugin_name' filename='NRPGazeboGrpcCameraControllerPlugin.so'/>
 	...
 </sensor>
 \endcode
 
 \section NRPGazeboGrpcLinkPlugin
-Adds GazeboLinkDataPack datapacks for each link in the given model. The example below registers four datapacks under the name of their respective links names
+Adds GazeboLinkDataPack datapacks for each link in the given model. The example below registers four datapacks under the name of their respective links names with the plugin name as a prefix.
+For example, the datapack associated with the link "back_left_link" can be accessed from TFs with the name "link_plugin_name::back_left_link".
 \code{.xml}
 <model>
 	...
-	<plugin name="link_plugin" filename="NRPGazeboGrpcLinkControllerPlugin.so" />
+	<plugin name="link_plugin_name" filename="NRPGazeboGrpcLinkControllerPlugin.so" />
 	...
 	<link name="back_left_link">...</link>
 	<link name="back_right_link">...</link>
@@ -45,7 +46,7 @@ Adds GazeboLinkDataPack datapacks for each link in the given model. The example 
 \endcode
 
 \section NRPGazeboGrpcJointPlugin
-Adds GazeboJointDataPack datapacks. In this case only those joints that are explicitly named in the plugin will be registered and made available to the NRP. The example below registers four datapacks under the name of their respective joints. 
+Adds GazeboJointDataPack datapacks. In this case only those joints that are explicitly named in the plugin will be registered and made available to the NRP. The example below registers four datapacks under the name of their respective joints with the plugin name as a prefix (e.g. "joint_plugin_name::back_left_joint" in the example below).
 
 In contrast to the plugins described above, when using NRPGazeboGrpcJointPlugin datapacks can be used to set a target state for the referenced joint. For each of the joint specified in the plugin configuration a PID controller is set. Incoming datapacks are used to adjust the controller target value. Two target types are supported: <b>position</b> and <b>velocity</b>.  
 
@@ -57,7 +58,7 @@ In contrast to the plugins described above, when using NRPGazeboGrpcJointPlugin 
 	<joint name="front_left_joint">...</joint>
 	<joint name="front_right_joint">...</joint>
 	...
-	<plugin name='husky' filename='NRPGazeboGrpcJointControllerPlugin.so'>
+	<plugin name='joint_plugin_name' filename='NRPGazeboGrpcJointControllerPlugin.so'>
 		<back_left_joint   P='10' I='0' D='0' Type='velocity' Target='0' IMax='0' IMin='0'/>
 		<back_right_joint  P='10' I='0' D='0' Type='velocity' Target='0' IMax='0' IMin='0'/>
 		<front_left_joint  P='10' I='0' D='0' Type='velocity' Target='0' IMax='0' IMin='0'/>

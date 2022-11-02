@@ -129,7 +129,7 @@ void gazebo::NRPJointController::Load(gazebo::physics::ModelPtr model, sdf::Elem
         // Create datapack
         const auto datapackName = NRPCommunicationController::createDataPackName(*this, joint->GetName());
 
-        NRPLogger::info("Registering joint controller for joint [ {} ]", jointName);
+        NRPLogger::info("Registering Joint datapack [ {} ]", datapackName);
         this->_jointDataPackControllers.push_back(JointGrpcDataPackController(jointName, joint, jointControllerPtr));
         NRPCommunicationController::getInstance().registerDataPack(datapackName, &(this->_jointDataPackControllers.back()));
     }

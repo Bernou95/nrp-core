@@ -33,7 +33,7 @@ void gazebo::NRPCameraController::Load(gazebo::sensors::SensorPtr sensor, sdf::E
     this->CameraPlugin::Load(sensor, sdf);
 
     const auto devName = NRPCommunicationController::createDataPackName(*this, sensor->Name());
-    NRPLogger::info("NRPCameraController: Registering new controller [ {} ]", devName);
+    NRPLogger::info("Registering Camera datapack [ {} ]", devName);
 
     // Create camera datapack and register it
     this->_cameraInterface.reset(new CameraDataPackController(devName, this->camera, sensor));

@@ -36,7 +36,7 @@ void gazebo::NRPModelControllerPlugin::Load(gazebo::physics::ModelPtr model, sdf
     // Register a datapack for the model
     const auto datapackName = NRPCommunicationController::createDataPackName(*this, model->GetName());
     this->_modelInterface.reset(new ModelGrpcDataPackController(datapackName, model));
-    NRPLogger::info("Registering Model controller for model [ {} ]", datapackName);
+    NRPLogger::info("Registering Model datapack [ {} ]", datapackName);
     commControl.registerDataPack(datapackName, this->_modelInterface.get());
 
     // Register plugin
