@@ -197,9 +197,9 @@ TEST(TestGazeboGrpcEngine, LinkAndModelPlugin)
     // Test model datapack data getting
     datapacks = engine->updateDataPacksFromEngine({DataPackIdentifier("model_youbot::youbot",
                                                                            engine->engineName(), "irrelevant_type")});
-    ASSERT_EQ(datapacks.size(), 1);
+    ASSERT_EQ(datapacks.size(), 2);
 
-    const auto *pModelDev = dynamic_cast<const DataPack<Gazebo::Model> *>(datapacks[0].get());
+    const auto *pModelDev = dynamic_cast<const DataPack<Gazebo::Model> *>(datapacks[1].get());
     ASSERT_NE(pModelDev, nullptr);
 
     // TODO: Check that link and model state are correct
