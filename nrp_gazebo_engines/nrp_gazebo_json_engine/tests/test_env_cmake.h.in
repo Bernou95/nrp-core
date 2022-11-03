@@ -55,6 +55,6 @@
 /*!
  *	\brief Path to a gazebo world file. Loads world with link and world plugin
  */
-#define TEST_LINK_AND_MODEL_PLUGIN_FILE "@CMAKE_CURRENT_SOURCE_DIR@/tests/test_files/test_link_and_model_plugin.sdf"
+#define TEST_LINK_PLUGIN_FILE "@CMAKE_CURRENT_SOURCE_DIR@/tests/test_files/test_link_plugin.sdf"
 
 #endif // TEST_ENV_CMAKE_H
