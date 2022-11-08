@@ -10,6 +10,7 @@ services:
             dockerfile: dockerfiles/base.Dockerfile
             args:
                 BASE_IMAGE: ubuntu:20.04
+                HOME_PARENT_FOLDER: /nrp-home
         image: ${NRP_DOCKER_REGISTRY}nrp-core/base-ubuntu20-env${NRP_CORE_TAG}
         command: bash
 
@@ -184,6 +185,7 @@ services:
             dockerfile: dockerfiles/base.Dockerfile
             args:
                 BASE_IMAGE: nvidia/cudagl:11.4.2-base-ubuntu20.04
+                HOME_PARENT_FOLDER: /nrp-home
         image: ${NRP_DOCKER_REGISTRY}nrp-core/base-nvidia-cuda-ubuntu20-env${NRP_CORE_TAG}
         command: bash
 
