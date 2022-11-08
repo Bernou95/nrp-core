@@ -79,8 +79,8 @@ class NRPDockerHandle(object):
         exec_env: list of strings containing environment variables to be used for running the NRPCore process
     """
 
-    # Home folder inside of the docker container. In NRP containers this is '/home/nrpuser'
-    DOCKER_HOME = '/home/nrpuser'
+    # Home folder inside of the docker container. In NRP containers this is '/nrp-home/nrpuser'
+    DOCKER_HOME = '/nrp-home/nrpuser'
 
     def __init__(self, docker_daemon_ip: str, image_name: str, experiment_folder: str, proc_cmd: str, exec_env: list):
 

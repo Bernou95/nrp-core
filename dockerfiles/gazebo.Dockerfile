@@ -18,7 +18,7 @@ RUN mkdir ${HOME}/nrp \
     && cd ${HOME}/nrp \
     && git clone https://@bitbucket.org/hbpneurorobotics/models.git \
     && git clone https://@bitbucket.org/hbpneurorobotics/gzweb.git \
-    && export HBP=/home/${USER}/.local/nrp \
+    && export HBP=${NRP_INSTALL_DIR} \
     && mkdir -p ${HBP}/gzweb/http/client/assets \
     && mkdir -p ${HOME}/.gazebo/models \
     && cd models \
