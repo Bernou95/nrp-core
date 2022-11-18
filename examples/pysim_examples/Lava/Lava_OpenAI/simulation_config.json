@@ -1,0 +1,35 @@
+{
+	"SimulationName": "test_openai_nest",
+	"SimulationDescription": "Launch a py_sim engine to run openAI simulation and a nest engine to control the simulation",
+	"SimulationTimeout": 10,
+	"EngineConfigs": 
+	[
+		{
+			"EngineType": "python_json",
+			"EngineName": "lava_controller",
+			"PythonFileName": "lava_controller.py",
+			"RunConfigureTag":"floating_pt",
+			"Layers":[["lava.proc.lif.process","LIF"],
+				["lava.proc.dense.process","Dense"]]
+		},
+		{
+			"EngineType": "py_sim",
+			"EngineName": "gym_simulator",
+			"PythonFileName": "gym_simulator.py",
+			"WorldFileName":"MountainCar-v0",
+			"Simulator":"OpenAI",
+			"Visualizer":true
+		}
+	],
+	"DataPackProcessingFunctions":
+	[
+		{
+			"Name": "from_lava",
+			"FileName": "from_lava.py"
+		},
+		{
+			"Name": "from_gym",
+			"FileName": "from_gym.py"
+		}
+	]
+}

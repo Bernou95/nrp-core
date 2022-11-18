@@ -95,7 +95,9 @@ if(NOT ${cxxopts_FOUND})
 endif()
 
 # restclient-cpp: REST client library
-find_package(restclient-cpp QUIET)
+find_package(restclient-cpp QUIET
+    PATHS ${NRP_DEP_CMAKE_INSTALL_PREFIX}
+    NO_DEFAULT_PATH)
 if(NOT ${restclient-cpp_FOUND})
     message("Please wait. Downloading restclient-cpp...")
 

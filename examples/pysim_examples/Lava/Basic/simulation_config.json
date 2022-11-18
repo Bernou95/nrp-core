@@ -1,0 +1,21 @@
+{
+	"SimulationName": "drone",
+	"SimulationDescription": "Drone simulation using NRP Core",
+	"SimulationTimeout": 1,
+	"SimulationTimestep":0.02,
+	"EngineConfigs":
+	[
+		{
+			"EngineType": "python_json",
+			"EngineName": "lava",
+			"EngineTimestep":0.02,
+			"PythonFileName": "for_lava.py",
+			"RunConfigureTag":"floating_pt",
+			"Layers":[["lava.proc.lif.process","LIF"],
+				["lava.proc.dense.process","Dense"]]
+		}
+	],
+	"DataPackProcessingFunctions":
+	[
+	]
+}

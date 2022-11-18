@@ -20,13 +20,20 @@
 
 from nrp_core.engines.python_json import EngineScript
 from .SimManager import *
-
+from .NetManager import *
 
 class PySimEngineScript(EngineScript):
-
     @property
     def sim_manager(self):
         if not hasattr(self, '_sim_manager'):
             self._sim_manager = SimulatorManager(self._config)
 
         return self._sim_manager
+
+class PyNetEngineScript(EngineScript):
+    @property
+    def net_manager(self):
+        if not hasattr(self, '_net_manager'):
+            self._net_manager = NetManager(self._config)
+
+        return self._net_manager

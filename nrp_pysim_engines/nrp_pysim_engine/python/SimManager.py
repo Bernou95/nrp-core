@@ -33,7 +33,7 @@ class SimulatorManager(object):
         """
         Reset the simulation, it is connected by the "server_callbacks.py"
         """
-        self.sim_interface.reset()
+        return self.sim_interface.reset()
 
     def shutdown(self):
         """
