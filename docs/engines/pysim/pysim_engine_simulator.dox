@@ -1,0 +1,43 @@
+/*! \page pysim_engine_simulator PySim Engine for simulators
+
+In this engine, several simulators (<a href="https://gym.openai.com/docs#">OpenAI </a>, <a href="https://mujoco.readthedocs.io/en/latest/APIreference.html#">Mujoco </a>, <a href="https://simtk.org/api_docs/opensim/api_docs#">OpenSim </a>) with python API are wrapped as functions in type of \ref python_json_engine can apply. It includes shutdown, reset, runLoop, and calling model properties. The interaction with the wrapped simulators is performed by an instance of the class \ref simulator_manager, which is stored in PySimEngineScript in the attribute self.sim_manager. This attribute must be "manually" called from the PySimEngineScript subclass in order to advance, modify or get information from the different simulators. As an example of this use, the script implementing PySimEngineScript in experiment *examples/pysim_examples/opensim_control* is listed below:
+
+\include pysim_examples/opensim_control/server.py
+
+\section simulator_manager SimulatorManager
+
+The SimulatorManager is a python class that acts as a bridge to connect NRP-core and any of the simulators supported by the Pysim Engine (OpenSim, Mujoco, OpenAI) through the Python API of the former. 
+
+It processes requests for simulation initialization, reset, shutdown, run step, and data retrival. 
+
+When instantiated, it loads the simulation model specified in the engine configuration. Additionally, a controller is attached to actuators for the model in simulator.
+
+The following functions are provided by SimulatorManager to interact with the simulator:
+
+- `run_step(action)`: advances the simulation by the engine timestep as specified in the engine configuration. Takes as input an array of floats. The length of the array must be equal to the number of controlled elements ( such as muscles in Opensim) in the model. 
+- `reset()`: resets the simulation
+- `shutdown()`: shutdowns the simulation
+- `get_model_properties(p_type)`: returns a list with the names of model's elements of the type specified by *p_type*. The latter can take multiple possible values.
+  - OpenAI: "Property" (the names of the observed elements)
+  - Mujoco: "body", "joint", "geom", "site", "light", "camera", "actuator", "sensor", "tendon", and "mesh"
+  - Opensim: "Joint" (the elements in the model `JointSet`) and "Force" (the elements in the model `ForceSet`)
+- `get_model_all_properties(p_type)`: returns a dictionary with the value of elements of the type specified by *p_type*. The latter can take multiple possible values.
+  - OpenAI: the same with `p_type` in `get_model_properties`
+  - Mujoco: supports all `get_<p_type>` in <a href="https://gym.openai.com/docs#">Mujoco Python API </a>
+  - Opensim: the same with `p_type` in `get_model_properties`
+- `get_model_property(p_name, p_type)`: returns the observed value for `p_name`, and the `p_type` is the same with `p_type` in `get_model_all_properties`
+- `get_sim_time()`: returns the simulation time in seconds
+
+\section simulator_manager_config_section Engine Configuration Parameters
+
+Parameters specific to simulator manager:
+
+<table>
+<tr><th>Name<th>Description<th>Type<th>Default<th>Required<th>Array
+<tr><td>PythonFileName<td>Path to the Python script containing the engine definition<td>string<td><td>X<td>
+<tr><td>WorldFileName<td>Path to the file of simulation world<td>string<td><td>X<td>
+<tr><td>Visualiser<td>To show the simulation in visualizer or not<td>bool<td>false<td><td>
+<tr><td>Simulator<td>To call the python API for a special simulator<td>string<td><td><td></table>
+
+
+*/
