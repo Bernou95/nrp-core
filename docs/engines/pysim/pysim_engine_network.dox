@@ -1,27 +1,25 @@
-/*! \page pysim_engine_network PySim Engine for network frameworks
+/*! \page pysim_engine_network PySim Engine as an interface to the LAVA framework
 
-In this engine, several simulators (<a href="https://lava-nc.org/">LAVA </a>) with python API are wrapped as functions in type of \ref python_json_engine can apply. It includes shutdown, reset, runLoop, and operations on network. The interaction with the wrapped network frameworks is performed by an instance of the class \ref network_manager, which is stored in PyNetEngineScript in the attribute self.net_manager. This attribute must be "manually" called from the PyNetEngineScript subclass in order to advance, modify or get information from the different simulators. As an example of this use, the script implementing PyNetEngineScript in experiment *examples/pysim_examples/Lava/Basic/for_lava.py* is listed below:
+The engine described herein provides an interface between NRP-core and simulators supported through the (<a href="https://lava-nc.org/">LAVA </a>) framework and its python API, which is wrapped inside a \ref python_json_engine. The methods of the latter includes shutdown, reset, runLoop, and operations on network. The interactions with the wrapped LAVA framework are performed by an instance of the class \ref network_manager, which is stored in PyNetEngineScript in the attribute self.net_manager. This attribute must be explicitly called from the PyNetEngineScript subclass in order to advance, modify or get information from the different simulators. To illustrate this point, the script implementing PyNetEngineScript in experiment *examples/pysim_examples/Lava/Basic/for_lava.py* is given below:
 
 \include pysim_examples/Lava/Basic/for_lava.py
 
 \section network_manager NetworkManager
 
-The NetworkManager is a python class that acts as a bridge to connect NRP-core and Lava network supported by the Pysim Engine through the Python API of the former. 
+The NetworkManager is a python class that acts as a bridge to connect NRP-core and the LAVA framework through the Pysim Engine and the Python API of LAVA. 
 
-It processes requests for simulation initialization, reset, shutdown, run step, network modification, and data retrieval. 
+More specifically, it processes requests for simulation initialization, reset, shutdown, run step, network modification, and data retrieval. Upon instanciation, it loads the network layer types specified in the engine configuration. Additionally, a controller is attached to actuators for the defined network.
 
-When instantiated, it loads the network layer types specified in the engine configuration. Additionally, a controller is attached to actuators for the defined network.
+The following functions are provided by NetworkManager to interact with a neural network or neuromorphic system running in LAVA:
 
-The following functions are provided by NetworkManager to interact with the Lava network:
-
-- `run_step( laver_name, timestep_ns)`: advances the network execution and monitor data changes by the engine timestep as specified in the engine configuration. Takes as input a string for the name of the output layer. 
-- `shutdown()`: shutdowns the network execution
-- `create_layer(laver_name, layer_type, params)`: execution in initialization to define the layer that will be used.
-- `layer_connect(in_port, out_port)`: execution in initialization to connect two network layers with layers' input and output port. The format of a port is  "<layer name>.<port name>"
-- `setDataToLayer(laver_name, para_name, data)`: modify a parameter in a network layer
-- `getDataFromLayer(laver_name, para_name)`: collet a parameter value from a network layer
-- `create_monitor(para_name)`: create a monitor to store a data change of parameter with the format "<layer name>.<parameter name>"
-- `res_plot(laver_name, para_name)`: plot the change of a parameter during layer execution
+- `run_step( laver_name, timestep_ns)`: advances the network execution and monitors data changes with the engine timestep specified in the engine configuration. Takes as input a string for the name of the output layer. 
+- `shutdown()`: shutdowns network execution
+- `create_layer(laver_name, layer_type, params)`: during initialization, defines a layer to be used.
+- `layer_connect(in_port, out_port)`: during initialization, connects two network layers through input and output port. The format of a port is  "<layer name>.<port name>"
+- `setDataToLayer(laver_name, para_name, data)`: modifies a parameter in a network layer
+- `getDataFromLayer(laver_name, para_name)`: collects a parameter value from a network layer
+- `create_monitor(para_name)`: creates a monitor to store a data change of parameter with the format "<layer name>.<parameter name>"
+- `res_plot(laver_name, para_name)`: plots the change of a parameter during layer execution
 
 
 \section engine_opensim_config_section Engine Configuration Parameters
@@ -30,10 +28,10 @@ Parameters specific to network manager:
 
 <table>
 <tr><th>Name<th>Description<th>Type<th>Default<th>Required<th>Array
-<tr><td>RunConfigureTag<td>To flag the network configuration type for lava<td>string<td><td>X<td>
+<tr><td>RunConfigureTag<td>To flag the network configuration type for LAVA<td>string<td><td>X<td>
 <tr><td>Layers<td>To import the python package or python script to call different definitions of network layers<td>array<td><td>X<td>
 </table>
 
-The "Layers" is performed as a list of multiple items. Each item express a type of network layer with format "*[package name, layer name]*" 
+The "Layers" parameter is a list of multiple items. Each item expresses a type of network layer with the format "*[package name, layer name]*" 
 
 */
