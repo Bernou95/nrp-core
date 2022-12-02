@@ -1,6 +1,6 @@
 /*! \page pysim_engine_network PySim Engine for network frameworks
 
-In this engine, several simulators (<a href="https://lava-nc.org/">LAVA </a>) with python API are wrapped as functions in type of \ref python_json_engine can apply. It includes shutdown, reset, runLoop, and operations on network. The interaction with the wrapped network frameworks is performed by an instance of the class \ref network_manager, which is stored in PyNetEngineScript in the attribute self.net_manager. This attribute must be "manually" called from the PyNetEngineScript subclass in order to advance, modify or get information from the different simulators. As an example of this use, the script implementing PyNetEngineScript in experiment *examples/pysim_examples/Lava/Basic/for_lava.py* is listed below:
+In PySim Engine, the interaction with the wrapped network frameworks (<a href="https://lava-nc.org/">LAVA </a>) is performed by an instance of the class \ref network_manager, which is stored in PyNetEngineScript in the attribute self.net_manager. This attribute must be "manually" called from the PyNetEngineScript subclass in order to advance, modify or get information from the different simulators. As an example of this use, the script implementing PyNetEngineScript in experiment *examples/pysim_examples/Lava/Basic/for_lava.py* is listed below:
 
 \include pysim_examples/Lava/Basic/for_lava.py
 

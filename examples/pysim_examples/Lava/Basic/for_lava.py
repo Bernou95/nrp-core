@@ -6,15 +6,15 @@ class Script(PyNetEngineScript):
     def initialize(self):
         params_1 = {"shape":(3, ), "vth":10., "dv":0.1, "du":0.1,
             "bias_mant":(1.1, 1.2, 1.3),  "name":"lif1"}
-        self.net_manager.create_layer(laver_name='lif1', 
+        self.net_manager.create_layer(layer_name='lif1', 
             layer_type='LIF', params=params_1)
         params_2 = {"shape":(2, ), "vth":10., "dv":0.1, "du":0.1,
             "bias_mant":0,  "name":"lif2"}
-        self.net_manager.create_layer(laver_name='lif2', 
+        self.net_manager.create_layer(layer_name='lif2', 
             layer_type='LIF', params=params_2)
 
         params_3 = {"weights":np.random.rand(2, 3),  "name":"dense"}
-        self.net_manager.create_layer(laver_name='dense', layer_type='Dense', params=params_3)
+        self.net_manager.create_layer(layer_name='dense', layer_type='Dense', params=params_3)
         
         self.net_manager.layer_connect("lif1.s_out","dense.s_in")
         self.net_manager.layer_connect("dense.a_out","lif2.a_in")

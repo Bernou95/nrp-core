@@ -4,8 +4,10 @@ import numpy as np
 
 class Script(PyNetEngineScript):
     def initialize(self):
+        # Parameter for network setting
         dim = 400
         shape = (dim,)
+        # Neurons to Excitatory and Inhibitory are divided with specific combination (80/20) 
         num_neurons_exc = int(dim * 0.8)
         num_neurons_inh = dim - num_neurons_exc
 
@@ -23,7 +25,7 @@ class Script(PyNetEngineScript):
         network_params_balanced['weights'] = self.generate_gaussian_weights(dim, num_neurons_exc,
             network_params_balanced['q_factor'], network_params_balanced['g_factor'])
 
-        self.net_manager.create_layer(laver_name='network_balanced', 
+        self.net_manager.create_layer(layer_name='network_balanced', 
             layer_type='EINetwork', params=network_params_balanced)
 
         self.net_manager.create_monitor('network_balanced.state')

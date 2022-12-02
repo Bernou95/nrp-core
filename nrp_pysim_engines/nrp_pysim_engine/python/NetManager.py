@@ -20,26 +20,26 @@ class NetManager(object):
             the_package = importlib.import_module(package_name)
             self.modules_list[module_name] = getattr(the_package, module_name)
 
-    def shutdown(self, laver_name):
-        self.layer_list[laver_name].stop()
+    def shutdown(self, layer_name):
+        self.layer_list[layer_name].stop()
 
-    def run_step(self, laver_name, timestep_ns):
+    def run_step(self, layer_name, timestep_ns):
         run_condition = RunSteps(num_steps=1e8/timestep_ns)
-        self.layer_list[laver_name].run(condition=run_condition, run_cfg=self.run_cfg)
+        self.layer_list[layer_name].run(condition=run_condition, run_cfg=self.run_cfg)
 
         for key in self.monitor_list.keys():
             t_layer_name, t_para_name = key.split('.')
             self.monitor_list[key].append(
                 getattr(self.layer_list[t_layer_name], t_para_name).get())
 
-    def create_layer(self, laver_name, layer_type, params):
-        self.layer_list[laver_name] = self.modules_list[layer_type](**params)
+    def create_layer(self, layer_name, layer_type, params):
+        self.layer_list[layer_name] = self.modules_list[layer_type](**params)
 
     def create_monitor(self, para_name):
         self.monitor_list[para_name] = []
 
-    def res_plot(self, laver_name, para_name):
-        var = self.monitor_list[laver_name+'.'+para_name]
+    def res_plot(self, layer_name, para_name):
+        var = self.monitor_list[layer_name+'.'+para_name]
         var_num = len(var[0])
         for i in range(var_num):
             plt.plot([data[i] for data in var])
@@ -54,10 +54,10 @@ class NetManager(object):
         t_out_port = self.get_port(out_port)
         t_in_port.connect(t_out_port)
 
-    def setDataToLayer(self, laver_name, para_name, data):
-        var = getattr(self.layer_list[laver_name], para_name)
+    def setDataToLayer(self, layer_name, para_name, data):
+        var = getattr(self.layer_list[layer_name], para_name)
         var.set(np.array(data))
         
-    def getDataFromLayer(self, laver_name, para_name):
-        return getattr(self.layer_list[laver_name], para_name).get()
+    def getDataFromLayer(self, layer_name, para_name):
+        return getattr(self.layer_list[layer_name], para_name).get()
 
