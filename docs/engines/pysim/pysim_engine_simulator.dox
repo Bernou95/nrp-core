@@ -1,6 +1,6 @@
 /*! \page pysim_engine_simulator PySim Engine to call simulators
 
-In PySim Engine, the interaction with the wrapped several simulators (<a href="https://gym.openai.com/docs#">OpenAI </a>, <a href="https://mujoco.readthedocs.io/en/latest/APIreference.html#">Mujoco </a>, <a href="https://simtk.org/api_docs/opensim/api_docs#">OpenSim </a>) is performed by an instance of the class \ref simulator_manager, which is stored in PySimEngineScript in the attribute self.sim_manager and provide a unified calling interfaces for different simulators. This attribute must be "manually" called from the PySimEngineScript subclass in order to advance, modify or get information from the different simulators. As an example of this use, the script implementing PySimEngineScript in experiment *examples/pysim_examples/opensim_control* is listed below:
+In the PySim Engine, the interactions with the various simulators that can be wrapped (e.g., <a href="https://gym.openai.com/docs#">OpenAI </a>, <a href="https://mujoco.readthedocs.io/en/latest/APIreference.html#">Mujoco </a>, <a href="https://simtk.org/api_docs/opensim/api_docs#">OpenSim </a>) are performed by an instance of the class \ref simulator_manager, which is stored inside the PySimEngineScript in the attribute self.sim_manager and provide a unified calling interfaces for different simulators. This attribute must be "manually" called from the PySimEngineScript subclass in order to advance, modify or get information from the different simulators. As an example of this use, the script implementing PySimEngineScript in experiment *examples/pysim_examples/opensim_control* is given below:
 
 \include pysim_examples/opensim_control/server.py
 
@@ -10,9 +10,9 @@ The SimulatorManager is a python class that acts as a bridge to connect NRP-core
 
 It processes requests for simulation initialization, reset, shutdown, run step, and data retrival. 
 
-When instantiated, it loads the simulation model specified in the engine configuration. Additionally, a controller is attached to actuators for the model in simulator.
+When instantiated, it loads the simulation model specified in the engine configuration. Additionally, a controller is attached to actuators for the models inside the wrapped simulator.
 
-The following functions are provided by SimulatorManager to interact with the simulator:
+The following functions are provided by SimulatorManager to interact with that simulator:
 
 - `run_step(action)`: advances the simulation by the engine timestep as specified in the engine configuration. Takes as input an array of floats. The length of the array must be equal to the number of controlled elements ( such as muscles in Opensim) in the model. 
 - `reset()`: resets the simulation
