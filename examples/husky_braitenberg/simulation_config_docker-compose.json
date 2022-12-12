@@ -1,12 +1,20 @@
 {
 	"SimulationName": "husky_simulation_nest_server",
 	"SimDescription": "Launches a Gazebo simulation with a Husky robot and a Nest sim with a Braitenberg model which controls the robot. Uses the nest_server engine.",
-	"SimulationTimeout": 20,
+	"SimulationTimeout": 100,
 	"EngineConfigs": [
 		{
 			"EngineType": "gazebo_grpc",
 			"EngineName": "gazebo",
 			"GazeboWorldFile": "husky_world.sdf",
+			"GazeboSDFModels": [
+				{
+					"Name": "husky",
+					"File": "husky.sdf",
+					"InitPose": "-0.009853 0.086704 0.187752 0 0 0"
+				}
+
+			],
 			"EngineProcStartParams": ["--verbose"],
 			"ServerAddress": "nrp-gazebo:9000",
 			"EngineLaunchCommand": {
@@ -28,7 +36,8 @@
 			"EngineType": "datatransfer_grpc_engine",
 			"EngineName": "datatransfer_engine",
 			"ServerAddress": "0.0.0.0:9004",
-			"MQTTBroker": "mqtt-broker:1883",
+			"MQTTBroker": "ws://mqtt-broker:8883",
+			"simulationID": "test/0",
 			"dataDirectory": "data/test",
 			"streamDataPackMessage": true,
 			"dumps":[

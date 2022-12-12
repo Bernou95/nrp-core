@@ -33,12 +33,14 @@
 
 #include "tests/test_env_cmake.h"
 
+#define MQTT_WELCOME "nrp/0/welcome"
+
 TEST(TestDatatransferGrpcEngine, ServerConnectedMock)
 {
     // Engine config
     auto simConfigFile = std::fstream(TEST_ENGINE_SIMPLE_CONFIG_FILE, std::ios::in);
     nlohmann::json engine_config(nlohmann::json::parse(simConfigFile));
-    json_utils::validateJson(engine_config, "https://neurorobotics.net/engines/engine_datatransfer.json#/engine_datatransfer_base");
+    json_utils::validateJson(engine_config, "json://nrp-core/engines/engine_datatransfer.json#/engine_datatransfer_base");
 
     // MQTT client config
     nlohmann::json mqtt_config;
@@ -63,7 +65,7 @@ TEST(TestDatatransferGrpcEngine, ServerConnectedMock)
     // data topics announcements from the DataPack Controller
     for (size_t i = 0; i < engine_config["dumps"].size(); i++){
         nlohmann::json dump = engine_config["dumps"].at(i);
-        EXPECT_CALL(*nrpMQTTClientMock, publish("nrp/data", "nrp/data/" + dump["name"].get<std::string>()))
+        EXPECT_CALL(*nrpMQTTClientMock, publish("nrp/0/data", "nrp/0/data/" + dump["name"].get<std::string>()))
                 .Times(1);
     }
     EXPECT_CALL(*nrpMQTTClientMock, disconnect())
@@ -84,7 +86,7 @@ TEST(TestDatatransferGrpcEngine, ServerDisconnectedMock)
     // Engine config
     auto simConfigFile = std::fstream(TEST_ENGINE_SIMPLE_CONFIG_FILE, std::ios::in);
     nlohmann::json engine_config(nlohmann::json::parse(simConfigFile));
-    json_utils::validateJson(engine_config, "https://neurorobotics.net/engines/engine_datatransfer.json#/engine_datatransfer_base");
+    json_utils::validateJson(engine_config, "json://nrp-core/engines/engine_datatransfer.json#/engine_datatransfer_base");
 
     // MQTT client config
     nlohmann::json mqtt_config;
@@ -117,7 +119,7 @@ TEST(TestDatatransferGrpcEngine, ServerBroker)
     // Engine config
     auto simConfigFile = std::fstream(TEST_ENGINE_SIMPLE_CONFIG_FILE, std::ios::in);
     nlohmann::json engine_config(nlohmann::json::parse(simConfigFile));
-    json_utils::validateJson(engine_config, "https://neurorobotics.net/engines/engine_datatransfer.json#/engine_datatransfer_base");
+    json_utils::validateJson(engine_config, "json://nrp-core/engines/engine_datatransfer.json#/engine_datatransfer_base");
 
     // MQTT client config
     nlohmann::json mqtt_config;

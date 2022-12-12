@@ -27,7 +27,7 @@
 
 void SimulationManager::validateConfig(jsonSharedPtr &config)
 {
-    json_utils::validateJson(*config, "https://neurorobotics.net/simulation.json#Simulation");
+    json_utils::validateJson(*config, "json://nrp-core/simulation.json#Simulation");
 
     // Set default values
     json_utils::setDefault<std::vector<nlohmann::json>>(*config, "EngineConfigs", std::vector<nlohmann::json>());
@@ -55,12 +55,12 @@ SimulationManager::RequestResult SimulationManager::initializeSimulation()
                           "initialized");
 }
 
-SimulationManager::RequestResult SimulationManager::runSimulation(unsigned numIterations)
+SimulationManager::RequestResult SimulationManager::runSimulation(unsigned numIterations, const nlohmann::json & clientData)
 {
     NRP_LOGGER_TRACE("{} called", __FUNCTION__);
     return processRequest([&]() {
                               changeState(SimState::Running);
-                              if(!this->runCB(numIterations))
+                              if(!this->runCB(numIterations, clientData))
                                   NRPLogger::debug("Simulation has been stopped before running the specified number of iterations");
                               changeState(SimState::Stopped);
                           },
