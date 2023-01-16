@@ -128,7 +128,7 @@ pipeline {
             }
             steps {
                 sh 'git submodule update --init'
-                sh "export NRP_CORE_TAG=:${params.IMAGE_TAG}; export NRP_DOCKER_REGISTRY=${DockerRegistryUrl}/; docker-compose -f docker-compose-env.yaml build; docker-compose -f docker-compose-nrp.yaml build --parallel"
+                sh "export NRP_CORE_TAG=:${params.IMAGE_TAG}; export NRP_DOCKER_REGISTRY=${DockerRegistryUrl}/; docker-compose -f docker-compose-env.yaml build; docker-compose -f docker-compose-nrp.yaml build"
                 withCredentials([usernamePassword(credentialsId: 'nexusadmin', usernameVariable: 'USER', passwordVariable: 'PASSWORD')])
                 {
                     sh 'docker login -u $USER -p $PASSWORD ${DockerRegistryUrl}'
