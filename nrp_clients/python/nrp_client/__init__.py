@@ -1,13 +1,30 @@
+from pkg_resources import get_distribution, DistributionNotFound
+try:
+    __version__ = get_distribution(__name__).version
+except DistributionNotFound:
+    # package is not installed
+    pass
+
 import grpc
 import os
 from contextlib import redirect_stdout
 from threading import Thread
 import json
 
-from nrp_server_pb2 import EmptyMessage, RunLoopMessage
-from nrp_server_pb2_grpc import NrpCoreStub
+try:
+    from nrp_server_pb2 import EmptyMessage, RunLoopMessage
+    from nrp_server_pb2_grpc import NrpCoreStub
+except ImportError as e:
+    raise ImportError(
+        'NRP-Core protobuf Python bindings for client-server communication could not be found.') from e
 
-from nrp_core.nrp_server_launchers import *
+from .nrp_server_launchers import *
+
+_dockerEnabled = True
+try:
+    from .nrp_server_docker_launchers import *
+except ImportError:
+    _dockerEnabled = False
 
 
 class NrpCore:
@@ -59,12 +76,15 @@ class NrpCore:
         self._launcher = None
 
         if image_name:
-            self._launcher = NRPCoreDockerLauncher(server_args,
-                                                   experiment_folder,
-                                                   docker_daemon_address,
-                                                   image_name,
-                                                   log_file,
-                                                   get_archives)
+            if _dockerEnabled:
+                self._launcher = NRPCoreDockerLauncher( server_args,
+                                                        experiment_folder,
+                                                        docker_daemon_address,
+                                                        image_name,
+                                                        log_file,
+                                                        get_archives)
+            else:
+                raise RuntimeError('Docker launchers are not enabled. Please, check your installation.')
         else:
             self._launcher = NRPCoreForkLauncher(server_args, experiment_folder)
 
