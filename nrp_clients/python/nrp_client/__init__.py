@@ -12,8 +12,8 @@ from threading import Thread
 import json
 
 try:
-    from nrp_server_pb2 import EmptyMessage, RunLoopMessage
-    from nrp_server_pb2_grpc import NrpCoreStub
+    from .pb.nrp_server_pb2 import EmptyMessage, RunLoopMessage
+    from .pb.nrp_server_pb2_grpc import NrpCoreStub
 except ImportError as e:
     raise ImportError(
         'NRP-Core protobuf Python bindings for client-server communication could not be found.') from e

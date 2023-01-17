@@ -113,75 +113,17 @@ function(GENERATE_GRPC_CPP PROTO_FILE_NAME PROTO_SRC_FILES_VAR)
 
 endfunction()
 
-# Generates Python proto code from file PROTO_FILE_NAME. Generated files are appended to var PROTO_PYTHON_FILES_VAR
-function(GENERATE_PROTO_PYTHON PROTO_FILE_NAME PROTO_PYTHON_FILES_VAR)
-    # List of protobuf proto files
-    get_filename_component(hw_proto "${PROTO_FILE_NAME}" ABSOLUTE)
-    get_filename_component(hw_proto_name "${hw_proto}" NAME_WE)
-
-    # Generated sources
-    set(proto_python "${CMAKE_CURRENT_BINARY_DIR}/include/${HEADER_DIRECTORY}/${hw_proto_name}_pb2.py")
-
-    # Generate
-    add_custom_command(
-            OUTPUT "${proto_python}"
-            COMMAND "mkdir" ARGS -p "${CMAKE_CURRENT_BINARY_DIR}/include/${HEADER_DIRECTORY}"
-            COMMAND python3
-            ARGS -m grpc_tools.protoc
-            --proto_path "${NRP_CORE_MSGS_PROTO_PATH}/nrp_proto_defs"
-            --proto_path "${NRP_CORE_MSGS_PROTO_PATH}/engine_proto_defs"
-            --python_out "${CMAKE_CURRENT_BINARY_DIR}/include/${HEADER_DIRECTORY}"
-            "${hw_proto}"
-            DEPENDS "${hw_proto}")
-
-    set(${PROTO_PYTHON_FILES_VAR} ${${PROTO_PYTHON_FILES_VAR}} ${proto_python} PARENT_SCOPE)
-
-endfunction()
-
-# Generates Python grpc code from file PROTO_FILE_NAME. Generated files are appended to var PROTO_PYTHON_FILES_VAR
-function(GENERATE_GRPC_PYTHON PROTO_FILE_NAME PROTO_PYTHON_FILES_VAR)
-    # List of protobuf proto files
-    get_filename_component(hw_proto "${PROTO_FILE_NAME}" ABSOLUTE)
-    get_filename_component(hw_proto_name "${hw_proto}" NAME_WE)
-
-    # Generated sources
-    set(proto_python "${CMAKE_CURRENT_BINARY_DIR}/include/${HEADER_DIRECTORY}/${hw_proto_name}_pb2_grpc.py")
-
-    # Generate
-    add_custom_command(
-            OUTPUT "${proto_python}"
-            COMMAND "mkdir" ARGS -p "${CMAKE_CURRENT_BINARY_DIR}/include/${HEADER_DIRECTORY}"
-            COMMAND python3
-            ARGS -m grpc_tools.protoc
-            --proto_path "${NRP_CORE_MSGS_PROTO_PATH}/nrp_proto_defs"
-            --proto_path "${NRP_CORE_MSGS_PROTO_PATH}/engine_proto_defs"
-            --grpc_python_out "${CMAKE_CURRENT_BINARY_DIR}/include/${HEADER_DIRECTORY}"
-            "${hw_proto}"
-            DEPENDS "${hw_proto}")
-
-    set(${PROTO_PYTHON_FILES_VAR} ${${PROTO_PYTHON_FILES_VAR}} ${proto_python} PARENT_SCOPE)
-
-endfunction()
 
 ##########################################
 ## Protobuf code generation
 
 # Proto generation
 set(PROTO_SRC_FILES "")
-set(PROTO_PYTHON_FILES "")
 
 generate_proto_cpp("${NRP_CORE_MSGS_PROTO_PATH}/nrp_proto_defs/engine_grpc.proto" PROTO_SRC_FILES)
 generate_grpc_cpp("${NRP_CORE_MSGS_PROTO_PATH}/nrp_proto_defs/engine_grpc.proto" PROTO_SRC_FILES)
 generate_proto_cpp("${NRP_CORE_MSGS_PROTO_PATH}/nrp_proto_defs/nrp_server.proto" PROTO_SRC_FILES)
 generate_grpc_cpp("${NRP_CORE_MSGS_PROTO_PATH}/nrp_proto_defs/nrp_server.proto" PROTO_SRC_FILES)
-generate_proto_python("${NRP_CORE_MSGS_PROTO_PATH}/nrp_proto_defs/nrp_server.proto" PROTO_PYTHON_FILES)
-generate_grpc_python("${NRP_CORE_MSGS_PROTO_PATH}/nrp_proto_defs/nrp_server.proto" PROTO_PYTHON_FILES)
-
-# Forces the generation of proto and grpc python code
-add_custom_target(
-        FORCE_PROTO_PYTHON
-        COMMAND bash -c "echo \"Generating proto python files\""
-        DEPENDS ${PROTO_PYTHON_FILES})
 
 ##########################################
 # NRPProtobuf
@@ -233,9 +175,6 @@ target_link_libraries(${BINDINGS_LIB_NAME}
 
         PRIVATE
         )
-
-# Forces the generation of proto and grpc python code
-add_dependencies("${BINDINGS_LIB_NAME}" FORCE_PROTO_PYTHON)
 
 ##########################################
 ## Executable
@@ -324,12 +263,6 @@ install(DIRECTORY "${HEADER_DIRECTORY}" "${CMAKE_CURRENT_BINARY_DIR}/include/${H
         PATTERN "*.h"
         PATTERN "*.hpp"
 )
-
-# Install automatically generated python modules with proto and gRPC
-if(PROTO_PYTHON_FILES)
-    install(FILES ${PROTO_PYTHON_FILES}
-            DESTINATION "${PYTHON_INSTALL_DIR_REL}")
-endif()
 
 # Install executable files
 if(TARGET ${EXECUTABLE_NAME})
