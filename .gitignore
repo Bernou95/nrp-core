@@ -20,4 +20,3 @@ tools/build_grpc_engine/
 tools/build_json_engine/
 reports
 .paho
-test_venv
