@@ -4,6 +4,8 @@ NRP-Core experiments can be run from the provided application, \ref nrp_simulati
 In this way, the experiment is loaded from a specified configuration file and run until the specified timeout.
 Additionally, we provide a Python module, *nrp_client.NrpCore*, which can be used to start experiments from Python and which enable more control over the experiment execution.
 
+This module can be installed separately into arbitrary Python virtual environment, using the command from the build directory `make nrp-py-client` or `make nrp-py-client-docker` if you want to use the dockerized version of the NRP-Core. 
+
 The main class used to launch and control NRP-Core experiment is *nrp_client.NrpCore*.
 When instantiated, it internally launches an NRPCoreSim process in \ref server_mode "server mode" and forwards requests made through its methods to the NRPCoreSim GRPC server.
 The NRPCoreSim process can be launched either as a forked process or inside of a docker container.
