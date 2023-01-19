@@ -1,5 +1,5 @@
 from .nrp_server_launchers import NRPCoreServerLauncher
-from .docker_handle import NRPDockerHandle
+from nrp_core.docker_handle import NRPDockerHandle
 
 class NRPCoreDockerLauncher(NRPCoreServerLauncher):
 

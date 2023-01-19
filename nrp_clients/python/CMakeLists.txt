@@ -11,7 +11,6 @@ include(GNUInstallDirs)
 # List library build files
 set(PROJECT_SRC_FILES
     nrp_client/__init__.py
-    nrp_client/docker_handle.py
     nrp_client/nrp_server_docker_launchers.py
     nrp_client/nrp_server_launchers.py
 )
