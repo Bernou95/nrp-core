@@ -1,0 +1,39 @@
+{"engine_edlut_base" : {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Edlut Base",
+    "description": "Edlut Base Engine configuration schema. Configuration for all edlut engine implementations inherit from this one",
+    "$id": "#EdlutBase",
+    "properties" : {
+      "NetworkFile": {
+        "type": "string",
+        "description": "Path to Edlut Network configuration file"
+      },
+      "WeightsFile": {
+        "type": "string",
+        "description": "Path to Neuron Weights file"
+      },
+      "NumThreads": {
+        "type": "integer",
+        "default": 1,
+        "description": "Number of threads to use if available"
+      }
+    },
+    "required": ["NetworkFile", "WeightsFile"]
+  },
+  "engine_edlut_grpc" : {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Edlut Grpc Engine",
+    "description": "Edlut Grpc Engine",
+    "$id": "#EdlutGRPCEngine",
+    "allOf": [
+      { "$ref": "json://nrp-core/engines/engine_comm_protocols.json#/engine_grpc" },
+      { "$ref": "#/engine_edlut_base" },
+      {
+        "properties": {
+          "EngineType": { "enum": ["edlut_grpc_engine"] },
+          "ProtobufPackages": { "default": ["Edlut"]}
+        }
+      }
+    ]
+  }
+}
