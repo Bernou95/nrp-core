@@ -38,7 +38,7 @@
  * \brief DataPackController class for processing streaming messages
  *
  * The instance of the class in created for every DataPack to be processed by the engine.
- * Dpending on the DataPack, the contoller instance is configured when receiving the first message.
+ * Depending on the DataPack, the controller instance is configured when receiving the first message.
  */
 class StreamDataPackController
     : public DataPackController<google::protobuf::Message>

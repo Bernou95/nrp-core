@@ -256,6 +256,9 @@ add_subdirectory(nrp_pysim_engines)
 ## Data Transfer Engine
 add_subdirectory("nrp_datatransfer_grpc_engine")
 
+## EDLUT gRPC Engine
+add_subdirectory(nrp_edlut_grpc_engine)
+
 ##########################################
 ## NRP Simulation
 add_subdirectory(nrp_simulation)
