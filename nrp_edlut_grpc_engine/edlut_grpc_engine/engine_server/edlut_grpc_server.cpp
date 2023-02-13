@@ -45,19 +45,7 @@ SimulationTime EdlutGrpcServer::runLoopStep(SimulationTime timeStep)
 
     this->_iteration++;
 
-    vector<double> event_time;
-    vector<long int> neuron_index;
     /* Run edlut simulator */
-    for(auto& name: _dataPacksNames)
-    {
-        auto dpc = this->getDataPackController(name);
-
-    }
-    //this->_handleDataPackMessage
-    this->addExternalSpikeActivity(event_time,neuron_index);
-    this->edlutSimul->RunSimulationSlot(fromSimulationTime<double,ratio<1>>(this->_simulationTime));
-    //output_driver->SendSpikeGroup();
-    this->getSpikeActivity(event_time,neuron_index);
 
     this->_simulationTime += timeStep;
 
@@ -66,28 +54,25 @@ SimulationTime EdlutGrpcServer::runLoopStep(SimulationTime timeStep)
 
 void EdlutGrpcServer::initialize(const nlohmann::json &data, EngineGrpcServer::lock_t & /*datapackLock*/)
 {
-    //const auto datapackName = "test_datapack";
-
     NRPLogger::info("Initializing EDLUT gRPC Engine");
     try{
         auto network_file = data.at("NetworkFile").dump();
         auto weight_file = data.at("WeightsFile").dump();
         auto simulation_timestep = data.at("EngineTimestep").dump();
         auto num_threads = data.at("NumThreads").dump();
-        //NRPLogger::info("Network: "+network_file+" Weights: "+weight_file+ " SimTimestep: "+simulation_timestep+" Threads: "+num_threads);
+
         network_file.erase(network_file.begin());
         network_file.erase(network_file.end()-1);
         weight_file.erase(weight_file.begin());
         weight_file.erase(weight_file.end()-1);
-        NRPLogger::info(network_file);
-        //NRPLogger::info("Network: "+network_file+" Weights: "+weight_file+ " SimTimestep: "+simulation_timestep+" Threads: "+num_threads);
+
         this->edlutSimul = std::make_shared<Simulation> (network_file.c_str(), weight_file.c_str(), std::numeric_limits<double>::max(), std::stod(simulation_timestep.c_str()), std::stoi(num_threads.c_str()));
-        //Simulation edlutSimul("Network_2.cfg", "Weights_2.cfg", std::numeric_limits<double>::max(), 0.002, 4);
+
 
     }
     catch (NRPException &e) {
         //throw NRPException::logCreate( e.what());
-        throw NRPException::logCreate("Unable start EDLUT simulation");
+        throw NRPException::logCreate("Unable to start EDLUT simulation");
     }
 
 
@@ -97,7 +82,7 @@ void EdlutGrpcServer::initialize(const nlohmann::json &data, EngineGrpcServer::l
     for(auto &dump : dumps){
         const auto datapackName = dump.at("name");
         _dataPacksNames.push_back(datapackName);
-        this->registerDataPackNoLock(datapackName, new EdlutGrpcDataPackController(datapackName, this->_engineName));
+        this->registerDataPackNoLock(datapackName, new EdlutGrpcDataPackController(datapackName, this->_engineName, this->edlutSimul, &this->input_spike_driver, &this->output_spike_driver));
 
         NRPLogger::info("DataPack {} dump was added", datapackName);
     }
@@ -111,6 +96,9 @@ void EdlutGrpcServer::initialize(const nlohmann::json &data, EngineGrpcServer::l
         // Add the first save weight event
         Simul.GetQueue()->InsertEventWithSynchronization(new SaveWeightsEvent(Simul.GetSaveStep(), &Simul));
     }*/
+    this->edlutSimul->AddInputSpikeDriver(&this->input_spike_driver);
+    this->edlutSimul->AddOutputSpikeDriver(&this->output_spike_driver);
+
     this->edlutSimul->InitSimulation();
 
     this->_initRunFlag = true;
@@ -128,55 +116,5 @@ void EdlutGrpcServer::reset()
     std::cout << "Resetting simulation" << std::endl;
 }
 
-void EdlutGrpcServer::addExternalSpikeActivity(const std::vector<double> & event_time, const std::vector<long int> & neuron_index) noexcept(false){
-    try{
-        if (!this->_initRunFlag) {
-            throw EDLUTException(TASK_INPUT_SPIKE_DRIVER, ERROR_NON_INITIALIZED_SIMULATION, REPAIR_EXECUTE_AFTER_INITIALIZE_SIMULATION);
-        }
-
-        //we introduce the new activity in the driver.
-        if (event_time.size()>0) {
-            this->input_spike_driver.LoadInputs(this->edlutSimul->GetQueue(), this->edlutSimul->GetNetwork(), event_time.size(), &event_time[0], &neuron_index[0]);
-        }
-    }
-    catch (EDLUTException Exc){
-        cerr << Exc << endl;
-        throw EDLUTException(TASK_EDLUT_INTERFACE, ERROR_EDLUT_INTERFACE, REPAIR_EDLUT_INTERFACE);
-    }
-}
-
-void EdlutGrpcServer::getSpikeActivity(std::vector<double> & event_time, std::vector<long int> & neuron_index) noexcept(false){
-    try{
-        if (!this->_initRunFlag) {
-            throw EDLUTException(TASK_OUTPUT_SPIKE_DRIVER, ERROR_NON_INITIALIZED_SIMULATION, REPAIR_EXECUTE_AFTER_INITIALIZE_SIMULATION);
-    }
-
-    double * OutputSpikeTimes;
-    long int * OutputSpikeCells;
-
-    unsigned int OutputSpikes = this->output_spike_driver.GetBufferedSpikes(OutputSpikeTimes,OutputSpikeCells);
-
-    if (OutputSpikes>0) {
-        event_time.resize(OutputSpikes);
-        neuron_index.resize(OutputSpikes);
-
-        double * SpTimesPtr = OutputSpikeTimes;
-        long int * SpCellsPtr = OutputSpikeCells;
-        std::vector<double>::iterator itTimes = event_time.begin();
-        std::vector<long int>::iterator itNeurons = neuron_index.begin();
-
-        for (unsigned int counter=0; counter<OutputSpikes; ++counter,++SpTimesPtr, ++SpCellsPtr, ++itTimes, ++itNeurons) {
-            *itTimes = *SpTimesPtr;
-            *itNeurons = *SpCellsPtr;
-        }
-    }
-
-    return;
-    }
-    catch (EDLUTException Exc){
-        cerr << Exc << endl;
-        throw EDLUTException(TASK_EDLUT_INTERFACE, ERROR_EDLUT_INTERFACE, REPAIR_EDLUT_INTERFACE);
-    }
-}
 
 // EOF

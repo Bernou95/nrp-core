@@ -36,7 +36,10 @@ class EdlutGrpcDataPackController
 {
     public:
         EdlutGrpcDataPackController(const std::string & datapackName,
-                                    const std::string & engineName);
+                                    const std::string & engineName,
+                                    const std::shared_ptr<Simulation> edlutSim,
+                                    ArrayInputSpikeDriver* isd,
+                                    ArrayOutputSpikeDriver* osd);
 
         /*!
          * \brief Processes data coming from the transceiver function
@@ -56,8 +59,8 @@ class EdlutGrpcDataPackController
          *         nullptr can be returned when no new data is available.
          */
         google::protobuf::Message * getDataPackInformation() override;
-
-        Edlut::Spikes getData();
+        void addExternalSpikeActivity(const std::vector<double> & event_time, const std::vector<long int> & neuron_index) noexcept(false);
+        void getSpikeActivity(std::vector<double> & event_time, std::vector<long int> & neuron_index) noexcept(false);
 
     private:
 
@@ -71,15 +74,27 @@ class EdlutGrpcDataPackController
          */
         std::string _engineName;
 
-        /*!
-         * \brief Cached message, can be used for storing incoming or outgoing simulation data
-         */
-        Edlut::Spikes data;
 
         /*!
          * \brief the first message flag (`true` if the first message has already been processed)
          */
         bool _initialized;
+
+        std::shared_ptr<Simulation> _edlutSimul;
+
+        /*!
+         * Input spike drive
+         */
+        ArrayInputSpikeDriver* _input_spike_driver;
+
+        /*!
+         * Output spike drive
+         */
+        ArrayOutputSpikeDriver* _output_spike_driver;
+
+        vector<double> event_time;
+        vector<long int> neuron_index;
+
 };
 
 #endif // EDLUT_GRPC_DATAPACK_CONTROLLER_SERVER_H

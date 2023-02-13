@@ -126,9 +126,6 @@ class EdlutGrpcServer
 
         std::shared_ptr<Simulation> edlutSimul;
 
-        /*!
-         * Input spike drive
-         */
         ArrayInputSpikeDriver input_spike_driver;
 
         /*!
@@ -136,9 +133,8 @@ class EdlutGrpcServer
          */
         ArrayOutputSpikeDriver output_spike_driver;
 
-        void addExternalSpikeActivity(const std::vector<double> & event_time, const std::vector<long int> & neuron_index);
 
-        void getSpikeActivity(std::vector<double> & event_time, std::vector<long int> & neuron_index) noexcept(false);
+
 
 };
 
