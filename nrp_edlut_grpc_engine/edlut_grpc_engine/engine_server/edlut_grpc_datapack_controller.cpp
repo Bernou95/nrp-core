@@ -42,55 +42,39 @@ void EdlutGrpcDataPackController::handleDataPackData(const google::protobuf::Mes
 
         // Check message type case. Only relevant for file dump
         if (msg == "Edlut.Spikes") {
-            std::cout << "Todo OK: " << std::endl;
             this->_initialized = true;
         }
-        else {
-            std::cout << "No todo OK: " << std::endl;
-        }
-
 
     }
 
     // In order to access the data from the message, you need to cast it to the proper type
-    if (this->_initialized == true)
+    if (this->_initialized == true && data.GetTypeName()=="Edlut.Spikes")
     {
         std::stringstream m_data;
-        m_data <<"Simulation time EDLUT "<< fromSimulationTime<float, std::ratio<1>>(EdlutGrpcServer::_simulationTime) <<std::endl;//",";
-        auto n = data.GetDescriptor()->field_count();
+        m_data <<"Simulation time EDLUT "<< fromSimulationTime<float, std::ratio<1>>(EdlutGrpcServer::_simulationTime) <<std::endl;
 
-        for(int i = 0; i < n; ++i){
-            /*if(i==0)
-            {
-                //this->data.set_timestep(proto_field_ops::GetScalarField(data, data.GetDescriptor()->field(i))) ;
-                //this->data.set_timestep(data.GetReflection()->GetFloat(data, data.GetDescriptor()->field(i))) ;
-            }
-            if(i==1)
-            {
-                //this->data.set_time(proto_field_ops::GetScalarField(data, data.GetDescriptor()->field(i))) ;
-                //this->data.set_time(data.GetReflection()->GetFloat(data, data.GetDescriptor()->field(i))) ;
-            }*/
-            if(i==2 && data.GetReflection()->FieldSize(data,data.GetDescriptor()->FindFieldByName("spikes_time"))> 0){
-                for(int j=0;j<data.GetReflection()->FieldSize(data,data.GetDescriptor()->FindFieldByName("spikes_time"));j++)
-                {
-                    this->event_time.push_back(data.GetReflection()->GetRepeatedFloat(data,data.GetDescriptor()->FindFieldByName("spikes_time"),j));
-                }
-            }
-            if(i==3 && data.GetReflection()->FieldSize(data,data.GetDescriptor()->FindFieldByName("neuron_indexes"))> 0)
-            {
-                for(int j=0;j<data.GetReflection()->FieldSize(data,data.GetDescriptor()->FindFieldByName("neuron_indexes"));j++)
-                {
-                    this->neuron_index.push_back(data.GetReflection()->GetRepeatedUInt32(data,data.GetDescriptor()->FindFieldByName("neuron_indexes"),j));
-                }
-            }
+        auto stamp = data.GetReflection()->GetFloat(data, data.GetDescriptor()->FindFieldByName("time"));
 
+        if(data.GetReflection()->FieldSize(data,data.GetDescriptor()->FindFieldByName("spikes_time"))> 0){
+            for(int j=0;j<data.GetReflection()->FieldSize(data,data.GetDescriptor()->FindFieldByName("spikes_time"));j++)
+            {
+                this->event_time.push_back(data.GetReflection()->GetRepeatedFloat(data,data.GetDescriptor()->FindFieldByName("spikes_time"),j));
             }
+        }
+        if(data.GetReflection()->FieldSize(data,data.GetDescriptor()->FindFieldByName("neuron_indexes"))> 0)
+        {
+            for(int j=0;j<data.GetReflection()->FieldSize(data,data.GetDescriptor()->FindFieldByName("neuron_indexes"));j++)
+            {
+                this->neuron_index.push_back(data.GetReflection()->GetRepeatedUInt32(data,data.GetDescriptor()->FindFieldByName("neuron_indexes"),j));
+            }
+        }
 
-        //std::cout << m_data.str();
+
+        NRPLogger::debug(m_data.str());
 
         this->addExternalSpikeActivity(this->event_time,this->neuron_index);
 
-        this->_edlutSimul->RunSimulationSlot(fromSimulationTime<double,ratio<1>>(EdlutGrpcServer::_simulationTime));
+        this->_edlutSimul->RunSimulationSlot(static_cast<double>(stamp));
 
         this->getSpikeActivity(this->event_time,this->neuron_index);
 
@@ -104,7 +88,7 @@ google::protobuf::Message * EdlutGrpcDataPackController::getDataPackInformation(
 
     auto payload = new Edlut::Spikes();
     payload->set_time(fromSimulationTime<float, std::ratio<1>>(EdlutGrpcServer::_simulationTime));
-    payload->set_timestep(0.002);
+
     for(auto &spike: this->event_time)
     {
         payload->add_spikes_time(spike);

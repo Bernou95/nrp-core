@@ -124,12 +124,18 @@ class EdlutGrpcServer
          */
         std::vector< std::string > _dataPacksNames;
 
+        /*!
+         * \brief Pointer to EDLUT simulation object
+         */
         std::shared_ptr<Simulation> edlutSimul;
 
+        /*!
+         * \brief Input spike driver to EDLUT
+         */
         ArrayInputSpikeDriver input_spike_driver;
 
         /*!
-         * Output spike drive
+         * \brief Output spike driver from EDLUT
          */
         ArrayOutputSpikeDriver output_spike_driver;
 

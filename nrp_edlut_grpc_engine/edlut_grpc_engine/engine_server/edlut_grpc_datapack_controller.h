@@ -59,7 +59,21 @@ class EdlutGrpcDataPackController
          *         nullptr can be returned when no new data is available.
          */
         google::protobuf::Message * getDataPackInformation() override;
+
+        /*!
+         * \brief Introduces data to the simulation network
+         *
+         * The data will be passed to the network through the input driver.
+         *
+         */
         void addExternalSpikeActivity(const std::vector<double> & event_time, const std::vector<long int> & neuron_index) noexcept(false);
+
+        /*!
+         * \brief Gets output data from the simulation network
+         *
+         * The output data will be passed to the datapack controller through the output driver.
+         *
+         */
         void getSpikeActivity(std::vector<double> & event_time, std::vector<long int> & neuron_index) noexcept(false);
 
     private:
@@ -83,16 +97,23 @@ class EdlutGrpcDataPackController
         std::shared_ptr<Simulation> _edlutSimul;
 
         /*!
-         * Input spike drive
+         * \brief Input spike driver to EDLUT simulation
          */
         ArrayInputSpikeDriver* _input_spike_driver;
 
         /*!
-         * Output spike drive
+         * \brief Output spike driver to read spikes activity
          */
         ArrayOutputSpikeDriver* _output_spike_driver;
 
+        /*!
+         * \brief Vector used for both drivers to store spikes firing times
+         */
         vector<double> event_time;
+
+        /*!
+         * \brief Vector used for both drivers to store network neuron indexes
+         */
         vector<long int> neuron_index;
 
 };
