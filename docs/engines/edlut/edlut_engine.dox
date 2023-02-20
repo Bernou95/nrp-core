@@ -20,7 +20,7 @@ The EdlutSpikesDatapack consists of the following attributes:
 <tr><th>Attribute  <th>Description                                 <th>Python Type                   <th>C type
 <tr><td>time        <td>Simulation Time                              <td>float <td>float
 <tr><td>spikes_time    <td>Spikes Firing Time                       <td>numpy.array(numpy.float32) <td>std::array<float>
-<tr><td>neuron_indexes    <td>Neuron Indexes Firing                      <td>numpy.array(numpy.float32) <td>std::array<float>
+<tr><td>neuron_indexes    <td>Neuron Indexes Firing                      <td>numpy.array(numpy.uint32) <td>std::array<uint32>
 </table>
 
 Each of this attributes can be accessed under their respective names from the *data* attribute of each DataPack type.
