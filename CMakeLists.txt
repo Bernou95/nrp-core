@@ -399,6 +399,7 @@ doxygen_add_docs(nrp_doxygen
         "docs/engines/pysim/pysim_engine.dox"
         "docs/engines/tvb/tvb_engine.dox"
         "docs/engines/datatransfer/datatransfer_engine.dox"
+        "docs/engines/edlut/edlut_engine.dox"
 
         "docs/getting_started/getting_started.dox"
         "docs/getting_started/installation.dox"

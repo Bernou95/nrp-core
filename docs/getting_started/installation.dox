@@ -246,4 +246,8 @@ source $HOME/.bashrc
 
 \endcode
 
+\subsection installation_sim_edlut EDLUT installation
+
+For EDLUT installation instructions please check at <a href="https://github.com/EduardoRosLab/edlut">https://github.com/EduardoRosLab/edlut</a>
+
 */
