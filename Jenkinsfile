@@ -24,14 +24,14 @@ pipeline {
         stage('Build image') {
             steps {
                 bitbucketStatusNotify(buildState: 'INPROGRESS', buildName: 'Image build nrp-core')
-                sh 'export NRP_CORE_TAG=:${IMAGE_TAG}; docker-compose -f docker-compose-env.yaml up --build nrp-gazebo-nest-env'
+                sh 'export NRP_CORE_TAG=:${IMAGE_TAG}; docker-compose -f docker-compose-env.yaml up --build nrp-nest-gazebo-nvidia-cuda-env'
             }
         }
 
         stage('Build and test') {
             agent {
                 docker {
-                    image "nrp-core/nrp-gazebo-nest-ubuntu20-env:${IMAGE_TAG}"
+                    image "nrp-core/nrp-nest-gazebo-nvidia-cuda-ubuntu20-env:${IMAGE_TAG}"
                     args '-u nrpuser:nrpgroup --privileged --net=host'
                     reuseNode true
                 }

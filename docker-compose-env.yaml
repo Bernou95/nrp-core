@@ -133,3 +133,40 @@ services:
         command: bash
         depends_on:
         - base-nvidia-cuda-env
+
+
+    gazebo-nvidia-cuda-env:
+        build:
+            context: .
+            dockerfile: dockerfiles/gazebo.Dockerfile
+            args:
+                BASE_IMAGE: ${NRP_DOCKER_REGISTRY}nrp-core/nvidia-cuda-ubuntu20-env${NRP_CORE_TAG}
+        image: ${NRP_DOCKER_REGISTRY}nrp-core/gazebo-nvidia-cuda-ubuntu20-env${NRP_CORE_TAG}
+        command: bash
+        depends_on:
+        - nvidia-cuda-env
+
+
+    nest-gazebo-nvidia-cuda-env:
+        build:
+            context: .
+            dockerfile: dockerfiles/nest.Dockerfile
+            args:
+                BASE_IMAGE: ${NRP_DOCKER_REGISTRY}nrp-core/gazebo-nvidia-cuda-ubuntu20-env${NRP_CORE_TAG}
+        image: ${NRP_DOCKER_REGISTRY}nrp-core/nest-gazebo-nvidia-cuda-ubuntu20-env${NRP_CORE_TAG}
+        command: bash
+        depends_on:
+        - gazebo-nvidia-cuda-env
+
+
+    nrp-nest-gazebo-nvidia-cuda-env:
+        build:
+            context: .
+            dockerfile: dockerfiles/nrp-core.Dockerfile
+            target: nrp-core-env
+            args:
+                BASE_IMAGE: ${NRP_DOCKER_REGISTRY}nrp-core/nest-gazebo-nvidia-cuda-ubuntu20-env${NRP_CORE_TAG}
+        image: ${NRP_DOCKER_REGISTRY}nrp-core/nrp-nest-gazebo-nvidia-cuda-ubuntu20-env${NRP_CORE_TAG}
+        command: bash
+        depends_on:
+        - nest-gazebo-nvidia-cuda-env

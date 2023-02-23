@@ -48,7 +48,7 @@ if(OPENMP_FOUND)
     set(OpenMP_FLAGS ${OpenMP_CXX_FLAGS})  # or if you use C: ${OpenMP_C_FLAGS}
     set(OpenMP_LIBS gomp)
 endif()
-set(WITH_CUDA OFF)
+option(WITH_CUDA "NVidia CUDA support" ON)
 if(WITH_CUDA)
     find_package(CUDA REQUIRED)
     if (CUDA_FOUND)
