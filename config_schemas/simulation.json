@@ -10,6 +10,11 @@
       "default": "FTILoop",
       "description": "Type of simulation loop used in the experiment"
     },
+    "FTILoopType" : {
+      "enum" : ["original", "RL"],
+      "default": "original",
+      "description": "Defines order of operations in the FTI loop"
+    },
     "SimulationTimeout" : {
       "type" : "number",
       "default": 0,

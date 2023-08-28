@@ -51,7 +51,8 @@ TEST(FTILoopTest, Constructor)
     EngineClientInterfaceSharedPtr brain(NestEngineJSONLauncher().launchEngine(config->at("EngineConfigs").at(1), ProcessLauncherInterface::unique_ptr(new ProcessLauncherBasic())));
     EngineClientInterfaceSharedPtr physics(GazeboEngineGrpcLauncher().launchEngine(config->at("EngineConfigs").at(0), ProcessLauncherInterface::unique_ptr(new ProcessLauncherBasic())));
 
-    ASSERT_NO_THROW(FTILoop simLoop(config, {brain, physics}, &simulationDataManager));
+    const SimulationTime timestep = std::chrono::duration_cast<SimulationTime>(std::chrono::milliseconds (500));
+    ASSERT_NO_THROW(FTILoop simLoop(config, {brain, physics}, &simulationDataManager, timestep));
 }
 
 TEST(FTILoopTest, RunLoop)
@@ -88,15 +89,15 @@ TEST(FTILoopTest, RunLoop)
     // TODO Without the sleeps between calls, gRPC seems to fail in weird ways...
     std::this_thread::sleep_for(100ms);
 
-    FTILoop simLoop(config, {brain, physics}, &simulationDataManager);
+    FTILoop simLoop(config, {brain, physics}, &simulationDataManager, timestep);
 
     ASSERT_NO_THROW(simLoop.initLoop());
 
     ASSERT_EQ(simLoop.getSimTime(), SimulationTime::zero());
-    ASSERT_NO_THROW(simLoop.runLoop(timestep));
+    ASSERT_NO_THROW(simLoop.runLoop(1));
     std::this_thread::sleep_for(100ms);
     ASSERT_EQ(simLoop.getSimTime(), timestep);
-    ASSERT_NO_THROW(simLoop.runLoop(timestep));
+    ASSERT_NO_THROW(simLoop.runLoop(1));
     std::this_thread::sleep_for(100ms);
     ASSERT_EQ(simLoop.getSimTime(), timestep+timestep);
 }
@@ -133,10 +134,11 @@ TEST(FTILoopTest, TimeNodes)
     // TODO Without the sleeps between calls, gRPC seems to fail in weird ways...
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
-    FTILoop simLoop(config, {brain, physics}, &simulationDataManager);
+    const SimulationTime timestep = std::chrono::duration_cast<SimulationTime>(std::chrono::milliseconds (500));
+    FTILoop simLoop(config, {brain, physics}, &simulationDataManager, timestep);
 
     ASSERT_NO_THROW(simLoop.initLoop());
     ASSERT_EQ(simLoop.getSimTime(), SimulationTime::zero());
-    auto runTime = std::chrono::duration_cast<SimulationTime>(std::chrono::seconds(1));
-    ASSERT_NO_THROW(simLoop.runLoop(runTime));
+    //auto runTime = std::chrono::duration_cast<SimulationTime>(std::chrono::seconds(1));
+    ASSERT_NO_THROW(simLoop.runLoop(100));
 }

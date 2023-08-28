@@ -114,6 +114,21 @@ public:
         this->_simulationDataManager->startNewIteration();
     }
 
+    void sendDataPacks(const std::vector<EngineClientInterfaceSharedPtr> &engines)
+    {
+        sendDataPacksToEngines(engines);
+        NRP_LOG_TIME("after_send_datapacks");
+    }
+
+    void getDataPacksAndRunFunctions(const std::vector<EngineClientInterfaceSharedPtr> &engines)
+    {
+        updateDataPacksFromEngines(engines);
+        NRP_LOG_TIME("after_get_datapacks");
+        compute(engines);
+        NRP_LOG_TIME("after_run_tfs");
+        this->_simulationDataManager->startNewIteration();
+    }
+
     void setSimulationTime(SimulationTime simulationTime)
     {
         this->_simulationTime = simulationTime;

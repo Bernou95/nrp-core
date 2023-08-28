@@ -142,15 +142,42 @@ bool FTILoopSimManager::runSimulationUntilCondition(std::function<bool ()> condi
 void FTILoopSimManager::runSimulationOnce()
 {
     if(this->_loop != nullptr)
-        this->_loop->runLoop(this->_timeStep);
+        this->_loop->runLoop(1);
     else
         throw NRPException::logCreate("Simulation must be initialized before calling runLoop");
 }
 
-FTILoop FTILoopSimManager::createSimLoop()
+void FTILoopSimManager::setSimulationTimestep(const nlohmann::json & engineConfigs)
 {
     this->_timeStep = SimulationTime::max();
 
+    for(auto &engineConfig : engineConfigs)
+    {
+        const auto engineTimestep = toSimulationTimeFromSeconds(engineConfig.at("EngineTimestep").get<double>());
+        if(this->_timeStep > engineTimestep)
+        {
+            this->_timeStep = engineTimestep;
+        }
+    }
+    
+    NRPLogger::debug("Simulation Timestep is: "+ std::to_string(fromSimulationTime<double, std::ratio<1>>(this->_timeStep)));
+}
+
+void FTILoopSimManager::verifyEngineTimesteps(const DataPackProcessor::engine_interfaces_t & engines)
+{
+    for(const auto engine : engines)
+    {
+        if(engine->getEngineTimestep().count() % this->_timeStep.count() != 0)
+        {
+            NRPLogger::warn("Engine's " + engine->engineName() +
+                            " timestep (" + std::to_string(engine->getEngineTimestep().count()) +
+                            ") is not a multiple of simulation timestep (" + std::to_string(this->_timeStep.count()) + ")" );
+        }
+    }
+}
+
+FTILoop FTILoopSimManager::createSimLoop()
+{
     DataPackProcessor::engine_interfaces_t engines;
     auto &engineConfigs = this->_simConfig->at("EngineConfigs");
     std::set<std::string> engineNames;
@@ -168,7 +195,7 @@ FTILoop FTILoopSimManager::createSimLoop()
                                           + engineName);
         
         // Get engine launcher associated with type
-        const std::string engineType = engineConfig.at("EngineType");
+        const std::string engineType = engineConfig.at("EngineType"); 
         auto engineLauncher = _engineLauncherManager->findLauncher(engineType);
         if(engineLauncher == nullptr)
         {
@@ -187,14 +214,12 @@ FTILoop FTILoopSimManager::createSimLoop()
         {
             throw NRPException::logCreate(e, "Failed to launch engine:  \"" + engineName + "\"");
         }
-
-        if(this->_timeStep > toSimulationTimeFromSeconds(engineConfig.at("EngineTimestep").get<double>()))
-        {
-            this->_timeStep = toSimulationTimeFromSeconds(engineConfig.at("EngineTimestep").get<double>());
-        }
     }
-    NRPLogger::debug("Simulation Timestep is: "+ std::to_string(fromSimulationTime<double, std::ratio<1>>(this->_timeStep)));
-    return FTILoop(this->_simConfig, engines, &this->_simulationDataManager);
+
+    setSimulationTimestep(engineConfigs);
+    verifyEngineTimesteps(engines);
+    
+    return FTILoop(this->_simConfig, engines, &this->_simulationDataManager, this->_timeStep);
 }
 
 bool FTILoopSimManager::hasSimTimedOut(const SimulationTime &simTime, const SimulationTime &simTimeout)

@@ -72,6 +72,9 @@ class FTILoopSimManager
         /*! \brief Used to process stop loop requests */
         std::atomic<bool> _stopLoop;
 
+        void setSimulationTimestep(const nlohmann::json & engineConfigs);
+        void verifyEngineTimesteps(const DataPackProcessor::engine_interfaces_t & engines);
+
         /*!
          * \brief Creates a simulation loop using the engines specified in the config file
          */
