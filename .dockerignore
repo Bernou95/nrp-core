@@ -6,6 +6,8 @@ generatedJUnitFiles
 
 Jenkinsfile
 docker-compose.yaml
+docker-compose-env.yaml
+docker-compose-nrp.yaml
 .ci/Jenkinsfile
 
 dockerfiles
