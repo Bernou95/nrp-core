@@ -1,7 +1,7 @@
 //
 // NRP Core - Backend infrastructure to synchronize simulations
 //
-// Copyright 2020-2021 NRP Team
+// Copyright 2020-2023 NRP Team
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -38,8 +38,8 @@ class TestEngineJSONServer
 {
     public:
     template<class ...T>
-    TestEngineJSONServer(T &&...properties)
-        : EngineJSONServer(std::forward<T>(properties)...)
+    TestEngineJSONServer(T &...properties)
+        : EngineJSONServer(std::forward<T>(properties)..., "", "")
     {}
 
     virtual ~TestEngineJSONServer() override = default;
@@ -101,23 +101,19 @@ TEST(EngineJSONServerTest, Functions)
     // Test setting empty data
     // The JSON object in the controller should not be updated
 
-    auto retData = server.setDataPackData(nlohmann::json());
+    server.setDataPackData(nlohmann::json());
     ASSERT_FALSE(dev1Ctrl.data().contains("data"));
-    ASSERT_TRUE(retData.empty());
 
     // Test setting data for an unregistered datapack
     // The JSON object in the controller should not be updated
 
-    retData = server.setDataPackData(nlohmann::json({{"fakeDataPack", {}}}));
+    server.setDataPackData(nlohmann::json({{"fakeDataPack", {}}}));
     ASSERT_FALSE(dev1Ctrl.data().contains("data"));
-    ASSERT_STREQ(retData.find("fakeDataPack")->get<std::string>().data(), "");
-    ASSERT_EQ(retData.size(), 1);
 
     // Test setting data for a registered datapack
     // The JSON object in the controller should be updated
 
-    retData = server.setDataPackData(*data);
-    ASSERT_EQ(retData.size(), 1);
+    server.setDataPackData(*data);
     ASSERT_TRUE(dev1Ctrl.data().contains(datapackName));
     ASSERT_EQ(dev1Ctrl.data()[datapackName]["type"       ], JsonDataPack::getType());
     ASSERT_EQ(dev1Ctrl.data()[datapackName]["engine_name"], engineName);
@@ -125,7 +121,7 @@ TEST(EngineJSONServerTest, Functions)
 
     // Test getting empty data
 
-    retData = server.getDataPackData(nlohmann::json());
+    auto retData = server.getDataPackData(nlohmann::json());
     ASSERT_TRUE(retData.empty());
 
     // Test getting data for an unregistered datapack
@@ -148,7 +144,6 @@ TEST(EngineJSONServerTest, Functions)
     ASSERT_EQ(retData[datapackName]["data"       ], (*data)[datapackName]["data"]);
 
     // Clear datapacks
-
     server.clearRegisteredDataPacks();
     ASSERT_EQ(server._datapacksControllers.size(), 0);
 }
@@ -170,8 +165,6 @@ TEST(EngineJSONServerTest, HttpRequests)
     auto dev1Ctrl = TestJSONDataPackController(DataPackIdentifier(dev1.id()));
     server.registerDataPack(dev1.name(), &dev1Ctrl);
 
-    ASSERT_FALSE(server.isServerRunning());
-    server.startServerAsync();
     ASSERT_TRUE(server.isServerRunning());
 
     // Init command
@@ -192,10 +185,9 @@ TEST(EngineJSONServerTest, HttpRequests)
     auto request = nlohmann::json();
     request[datapackName] = {{"engine_name", engineName}, {"data", 2}};
     resp = RestClient::post(address + "/" + EngineJSONConfigConst::EngineServerSetDataPacksRoute.data(), EngineJSONConfigConst::EngineServerContentType.data(), request.dump());
-    retData = nlohmann::json::parse(resp.body);
-    // DataPack name with no data should be returned as confirmation
-    ASSERT_EQ(retData.size(), 1);
-    ASSERT_EQ(retData[datapackName], "");
+    ASSERT_EQ(resp.code, 200);
+
+
 
     // Run get server command
     request.clear();

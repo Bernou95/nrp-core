@@ -1,6 +1,6 @@
 /* * NRP Core - Backend infrastructure to synchronize simulations
  *
- * Copyright 2020-2021 NRP Team
+ * Copyright 2020-2023 NRP Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@
 struct NestServerConfigConst
 {
     static constexpr char EngineType[] = "nest_server";
-    static constexpr char EngineSchema[] = "https://neurorobotics.net/engines/engines_nest.json#/engine_nest_server";
+    static constexpr char EngineSchema[] = "json://nrp-core/engines/engines_nest.json#/engine_nest_server";
 };
 
 #endif // NEST_SERVER_CONFIG_H

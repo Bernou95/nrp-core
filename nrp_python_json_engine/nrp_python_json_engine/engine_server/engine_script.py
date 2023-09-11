@@ -1,6 +1,6 @@
 # NRP Core - Backend infrastructure to synchronize simulations
 #
-# Copyright 2020-2021 NRP Team
+# Copyright 2020-2023 NRP Team
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -28,11 +28,13 @@ class EngineScript:
         self._name = ""
         self._config = None
 
+    def _getEngineName(self) -> str:
+        """Returns Engine name"""
+        return self._name
 
     def _advanceTime(self, timestep_ns: int) -> None:
         """Advances the simulation time by given timestep"""
         self._time_ns = self._time_ns + timestep_ns
-
 
     def _registerDataPack(self, datapack_name: str) -> None:
         """
@@ -44,6 +46,11 @@ class EngineScript:
 
         self._datapacks[datapack_name] = None
 
+    def _getRegisteredDataPackNames(self) -> list:
+        """
+        Returns the list of registered datapack names
+        """
+        return list(self._datapacks.keys())
 
     def _getDataPack(self, datapack_name: str) -> dict:
         """Returns cached data of the datapack with given name"""
@@ -52,14 +59,12 @@ class EngineScript:
 
         return self._datapacks[datapack_name]
 
-
     def _setDataPack(self, datapack_name: str, data: dict) -> None:
         """Sets cached data of the datapack with given name"""
         if datapack_name not in self._datapacks:
             raise Exception(f"Attempting to set data on an unregistered DataPack ({datapack_name})")
 
         self._datapacks[datapack_name] = data
-
 
     def initialize(self) -> None:
         """
@@ -70,17 +75,15 @@ class EngineScript:
         """
         pass
 
-
     def runLoop(self, timestep_ns: int) -> None:
         """
-        Runs a signle step of the simulation.
+        Runs a single step of the simulation.
 
         This function should be overwritten by the derived class and
         should contain all steps necessary to advance the simulation
         by the specified time.
         """
         pass
-
 
     def shutdown(self) -> None:
         """
@@ -91,7 +94,6 @@ class EngineScript:
         """
         pass
 
-
     def reset(self) -> None:
         """
         Resets the simulation.
@@ -99,6 +101,6 @@ class EngineScript:
         This function should be overwritten by the derived class and
         should contain all steps necessary to reset the simulation.
         """
-        raise NotImplementedError("The reset method of EngineScript is not implemented.")
+        pass
 
 # EOF

@@ -1,6 +1,6 @@
 /* * NRP Core - Backend infrastructure to synchronize simulations
  *
- * Copyright 2020-2021 NRP Team
+ * Copyright 2020-2023 NRP Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,11 +66,10 @@ class EngineJSONServer
         EngineJSONServer(const std::string &engineAddress, const std::string &engineName, const std::string &clientAddress);
 
         /*!
-         * \brief Constructor. Will try to bind to engineAddress
-         * \param engineAddress Server address
+         * \brief No dummy servers without name and address
          */
-        EngineJSONServer(const std::string &engineAddress);
-        EngineJSONServer();
+        EngineJSONServer() = delete;
+
         virtual ~EngineJSONServer();
 
         // Delete copy mechanisms
@@ -154,6 +153,12 @@ class EngineJSONServer
          */
         virtual nlohmann::json shutdown(const nlohmann::json &data) = 0;
 
+        /*!
+         * \brief Has a shutdown command been received?
+         * \return Returns true if a shutdown command has been received
+         */
+        bool shutdownFlag();
+
     protected:
         /*!
          * \brief Lock access to _datapacks to make execution thread-safe
@@ -178,14 +183,28 @@ class EngineJSONServer
          * \param reqData A JSON array containing datapack names linked to the individual datapack's data
          * \return Execution result
          */
-        // TODO What is this function supposed to return?
-        virtual nlohmann::json setDataPackData(const nlohmann::json &reqData);
+        virtual void setDataPackData(const nlohmann::json &reqData);
+
+        /*!
+         * \brief Get the Engine name
+         */
+        const std::string &getEngineName() { return _engineName; }
 
     private:
         /*!
          * \brief Is the server running?
          */
         bool _serverRunning = false;
+
+        /*!
+         * \brief Shutdown Flag. Set to true once the shutdown signal has been received
+         */
+        bool _shutdownFlag = false;
+
+        /*!
+         * \brief Mutex used to access the shutdown flag in a thread-safe manner
+         */
+        std::mutex _shutdown_mutex;
 
         /*!
          *  \brief ServerURL
@@ -196,6 +215,14 @@ class EngineJSONServer
          * \brief Routes
          */
         Pistache::Rest::Router _router;
+
+        /*!
+         * \brief Name of the simulation engine
+         *
+         * Must be the same on the server and the client side. It should be imprinted
+         * in the datapack metadata, which allows for additional consistency checks.
+         */
+        std::string _engineName;
 
         using enpoint_ptr_t = std::unique_ptr<Pistache::Http::Endpoint>;
 

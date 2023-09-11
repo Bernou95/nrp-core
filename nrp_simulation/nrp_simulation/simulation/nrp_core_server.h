@@ -1,6 +1,6 @@
 /* * NRP Core - Backend infrastructure to synchronize simulations
  *
- * Copyright 2020-2021 NRP Team
+ * Copyright 2020-2023 NRP Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,8 @@
 #include <grpcpp/grpcpp.h>
 
 #include "nrp_protobuf/nrp_server.grpc.pb.h"
+#include "nrp_simulation/simulation/simulation_manager.h"
+#include "nrp_protobuf/proto_ops/protobuf_ops.h"
 
 /*!
  * \brief NRP Server class, responsible for handling simulation control requests coming from the client application or script
@@ -48,131 +50,165 @@
  */
 class NrpCoreServer : public NrpCore::NrpCore::Service
 {
-    public:
-        enum class RequestType { None, Init, RunLoop, Shutdown };
+public:
+    /*! \brief enum with possible request types to be processed by SimulationManager */
+    enum class RequestType { None, Initialize, RunLoop, RunUntilTimeout, StopLoop, Reset, Shutdown };
 
-        /*!
-         * \brief Constructor. Spawns an instance of gRPC server with given address.
-         * \param address Address of the gRPC server
-         */
-        NrpCoreServer(const std::string & address);
+    /*!
+     * \brief Constructor. Spawns an instance of gRPC server with given address.
+     * \param address Address of the gRPC server
+     * \param manager SimulationManager which actually perform actions from requests
+     */
+    NrpCoreServer(const std::string & address, std::shared_ptr<SimulationManager> && manager);
 
-        /*!
-         * \brief Returns the type of request coming from the client
-         */
-        RequestType getRequestType() const;
+    /*!
+     * \brief Enters server loop in which requests are processed sequentially
+     */
+    void runServerLoop();
 
-        /*!
-         * \brief Returns number of iterations of runLoop requested by the client
-         */
-        unsigned getNumIterations() const;
+    /*!
+     * \brief Stops server loop
+     */
+    void stopServerLoop();
 
-        /*!
-         * \brief Puts the current thread to sleep until a request is available
-         *
-         * The function is supposed to be called by the consumer thread.
-         * It should be called in combination with markRequestAsProcessed function.
-         */
-        void waitForRequest();
+private:
 
-        /*!
-         * \brief Signals the server that the request has been processed
-         *
-         * The function is supposed to be called by the consumer thread, after
-         * the pending request has been consumed. If the function isn't called, the
-         * producer thread will not wake up! It must be called after waitForRequest function.
-         */
-        void markRequestAsProcessed();
+    //// Thread sync methods
 
-        /*!
-         * \brief Signals the server, that there was an error during request handling
-         *
-         * \param errorMessage Message describing what went wrong
-         */
-        void markRequestAsFailed(const std::string & errorMessage);
+    /*!
+     * \brief Puts the current thread to sleep until a request is available
+     *
+     * The function is supposed to be called by the consumer thread.
+     * It should be called in combination with markRequestAsProcessed function.
+     */
+    void waitForRequest();
 
-    private:
+    /*! \brief Indicates if there's a request pending */
+    bool isRequestPending() const;
 
-        /*!
-         * \brief Clears the request variables and sets the request type to none
-         */
-        void resetRequest();
+    //// Methods for getting request information from main thread
 
-        /*!
-         * \brief Indicates if there's a request pending
-         */
-        bool isRequestPending() const;
+    /*! \brief Returns the type of request coming from the client */
+    RequestType getRequestType() const;
 
-        /*!
-         * \brief A helper function used by the request callbacks
-         *
-         * The function will block the callback thread until the request has been processed by the consumer.
-         *
-         * \param lock        Lock acquired by the callback
-         * \param requestType Type of the request to be prepared for the consumer
-         * \return            Status of the request. In case of failure, it will contain grpc::StatusCode::CANCELLED
-         *                    and the error message returned by the consumer.
-         */
-        grpc::Status requestHelper(std::unique_lock<std::mutex> & lock, RequestType requestType);
+    /*! \brief Returns number of iterations of runLoop requested by the client */
+    unsigned getRequestNumIterations() const;
 
-        /*!
-         * \brief Callback for the initialization request coming from the client
-         */
-        grpc::Status initialize(grpc::ServerContext * , const NrpCore::EmptyMessage * , NrpCore::EmptyMessage *) override;
+    //// Methods for setting request output from main thread
 
-        /*!
-         * \brief Callback for the run loop request coming from the client
-         */
-        grpc::Status runLoop(grpc::ServerContext * , const NrpCore::RunLoopMessage * message, NrpCore::EmptyMessage *) override;
+    /*! \brief Clears the request variables and sets the request type to none */
+    void resetRequest();
 
-        /*!
-         * \brief Callback for the shutdown request coming from the client
-         */
-        grpc::Status shutdown(grpc::ServerContext * , const NrpCore::EmptyMessage * , NrpCore::EmptyMessage *) override;
+    /*!
+     * \brief Signals the server that the request has been processed
+     *
+     * The function is supposed to be called by the consumer thread, after
+     * the pending request has been consumed. If the function isn't called, the
+     * producer thread will not wake up! It must be called after waitForRequest function.
+     *
+     * \param result Result of the processed request
+     */
+    void markRequestAsProcessed(const SimulationManager::RequestResult & result);
 
-        /*!
-         * \brief Mutex used for synchronization of consumer and producer threads with conditional variables
-         */
-        std::mutex _mutex;
+    //// Request processing methods
 
-        /*!
-         * \brief Conditional variable used to deliver requests to the consumer
-         */
-        std::condition_variable _consumerConditionalVar;
+    /*!
+     * \brief A helper function used by the request callbacks
+     *
+     * The function will block the callback thread until the request has been processed by the consumer.
+     *
+     * \param lock        Lock acquired by the callback
+     * \param requestType Type of the request to be prepared for the consumer
+     * \return            Status of the request. In case of failure, it will contain grpc::StatusCode::CANCELLED
+     *                    and the error message returned by the consumer.
+     */
+    grpc::Status requestHelper(std::unique_lock<std::mutex> & lock, RequestType requestType, NrpCore::SimStateMessage * returnMessage);
 
-        /*!
-         * \brief Conditional variable used to pass responses back to the producer
-         */
-        std::condition_variable _producerConditionalVar;
+    /*!
+     * \brief Populates the RunLoopResponse with trajectory data from the Status Function
+     *
+     * The function fetches the trajectory data (a vector of DataPacks) from the SimulationDataManager.
+     * This data is then serialized into proper protobuf messages and included in the response message.
+     * Since the observations that are parts of the full trajectory may be of different types
+     * (JSON, protobuf), they are included in different fields (lists) in the response message.
+     * These lists will be assembled back into a single trajectory by the client, based on the
+     * message indices assigned to each of the observations.
+     *
+     * \param trajectory Message that should be populated with the trajectory data
+     */
+    void prepareTrajectory(NrpCore::Trajectory * trajectory);
 
-        /*!
-         * \brief Lock used by the functions called from the consumer threads
-         */
-        std::unique_lock<std::mutex> _lock;
+    /*!
+     * \brief Set content in rpc return message from SimulationManager RequestResult
+     */
+    void setReturnMessageContent(const SimulationManager::RequestResult& res, NrpCore::SimStateMessage * returnMessage);
 
-        /*!
-         * \brief Pointer to the gRPC server class
-         */
-        std::unique_ptr<grpc::Server> _server;
+    std::vector<std::shared_ptr<const DataPackInterface>> extractExternalDataPacks(const NrpCore::DataPacks & message);
 
-        /*!
-         * \brief Type of the pending request
-         */
-        RequestType _requestType = RequestType::None;
+    /*!
+     * \brief Callback for the initialization request coming from the client
+     */
+    grpc::Status initialize(grpc::ServerContext * , const NrpCore::EmptyMessage * message, NrpCore::InitializeResponse * returnMessage) override;
 
-        /*!
-         * \brief Number of iterations of runLoop requested by the client
-         */
-        unsigned _numIterations = 0;
+    /*!
+     * \brief Callback for the run loop request coming from the client
+     */
+    grpc::Status runLoop(grpc::ServerContext * , const NrpCore::RunLoopMessage * message, NrpCore::RunLoopResponse * status) override;
 
-        /*!
-         * \brief Helper structure holding request status and error messages
-         */
-        struct RequestStatus
-        {
-            bool        failed       = false;
-            std::string errorMessage = "";
-        } _requestStatus;
+    /*!
+     * \brief Callback for the run until timeout loop request coming from the client
+     */
+    grpc::Status runUntilTimeout(grpc::ServerContext * , const NrpCore::EmptyMessage * , NrpCore::RunLoopResponse * returnMessage) override;
+
+    /*!
+     * \brief Callback for the stop request coming from the client
+     */
+    grpc::Status stopLoop(grpc::ServerContext * , const NrpCore::EmptyMessage * , NrpCore::Response * returnMessage) override;
+
+    /*!
+     * \brief Callback for the reset request coming from the client
+     */
+    grpc::Status reset(grpc::ServerContext * , const NrpCore::ResetMessage * message, NrpCore::ResetResponse * returnMessage) override;
+
+    /*!
+     * \brief Callback for the shutdown request coming from the client
+     */
+    grpc::Status shutdown(grpc::ServerContext * , const NrpCore::EmptyMessage * , NrpCore::Response * returnMessage) override;
+
+    //// Synchronization members
+
+    /*! \brief Mutex used for synchronization of consumer and producer threads with conditional variables */
+    std::mutex _mutex;
+
+    /*! \brief Conditional variable used to deliver requests to the consumer  */
+    std::condition_variable _consumerConditionalVar;
+
+    /*!  \brief Conditional variable used to pass responses back to the producer */
+    std::condition_variable _producerConditionalVar;
+
+    /*! \brief Lock used by the functions called from the consumer threads */
+    std::unique_lock<std::mutex> _lock;
+
+    //// Other members
+
+    /*! \brief Pointer to the gRPC server class */
+    std::unique_ptr<grpc::Server> _server;
+
+    /*! \brief Type of the pending request */
+    RequestType _requestType = RequestType::None;
+
+    /*! \brief Number of iterations of runLoop requested by the client */
+    unsigned _numIterations = 0;
+
+    /*! \brief Request status and error messages */
+    SimulationManager::RequestResult _requestResult;
+
+    /*! \brief SimulationManager which actually perform actions from requests */
+    std::shared_ptr<SimulationManager> _manager;
+
+    /*! \brief Vector of protobuf converters */
+    std::vector<std::unique_ptr<protobuf_ops::NRPProtobufOpsIface>> _protoOps;
+
 };
 
 #endif // NRP_CORE_SERVER_H

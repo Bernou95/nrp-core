@@ -1,6 +1,6 @@
 /* * NRP Core - Backend infrastructure to synchronize simulations
  *
- * Copyright 2020-2021 NRP Team
+ * Copyright 2020-2023 NRP Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ class FTILoop
     public:
 
         FTILoop() = default;
-        FTILoop(jsonSharedPtr config, DataPackProcessor::engine_interfaces_t engines);
+        FTILoop(jsonSharedPtr config, DataPackProcessor::engine_interfaces_t engines, SimulationDataManager * simulationDataManager);
 
         /*!
          * \brief Initialize engines before running loop
@@ -55,10 +55,9 @@ class FTILoop
         void shutdownLoop();
 
         /*!
-         * \brief Runs a single loop step
-         * \param timeStep How long the single components should run (in seconds)
+         * \brief Blocks until all running Engines finishe their execution
          */
-        //void runLoopStep(float timeStep);
+        void waitForEngines();
 
         /*!
          * \brief Runs simulation for a total of runLoopTime (in s)
@@ -95,6 +94,8 @@ class FTILoop
          * \brief Simulated time (in seconds)
          */
         SimulationTime _simTime = SimulationTime::zero();
+
+        unsigned long _simIteration = 0;
 
         /*!
          * \brief Used to handle datapack operations in engines

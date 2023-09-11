@@ -43,6 +43,8 @@ set(TEST_SRC_FILES
 
 ##########################################
 ## Dependencies
+set(ENV{CMAKE_PREFIX_PATH} "${NRP_DEP_CMAKE_INSTALL_PREFIX}:$ENV{CMAKE_PREFIX_PATH}")
+message(STATUS "Using CMAKE_PREFIX_PATH $ENV{CMAKE_PREFIX_PATH}")
 
 find_package(eclipse-paho-mqtt-c 1.3.8 REQUIRED)
 find_package(PahoMqttCpp 1.2.0 REQUIRED)
@@ -129,12 +131,13 @@ if(${ENABLE_TESTING} AND NOT "${TEST_SRC_FILES}" STREQUAL "")
     # Create testing executable
     enable_testing()
     add_executable(${TEST_NAME} ${TEST_SRC_FILES})
+    target_compile_options(${TEST_NAME} PUBLIC $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:GNU>>:${NRP_COMMON_COMPILATION_FLAGS}>)
+    target_link_options(${TEST_NAME} PUBLIC ${NRP_COMMON_LD_FLAGS})
     target_link_libraries(${TEST_NAME}
         PUBLIC
         ${NAMESPACE_NAME}::${LIBRARY_NAME}
-        GTest::GTest
         GTest::Main
-        gmock_main
+        GTest::GTest
         gmock)
 
     gtest_discover_tests(${TEST_NAME}
@@ -178,15 +181,6 @@ install(DIRECTORY "${HEADER_DIRECTORY}" "${CMAKE_CURRENT_BINARY_DIR}/include/${H
         PATTERN "*.h"
         PATTERN "*.hpp"
 )
-
-# Install python module
-#if(TARGET ${PYTHON_MODULE_NAME})
-#   install(TARGETS ${PYTHON_MODULE_NAME}
-#       DESTINATION "${PYTHON_INSTALL_DIR_REL}/${PYTHON_MODULE_NAME}")
-#
-#   install(FILES "${CMAKE_CURRENT_BINARY_DIR}/src/__init__.py"
-#       DESTINATION "${PYTHON_INSTALL_DIR_REL}/${PYTHON_MODULE_NAME}")
-#endif()
 
 # Install executable files
 if(TARGET ${EXECUTABLE_NAME})

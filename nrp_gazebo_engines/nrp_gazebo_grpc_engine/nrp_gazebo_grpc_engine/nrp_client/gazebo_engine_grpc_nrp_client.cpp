@@ -1,7 +1,7 @@
 //
 // NRP Core - Backend infrastructure to synchronize simulations
 //
-// Copyright 2020-2021 NRP Team
+// Copyright 2020-2023 NRP Team
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -69,8 +69,6 @@ void GazeboEngineGrpcNRPClient::reset()
         throw NRPException::logCreate(e, "Engine \"" + this->engineName() + "\" reset failed");
     }
 
-    this->_datapackCache.clear();
-
     this->resetEngineTime();
 }
 
@@ -86,24 +84,6 @@ void GazeboEngineGrpcNRPClient::shutdown()
     {
         throw NRPException::logCreate("Engine \"" + this->engineName() + "\" shutdown failed");
     }
-}
-
-const std::vector<std::string> GazeboEngineGrpcNRPClient::engineProcEnvParams() const
-{
-    NRP_LOGGER_TRACE("{} called", __FUNCTION__);
-
-    std::vector<std::string> envVars = this->EngineGrpcClient::engineProcEnvParams();
-
-    // Add NRP and Gazebo plugins dir
-    envVars.push_back("GAZEBO_PLUGIN_PATH=" NRP_GAZEBO_PLUGINS_DIR ":" DEFAULT_GAZEBO_PLUGIN_DIR ":$GAZEBO_PLUGIN_PATH");
-
-    // Add NRP and Gazebo library paths
-    envVars.push_back("LD_LIBRARY_PATH=" NRP_LIB_INSTALL_DIR ":" DEFAULT_GAZEBO_LIB_DIRS ":" NRP_GAZEBO_PLUGINS_DIR ":" DEFAULT_GAZEBO_PLUGIN_DIR ":$LD_LIBRARY_PATH");
-
-    // Add Gazebo models path
-    envVars.push_back("GAZEBO_MODEL_PATH=" DEFAULT_GAZEBO_MODEL_DIR ":${GAZEBO_MODEL_PATH}");
-
-    return envVars;
 }
 
 const std::vector<std::string> GazeboEngineGrpcNRPClient::engineProcStartParams() const

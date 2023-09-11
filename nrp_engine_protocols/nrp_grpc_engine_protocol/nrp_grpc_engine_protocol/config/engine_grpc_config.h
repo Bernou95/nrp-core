@@ -1,6 +1,6 @@
 /* * NRP Core - Backend infrastructure to synchronize simulations
  *
- * Copyright 2020-2021 NRP Team
+ * Copyright 2020-2023 NRP Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,11 +27,6 @@
 struct EngineGRPCConfigConst
 {
         /*!
-         * \brief Maximum amount of tries for EngineJSONserver to bind to different ports
-         */
-        static constexpr short MaxAddrBindTries = 1024;
-
-        /*!
          * \brief Parameter name that is used to pass along the server address
          */
         static constexpr std::string_view EngineServerAddrArg = "serverurl";
@@ -41,30 +36,15 @@ struct EngineGRPCConfigConst
          */
         static constexpr std::string_view EngineNameArg = "engine";
 
-        /*!
-         * \brief REST Server Route from which to get datapack information
-         */
-        static constexpr std::string_view EngineServerGetDataPacksRoute = "/get_datapack_information";
+    /*!
+     * \brief Parameter name that is used to pass the protobuf plugins path
+     */
+    static constexpr std::string_view ProtobufPluginsPathArg = "protobuf_plugins_path";
 
-        /*!
-         * \brief REST Server Route to which to send datapack changes
+    /*!
+         * \brief Parameter name that is used to pass the list of protobuf plugins
          */
-        static constexpr std::string_view EngineServerSetDataPacksRoute = "/set_datapack";
-
-        /*!
-         * \brief REST Server Route to execute a single loop
-         */
-        static constexpr std::string_view EngineServerRunLoopStepRoute = "/run_loop";
-
-        /*!
-         * \brief REST Server Route for engine initialization
-         */
-        static constexpr std::string_view EngineServerInitializeRoute = "/initialize";
-
-        /*!
-         * \brief REST Server Route for engine shutdown
-         */
-        static constexpr std::string_view EngineServerShutdownRoute = "/shutdown";
+    static constexpr std::string_view ProtobufPluginsArg = "protobuf_plugins";
 
         /*!
          * \brief JSON name under which the runLoopStep timeStep is saved
@@ -75,11 +55,6 @@ struct EngineGRPCConfigConst
          * \brief JSON name under which the runLoopStep engine time is sent
          */
         static constexpr std::string_view EngineTimeName = "time";
-
-        /*!
-         * \brief Content Type passed between server and client
-         */
-        static constexpr std::string_view EngineServerContentType = "application/json";
 };
 
 

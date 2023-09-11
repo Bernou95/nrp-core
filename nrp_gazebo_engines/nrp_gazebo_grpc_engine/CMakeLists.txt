@@ -26,7 +26,6 @@ set(LIB_SRC_FILES
 
 # List of python module build files
 set(PYTHON_MODULE_SRC_FILES
-#   nrp_gazebo_grpc_engine/python/python_module.cpp
 )
 
 # List executable build files
@@ -34,31 +33,23 @@ set(EXEC_SRC_FILES
 )
 
 # List testing build files
-set(TEST_SRC_FILES
-    tests/test_gazebo_engine.cpp
-)
+if(BUILD_GAZEBO_ENGINE_SERVER)
+    set(TEST_SRC_FILES
+        tests/test_gazebo_engine.cpp
+    )
+endif()
 
 
 ##########################################
 ## Dependencies
 
-if(ENABLE_GAZEBO STREQUAL FULL)
+if(BUILD_GAZEBO_ENGINE_SERVER)
     find_package(Gazebo REQUIRED)
 endif()
 
 ##########################################
 ## Header configuration
-
-set(NRP_GAZEBO_PLUGINS_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}/nrp_gazebo_plugins" CACHE PATH "Install location of gazebo plugins")
-
 set(NRP_GAZEBO_COMMUNICATION_PLUGIN NRPGazeboGrpcCommunicationPlugin)
-
-set(NRP_GAZEBO_PLUGINS_INSTALL_DIR_ABSOLUTE ${NRP_GAZEBO_PLUGINS_INSTALL_DIR})
-if(NOT IS_ABSOLUTE ${NRP_GAZEBO_PLUGINS_INSTALL_DIR})
-    set(NRP_GAZEBO_PLUGINS_INSTALL_DIR_ABSOLUTE ${CMAKE_INSTALL_PREFIX}/${NRP_GAZEBO_PLUGINS_INSTALL_DIR})
-endif()
-
-list(JOIN GAZEBO_LIBRARY_DIRS ":" DEFAULT_GAZEBO_LIB_DIRS)
 
 # Gazebo defines
 configure_file("nrp_gazebo_grpc_engine/config/cmake_constants.h.in" "${CMAKE_CURRENT_BINARY_DIR}/include/${HEADER_DIRECTORY}/config/cmake_constants.h" @ONLY)
@@ -121,7 +112,7 @@ add_doxygen_source("${CMAKE_CURRENT_SOURCE_DIR}" ${EXEC_SRC_FILES} ${LIB_SRC_FIL
 
 
 ## This section needs Gazebo libraries installed
-if(ENABLE_GAZEBO STREQUAL FULL)
+if(BUILD_GAZEBO_ENGINE_SERVER)
 
     ##########################################
     ## Gazebo Grpc DataPack Controllers
@@ -131,7 +122,7 @@ if(ENABLE_GAZEBO STREQUAL FULL)
     ##########################################
     ## Gazebo plugins
     set(NRP_GAZEBO_LIB_TARGETS
-            "${NAMESPACE_NAME}::${LIBRARY_NAME}"
+            ${NRP_GAZEBO_GRPC_LIB}
             NRPGazeboGrpcDataPackControllers::NRPGazeboGrpcDataPackControllers)
 
     add_subdirectory(gazebo_grpc_plugins)
@@ -165,7 +156,6 @@ if(ENABLE_GAZEBO STREQUAL FULL)
     endif()
 
 endif()
-
 
 ##########################################
 ## Installation

@@ -1,6 +1,6 @@
 /* * NRP Core - Backend infrastructure to synchronize simulations
  *
- * Copyright 2020-2021 NRP Team
+ * Copyright 2020-2023 NRP Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,6 @@ class NestJSONServer
         : public EngineJSONServer
 {
     public:
-        NestJSONServer(const std::string &serverAddress, boost::python::dict globals);
         NestJSONServer(const std::string &serverAddress, const std::string &engineName, const std::string &registrationAddress, boost::python::dict globals);
         virtual ~NestJSONServer() override;
 
@@ -44,12 +43,6 @@ class NestJSONServer
          * \return Returns true once the initialize function has been run once
          */
         bool initRunFlag() const;
-
-        /*!
-         * \brief Has a shutdown command been received?
-         * \return Returns true if a shutdown command has been received
-         */
-        bool shutdownFlag() const;
 
         virtual SimulationTime runLoopStep(SimulationTime timeStep) override;
         virtual nlohmann::json initialize(const nlohmann::json &data, EngineJSONServer::lock_t &datapackLock) override;
@@ -61,11 +54,6 @@ class NestJSONServer
          * \brief Init Flag. Set to true once the server has executed the initialize function
          */
         bool _initRunFlag = false;
-
-        /*!
-         * \brief Shutdown Flag. Set to true once the shutdown signal has been received
-         */
-        bool _shutdownFlag = false;
 
         /*!
          * \brief NEST Preparation Flag. Set to true once nest.Prepare() was run and back to false after nest.Cleanup() was run
@@ -125,7 +113,7 @@ class NestJSONServer
 
         nlohmann::json getDataPackData(const nlohmann::json &reqData) override;
 
-        nlohmann::json setDataPackData(const nlohmann::json &reqData) override;
+        void setDataPackData(const nlohmann::json &reqData) override;
 
         nlohmann::json _initData;
 };

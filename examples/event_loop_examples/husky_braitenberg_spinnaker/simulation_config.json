@@ -1,6 +1,6 @@
 {
   "SimulationName": "test_sim",
-  "SimDescription": "Adaptation of the example `husky_braitenberg` using Spinnaker as brain simulator",
+  "SimulationDescription": "Adaptation of the example `husky_braitenberg` using Spinnaker as brain simulator",
   "SimulationTimeout": 90,
   "DataPackProcessor": "cg",
   "SimulationLoop": "EventLoop",
@@ -9,6 +9,13 @@
       "EngineType": "gazebo_grpc",
       "EngineName": "gazebo",
       "GazeboWorldFile": "husky_world.sdf",
+      "GazeboSDFModels": [
+        {
+          "Name": "husky",
+          "File": "husky.sdf",
+          "InitPose": "-0.009853 0.086704 0.187752 0 0 0"
+        }
+      ],
       "EngineProcStartParams": ["--verbose"]
     }
   ],

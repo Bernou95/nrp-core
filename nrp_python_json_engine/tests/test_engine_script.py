@@ -1,6 +1,6 @@
 # NRP Core - Backend infrastructure to synchronize simulations
 #
-# Copyright 2020-2021 NRP Team
+# Copyright 2020-2023 NRP Team
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -102,12 +102,6 @@ class TestServer(unittest.TestCase):
         self.assertEqual(script._time_ns, timestep)
         script._advanceTime(timestep)
         self.assertEqual(script._time_ns, 2 * timestep)
-
-
-    def test_reset_not_implemented(self):
-        script = Script()
-        with self.assertRaisesRegex(NotImplementedError, "The reset method of EngineScript is not implemented"):
-            script.reset()
 
 
 if __name__ == '__main__':

@@ -21,10 +21,6 @@ include(GNUInstallDirs)
 # List library build files
 set(LIB_SRC_FILES
     nrp_gazebo_json_engine/config/gazebo_json_config.cpp
-    nrp_gazebo_json_engine/engine_server/gazebo_step_controller.cpp
-    nrp_gazebo_json_engine/engine_server/camera_datapack_controller.cpp
-    nrp_gazebo_json_engine/engine_server/joint_datapack_controller.cpp
-    nrp_gazebo_json_engine/engine_server/link_datapack_controller.cpp
     nrp_gazebo_json_engine/nrp_client/gazebo_engine_json_nrp_client.cpp
 )
 
@@ -37,37 +33,26 @@ set(EXEC_SRC_FILES
 )
 
 # List testing build files
-set(TEST_SRC_FILES
-    tests/test_gazebo_engine.cpp
-)
+if(BUILD_GAZEBO_ENGINE_SERVER)
+    set(TEST_SRC_FILES
+        tests/test_gazebo_engine.cpp
+    )
+endif()
 
 
 ##########################################
 ## Dependencies
 
-if(ENABLE_GAZEBO STREQUAL FULL)
+if(BUILD_GAZEBO_ENGINE_SERVER)
     find_package(Gazebo REQUIRED)
 endif()
 
 ##########################################
 ## Header configuration
-set(NRP_GAZEBO_PLUGINS_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}/nrp_gazebo_plugins" CACHE PATH "Install location of gazebo plugins")
-
 set(NRP_GAZEBO_COMMUNICATION_PLUGIN NRPGazeboJSONCommunicationPlugin)
-
-set(NRP_GAZEBO_PLUGINS_INSTALL_DIR_ABSOLUTE ${NRP_GAZEBO_PLUGINS_INSTALL_DIR})
-if(NOT IS_ABSOLUTE ${NRP_GAZEBO_PLUGINS_INSTALL_DIR})
-    set(NRP_GAZEBO_PLUGINS_INSTALL_DIR_ABSOLUTE ${CMAKE_INSTALL_PREFIX}/${NRP_GAZEBO_PLUGINS_INSTALL_DIR})
-endif()
-
-list(JOIN GAZEBO_LIBRARY_DIRS ":" DEFAULT_GAZEBO_LIB_DIRS)
 
 # Gazebo defines
 configure_file("nrp_gazebo_json_engine/config/cmake_constants.h.in" "${CMAKE_CURRENT_BINARY_DIR}/include/${HEADER_DIRECTORY}/config/cmake_constants.h" @ONLY)
-
-# Python module dependencies
-#configure_file("nrp_gazebo_json_engine/python/__init__.py.in" "${CMAKE_CURRENT_BINARY_DIR}/src/__init__.py" @ONLY)
-
 
 ##########################################
 # NRPGazeboJSONEngine
@@ -82,13 +67,15 @@ target_include_directories(${LIBRARY_NAME} BEFORE
         $<INSTALL_INTERFACE:include>
         "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>"
         "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>"
-        ${GAZEBO_INCLUDE_DIRS}
+
+    PRIVATE
 )
 
 target_link_libraries(${LIBRARY_NAME}
     PUBLIC
         NRPJSONEngineProtocol::NRPJSONEngineProtocol
-        ${GAZEBO_LIBRARIES}
+
+    PRIVATE
 )
 
 
@@ -125,14 +112,20 @@ add_doxygen_source("${CMAKE_CURRENT_SOURCE_DIR}" ${EXEC_SRC_FILES} ${LIB_SRC_FIL
 
 
 ## This section needs Gazebo libraries installed
-if(ENABLE_GAZEBO STREQUAL FULL)
+if(BUILD_GAZEBO_ENGINE_SERVER)
+
+    ##########################################
+    ## Gazebo Grpc DataPack Controllers
+    set(NRP_GAZEBO_JSON_LIB "${NAMESPACE_NAME}::${LIBRARY_NAME}")
+    add_subdirectory(nrp_gazebo_json_engine/engine_server)
 
     ##########################################
     ## Gazebo plugins
     set(NRP_GAZEBO_LIB_TARGETS
-            "${NAMESPACE_NAME}::${LIBRARY_NAME}")
-    add_subdirectory(gazebo_json_plugins)
+            ${NRP_GAZEBO_JSON_LIB}
+            NRPGazeboJSONDataPackControllers::NRPGazeboJSONDataPackControllers)
 
+    add_subdirectory(gazebo_json_plugins)
 
     ##########################################
     ## Tests
@@ -160,9 +153,6 @@ if(ENABLE_GAZEBO STREQUAL FULL)
         gtest_discover_tests(${TEST_NAME}
             WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/tests"
             EXTRA_ARGS -VV)
-
-        # Add tests based on running example experiments
-        add_test(NAME HuskyBraitenbergJsonExample COMMAND NRPCoreSim -c simulation_config_test.json -p "NRPNestJSONEngine.so,NRPGazeboJSONEngine.so" WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/examples/husky_braitenberg_json)
     endif()
 
 endif()

@@ -1,7 +1,7 @@
 //
 // NRP Core - Backend infrastructure to synchronize simulations
 //
-// Copyright 2020-2021 NRP Team
+// Copyright 2020-2023 NRP Team
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -32,15 +32,15 @@
 #include <iostream>
 
 // Helper function which reads simulation config and returns the correct DataPackProcessor
-static DataPackProcessor* makeHandleFromConfig(jsonSharedPtr config)
+static DataPackProcessor* makeHandleFromConfig(jsonSharedPtr config, SimulationDataManager * simulationDataManager)
 {
     std::string dev_p = config->at("DataPackProcessor").get<std::string>();
-    bool spinROS = config->contains("ConnectROS");
+    bool spinROS = config->contains("ROSNode");
     bool slaveMode = config->at("SimulationLoop") == "EventLoop";
     if(dev_p == "cg" || slaveMode)
-        return new ComputationalGraphHandle(slaveMode, spinROS);
+        return new ComputationalGraphHandle(simulationDataManager, slaveMode, spinROS);
     else if(dev_p == "tf")
-        return new TFManagerHandle();
+        return new TFManagerHandle(simulationDataManager);
     else
         throw NRPException::logCreate("Unsupported DataPackProcessor: " + dev_p);
 }
@@ -57,16 +57,16 @@ static void runLoopStepAsyncGet(EngineClientInterfaceSharedPtr engine)
     }
     catch(std::exception &e)
     {
-        throw NRPException::logCreate(e, "Engine \"" + engine->engineName() +"\" loop exceeded timeout of " +
-                                        std::to_string(timeout.count()));
+        throw NRPException::logCreate(e, "Error while executing runLoopStep in engine \"" + engine->engineName()
+        + "\". The Engine didn't respond before timeout. Check the engine logs for errors.");
     }
 }
 
 
-FTILoop::FTILoop(jsonSharedPtr config, DataPackProcessor::engine_interfaces_t engines)
+FTILoop::FTILoop(jsonSharedPtr config, DataPackProcessor::engine_interfaces_t engines, SimulationDataManager * simulationDataManager)
     : _config(config),
       _engines(engines),
-      _devHandler(makeHandleFromConfig(config))
+      _devHandler(makeHandleFromConfig(config, simulationDataManager))
 {
     NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 }
@@ -91,6 +91,8 @@ void FTILoop::initLoop()
             throw NRPException::logCreate(e, "Failed to initialize engine \"" + engine->engineName() + "\"");
         }
     }
+
+    this->_devHandler->postEngineInit(this->_engines);
 }
 
 void FTILoop::resetLoop()
@@ -119,6 +121,8 @@ void FTILoop::resetLoop()
         }
     }
 
+    this->_devHandler->preEngineReset(this->_engines);
+
     for(const auto &engine : this->_engines)
     {
         try
@@ -137,6 +141,8 @@ void FTILoop::resetLoop()
     }
 
     this->_simTime = SimulationTime::zero();
+
+    this->_devHandler->postEngineReset(this->_engines);
 }
 
 void FTILoop::shutdownLoop()
@@ -159,7 +165,6 @@ void FTILoop::shutdownLoop()
 void FTILoop::runLoop(SimulationTime runLoopTime)
 {
     NRP_LOGGER_TRACE("{} called [ runLoopTime: {} ]", __FUNCTION__, runLoopTime.count());
-    NRP_LOG_TIME_BLOCK("sim_loop");
 
     const auto loopStopTime = this->_simTime + runLoopTime;
 
@@ -174,6 +179,9 @@ void FTILoop::runLoop(SimulationTime runLoopTime)
     // _engineQueue is sorted by completion time of engine last step
     while(this->_engineQueue.begin()->first < loopStopTime)
     {
+        // Log the duration of the whole loop step
+        NRP_LOG_TIME_BLOCK("step_duration");
+
         // Get the next batch of engines which should finish next
         std::vector<EngineClientInterfaceSharedPtr> idleEngines;
         const auto nextCompletionTime = this->_engineQueue.begin()->first;
@@ -186,7 +194,7 @@ void FTILoop::runLoop(SimulationTime runLoopTime)
         }
         while(!this->_engineQueue.empty() && this->_engineQueue.begin()->first <= nextCompletionTime);
 
-        NRP_LOG_TIME("begin");
+        NRP_LOG_TIME("step_start");
 
         // Wait for engines which will be processed to complete execution
         for(const auto &engine : idleEngines)
@@ -194,7 +202,10 @@ void FTILoop::runLoop(SimulationTime runLoopTime)
             runLoopStepAsyncGet(engine);
         }
 
-        NRP_LOG_TIME("wait");
+        NRP_LOG_TIME("after_wait_for_engines");
+
+        this->_devHandler->setSimulationTime(this->_simTime);
+        this->_devHandler->setSimulationIteration(this->_simIteration);
 
         // Retrieve datapacks required by TFs from completed engines
         // Execute preprocessing TFs and TFs sequentially
@@ -237,8 +248,19 @@ void FTILoop::runLoop(SimulationTime runLoopTime)
             engine = nullptr;
         }
 
-        NRP_LOG_TIME("start");
+        this->_simIteration++;
+
+        NRP_LOG_TIME("after_restart_engines");
     }
 
     this->_simTime = loopStopTime;
+}
+
+void FTILoop::waitForEngines()
+{
+    // Wait for all engines to finish their last loop step
+    for(const auto &engine : this->_engineQueue)
+    {
+        runLoopStepAsyncGet(engine.second);
+    }
 }

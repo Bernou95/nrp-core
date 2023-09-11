@@ -1,7 +1,7 @@
 //
 // NRP Core - Backend infrastructure to synchronize simulations
 //
-// Copyright 2020-2021 NRP Team
+// Copyright 2020-2023 NRP Team
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,26 +22,26 @@
 
 #include "nrp_general_library/transceiver_function/transceiver_datapack_interface.h"
 
-TransceiverFunctionInterpreter *TransceiverDataPackInterface::TFInterpreter = nullptr;
+FunctionManager *TransceiverDataPackInterface::_functionManager = nullptr;
 
 const std::string &TransceiverDataPackInterface::linkedEngineName() const
 {
-    return this->_function->linkedEngineName();
+    return this->_nextDecorator->linkedEngineName();
 }
 
-bool TransceiverDataPackInterface::isPrepocessing() const
+bool TransceiverDataPackInterface::isPreprocessing() const
 {
-    return this->_function->isPrepocessing();
+    return this->_nextDecorator->isPreprocessing();
 }
 
-boost::python::object TransceiverDataPackInterface::runTf(boost::python::tuple &args, boost::python::dict &kwargs)
+boost::python::object TransceiverDataPackInterface::runTf(boost::python::tuple &args, boost::python::dict &kwargs, datapacks_set_t dataPacks)
 {
-    return this->_function->runTf(args, kwargs);
+    return this->_nextDecorator->runTf(args, kwargs, dataPacks);
 }
 
-EngineClientInterface::datapack_identifiers_set_t TransceiverDataPackInterface::updateRequestedDataPackIDs(EngineClientInterface::datapack_identifiers_set_t &&datapackIDs) const
+datapack_identifiers_set_t TransceiverDataPackInterface::updateRequestedDataPackIDs(datapack_identifiers_set_t &&datapackIDs) const
 {
-    auto subDataPackIDs = this->_function->updateRequestedDataPackIDs(std::move(datapackIDs));
+    auto subDataPackIDs = this->_nextDecorator->updateRequestedDataPackIDs(std::move(datapackIDs));
     auto newDataPackIDs = this->getRequestedDataPackIDs();
 
     subDataPackIDs.insert(newDataPackIDs.begin(), newDataPackIDs.end());
@@ -49,17 +49,17 @@ EngineClientInterface::datapack_identifiers_set_t TransceiverDataPackInterface::
     return subDataPackIDs;
 }
 
-EngineClientInterface::datapack_identifiers_set_t TransceiverDataPackInterface::getRequestedDataPackIDs() const
+datapack_identifiers_set_t TransceiverDataPackInterface::getRequestedDataPackIDs() const
 {
-    return EngineClientInterface::datapack_identifiers_set_t();
+    return datapack_identifiers_set_t();
 }
 
-void TransceiverDataPackInterface::setTFInterpreter(TransceiverFunctionInterpreter *interpreter)
+void TransceiverDataPackInterface::setTFInterpreter(FunctionManager *interpreter)
 {
-    TransceiverDataPackInterface::TFInterpreter = interpreter;
+    TransceiverDataPackInterface::_functionManager = interpreter;
 }
 
 TransceiverDataPackInterface::shared_ptr *TransceiverDataPackInterface::getTFInterpreterRegistry()
 {
-    return this->_function->getTFInterpreterRegistry();
+    return this->_nextDecorator->getTFInterpreterRegistry();
 }

@@ -1,7 +1,7 @@
 //
 // NRP Core - Backend infrastructure to synchronize simulations
 //
-// Copyright 2020-2021 NRP Team
+// Copyright 2020-2023 NRP Team
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,6 +21,8 @@
 //
 
 #include "nrp_general_library/utils/nrp_logger.h"
+
+#include "nrp_general_library/utils/time_utils.h"
 
 #include <iomanip>
 #include <spdlog/sinks/basic_file_sink.h>
@@ -224,13 +226,7 @@ void NRPLogger::registerDefaultLogger()
     // Append current date and time to filename
     try
     {
-        const auto t = std::time(nullptr);
-        const auto tm = *std::localtime(&t);
-
-        std::ostringstream oss;
-        oss << std::put_time(&tm, "-%Y%m%d-%H%M%S-") << getpid() << ".log";
-
-        _baseFilename = oss.str();
+        _baseFilename = "-" + getTimestamp() +  ".log";
     }
     catch(std::exception &e)
     {
@@ -316,10 +312,9 @@ NRPLogger::~NRPLogger()
     }
     catch (...)
     {
-        debug("Couldn't unlink the shared memory object");
+        std::cerr << "Couldn't unlink the shared memory object" << std::endl;
     }
 
-    debug("Shutting down logger...");
     NRPLogger::shutdownDefault();
 }
 

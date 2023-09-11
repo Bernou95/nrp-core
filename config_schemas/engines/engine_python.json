@@ -1,10 +1,10 @@
 {"python_base" : {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "title": "Python Json Engine Base",
-    "description": "Python Json Engine Base Configuration",
-    "$id": "#PythonJSONEngineBase",
+    "title": "Python Engine Base",
+    "description": "Python Engine Base Configuration",
+    "$id": "#PythonEngineBase",
     "allOf": [
-      { "$ref": "https://neurorobotics.net/engines/engine_comm_protocols.json#/engine_json" },
+      { "$ref": "json://nrp-core/engines/engine_comm_protocols.json#/engine_json" },
       {
         "properties": {
           "PythonFileName" : {
@@ -25,7 +25,26 @@
       { "$ref": "#/python_base" },
       {
         "properties": {
-          "EngineType": { "enum": ["python_json"] }
+          "EngineType": { "enum": ["python_json"] },
+          "ServerOptions" : {
+            "type": "string",
+            "default": "",
+            "description": "Additional options that will be used by the server (gunicorn) on startup. The string should contain a Python dictionary in the following format - \"{'key1': value, 'key2': 'value_str'}\". The full list of options can be found at the official page - https://docs.gunicorn.org/en/stable/settings.html."
+          }
+        }
+      }
+    ]
+  },
+  "python_grpc" : {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Python Grpc Engine",
+    "description": "Python Grpc Engine Configuration",
+    "$id": "#PythonGRPCEngine",
+    "allOf": [
+      { "$ref": "#/python_base" },
+      {
+        "properties": {
+          "EngineType": { "enum": ["python_grpc"] }
         }
       }
     ]
@@ -33,16 +52,23 @@
   "py_sim" : {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "title": "Python Simulation Engine",
-    "description": "Python Simulation Engine Configuration",
+    "description": "A simulation engine for simulators offering a Python API.",
     "$id": "#PySim",
     "allOf": [
       { "$ref": "#/python_base" },
       {
         "properties": {
-          "Simulator": {
+          "EngineType": {
+            "enum": ["py_sim"]
+          },
+          "ServerOptions" : {
             "type": "string",
-            "default": "Opensim",
-            "description": "The simulator will be used"
+            "default": "",
+            "description": "Additional options that will be used by the server (gunicorn) on startup. The string should contain a Python dictionary in the following format - \"{'key1': value, 'key2': 'value_str'}\". The full list of options can be found at the official page - https://docs.gunicorn.org/en/stable/settings.html."
+          },
+          "Simulator": {
+            "enum": ["Opensim","OpenAI","Mujoco","Bullet"],
+            "description": "The simulators that are supported"
           },
           "WorldFileName": {
             "type": "string",
@@ -54,22 +80,7 @@
             "description": "To show the simulation in visualizer or not"
           }
         },
-        "required": ["WorldFileName"]
-      }
-    ]
-  },
-  "opensim" : {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "title": "Opensim Simulation Engine",
-    "description": "Opensim Simulation Engine Configuration",
-    "$id": "#OpenSimEngine",
-    "allOf": [
-      { "$ref": "#/py_sim" },
-      {
-        "properties": {
-          "EngineType": { "enum": ["opensim"] },
-          "Simulator": { "enum": ["Opensim"] }
-        }
+        "required": ["Simulator", "WorldFileName"]
       }
     ]
   }

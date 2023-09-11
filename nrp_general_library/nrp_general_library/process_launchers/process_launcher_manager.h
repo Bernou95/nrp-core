@@ -1,6 +1,6 @@
 /* * NRP Core - Backend infrastructure to synchronize simulations
  *
- * Copyright 2020-2021 NRP Team
+ * Copyright 2020-2023 NRP Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,8 @@ class ProcessLauncherManager
         /*!
          * \brief Constructor. Registers all Process Launchers for further use
          */
-        ProcessLauncherManager()
+        ProcessLauncherManager(int logFD = -1) :
+            _logFD(logFD)
         {   this->registerProcessLauncher<PROCESS_LAUNCHERS...>();  }
         ~ProcessLauncherManager() = default;
 
@@ -65,7 +66,7 @@ class ProcessLauncherManager
             if(launcherIterator == this->_processLaunchers.end())
                 throw NRPException::logCreate("Could not find process launcher of type \"" + launcherType + "\"");
 
-            return launcherIterator->second->createLauncher();
+            return launcherIterator->second->createLauncher(_logFD);
         }
 
         void registerProcessLauncher(ProcessLauncherInterface::unique_ptr &&launcher)
@@ -77,6 +78,11 @@ class ProcessLauncherManager
          * \brief All Process Launchers
          */
         std::map<std::string, ProcessLauncherInterface::unique_ptr> _processLaunchers;
+
+        /*!
+         * \brief logFD File descriptor to route stdout and stderror outputs in launched process
+         */
+         int _logFD = -1;
 
         /*!
          *  \brief Register process launchers specified in the template on startup

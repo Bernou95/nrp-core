@@ -1,7 +1,7 @@
 //
 // NRP Core - Backend infrastructure to synchronize simulations
 //
-// Copyright 2020-2021 NRP Team
+// Copyright 2020-2023 NRP Team
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -227,6 +227,10 @@ namespace
 NestEngineServerNRPClient::NestEngineServerNRPClient(nlohmann::json &config, ProcessLauncherInterface::unique_ptr &&launcher)
     : EngineClient(config, std::move(launcher))
 {
+    // Disable RestrictedPython
+    this->engineConfig().at("EngineEnvParams").get<std::vector<std::string>>().emplace_back("NEST_SERVER_RESTRICTION_OFF=1");
+
+    // set engine command
     int n_mpi = this->engineConfig().at("MPIProcs").get<int>();
     if(n_mpi <= 1)
         setDefaultProperty<std::string>("EngineProcCmd", NRP_NEST_SERVER_EXECUTABLE_PATH);
@@ -235,9 +239,9 @@ NestEngineServerNRPClient::NestEngineServerNRPClient(nlohmann::json &config, Pro
         setDefaultProperty<std::string>("EngineProcCmd", mpi_cmd);
     }
 
-
+    // address
     if(!this->engineConfig().contains("NestServerPort"))
-        setDefaultProperty<int>("NestServerPort", findUnboundPort(this->PortSearchStart));
+        setDefaultProperty<int>("NestServerPort", getFreePort(this->engineConfig().at("NestServerHost").get<std::string>()));
 
     RestClientSetup::ensureInstance();
 
@@ -339,7 +343,12 @@ void NestEngineServerNRPClient::reset(){
 void NestEngineServerNRPClient::shutdown()
 {
     NRP_LOGGER_TRACE("{} called", __FUNCTION__);
+
     // Empty
+    // Revert https://bitbucket.org/hbpneurorobotics/nrp-core/pull-requests/96 changes
+    // When nest-server is launched separately with EmptyLaunchCommand, then this "hacked" shutdown gives an error
+    // The proper shutdown of the server instances should be handled correctly by the launcher,
+    // which knows how it was started
 }
 
 const std::string & NestEngineServerNRPClient::getDataPackIdList(const std::string & datapackName) const
@@ -358,11 +367,11 @@ const std::string & NestEngineServerNRPClient::getDataPackIdList(const std::stri
     return this->_populations.at(datapackName);
 }
 
-EngineClientInterface::datapacks_set_t NestEngineServerNRPClient::getDataPacksFromEngine(const datapack_identifiers_set_t &datapackIdentifiers)
+datapacks_vector_t NestEngineServerNRPClient::getDataPacksFromEngine(const datapack_identifiers_set_t &datapackIdentifiers)
 {
     NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
-    EngineClientInterface::datapacks_set_t retVals;
+    datapacks_vector_t retVals;
 
     for(const auto &devID : datapackIdentifiers)
     {
@@ -385,18 +394,18 @@ EngineClientInterface::datapacks_set_t NestEngineServerNRPClient::getDataPacksFr
             // Extract datapack details from the body
             // Response from GetStatus is an array of JSON objects, which contains datapack parameters
 
-            retVals.emplace(new JsonDataPack(devID.Name, devID.EngineName, new nlohmann::json(nlohmann::json::parse(response))));
+            retVals.push_back(DataPackInterfaceConstSharedPtr(new JsonDataPack(devID.Name, devID.EngineName, new nlohmann::json(nlohmann::json::parse(response)))));
         }
     }
 
     return retVals;
 }
 
-void NestEngineServerNRPClient::sendDataPacksToEngine(const datapacks_ptr_t &datapacksArray)
+void NestEngineServerNRPClient::sendDataPacksToEngine(const datapacks_set_t &datapacksArray)
 {
     NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
-    for(DataPackInterface * const datapack : datapacksArray)
+    for(auto datapack : datapacksArray)
     {
         if(isDataPackTypeValid(datapack->id(), this->engineName()))
         {
@@ -405,7 +414,7 @@ void NestEngineServerNRPClient::sendDataPacksToEngine(const datapacks_ptr_t &dat
             const auto datapackName = datapack->name();
 
             std::string setStatusStr = "{\"nodes\":" + getDataPackIdList(datapackName) + ","
-                                       "\"params\":" + ((JsonDataPack const *)datapack)->getData().dump() + "}";
+                                       "\"params\":" + ((JsonDataPack const *)datapack.get())->getData().dump() + "}";
 
             try
             {
@@ -434,21 +443,6 @@ std::string NestEngineServerNRPClient::serverAddress() const
     return this->_serverAddress;
 }
 
-const std::vector<std::string> NestEngineServerNRPClient::engineProcEnvParams() const
-{
-    NRP_LOGGER_TRACE("{} called", __FUNCTION__);
-
-    std::vector<std::string> envVars = this->engineConfig().at("EngineEnvParams");
-
-    // Add NRP library path
-    envVars.push_back("LD_LIBRARY_PATH=" NRP_LIB_INSTALL_DIR ":$LD_LIBRARY_PATH");
-
-    // Disable RestrictedPython
-    envVars.push_back("NEST_SERVER_RESTRICTION_OFF=1");
-
-    return envVars;
-}
-
 const std::vector<std::string> NestEngineServerNRPClient::engineProcStartParams() const
 {
     NRP_LOGGER_TRACE("{} called", __FUNCTION__);
@@ -465,6 +459,8 @@ const std::vector<std::string> NestEngineServerNRPClient::engineProcStartParams(
         startParams.push_back(this->engineConfig().at("NestServerHost"));
         startParams.push_back("-p");
         startParams.push_back(std::to_string(port));
+        // This parameter is ignored by nest-server if -o is specified
+        // And --plugin python3 is used by default at uwsgi launch
         startParams.push_back("-P");
         startParams.push_back("python3");
     }

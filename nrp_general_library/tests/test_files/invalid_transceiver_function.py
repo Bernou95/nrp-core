@@ -1,7 +1,7 @@
 
 # NRP Core - Backend infrastructure to synchronize simulations
 #
-# Copyright 2020-2021 NRP Team
+# Copyright 2020-2023 NRP Team
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,19 +19,11 @@
 # Framework Programme for Research and Innovation under the Specific Grant
 # Agreement No. 945539 (Human Brain Project SGA3).
 
-from libnrp_core import *
-from testModule import TestInputDataPack, TestOutputDataPack
 
-# Invalid syntax
-fsdavhufdsihjk = jfdaonv
+@TransceiverFunction("engine")
+def transceiver_function():
 
-@EngineDataPack(keyword='datapack', id=DataPackIdentifier('dev', 'type', 'engine'))
-@TransceiverFunction()
-def transceiver_function(datapack):
-    test_val = datapack.test_value
-    
-    ret_dev = TestInputDataPack()
-    ret_dev.test_value = str(test_val)
-    
-    return [ret_dev]
+    fsdavhufdsihjk = jfdaonv
+
+    return []
 

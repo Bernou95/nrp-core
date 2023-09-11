@@ -1,7 +1,7 @@
 
 /* * NRP Core - Backend infrastructure to synchronize simulations
  *
- * Copyright 2020-2021 NRP Team
+ * Copyright 2020-2023 NRP Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,15 +73,19 @@ class PythonEngineJSONNRPClientBase
             nlohmann::json config = this->engineConfig();
             config[PythonConfigConst::SimulationTimeRatio.data()] = { SimulationTime::period::num, SimulationTime::period::den };
 
-            nlohmann::json resp = this->sendInitCommand(config);
-            if(!resp.at(PythonConfigConst::InitFileExecStatus.data()).get<bool>())
+            try
+            {
+                nlohmann::json resp = this->sendInitCommand(config);
+            }
+            catch(std::exception &e)
             {
                 // Write the error message
-                this->_initErrMsg = resp.at(PythonConfigConst::ErrorMsg.data());
+                this->_initErrMsg = e.what();
                 NRPLogger::error(this->_initErrMsg);
 
                 throw NRPException::logCreate("Initialization failed: " + this->_initErrMsg);
             }
+
 
             NRPLogger::debug("PythonEngineJSONNRPClientBase::initialize(...) completed with no errors.");
         }
@@ -90,13 +94,15 @@ class PythonEngineJSONNRPClientBase
         {
             NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
-            nlohmann::json resp = this->sendResetCommand(nlohmann::json("reset"));
-            NRPLogger::debug("NestEngineJSONNRPClient:reset()::resp [ {} ]", resp.dump());
-
-            if(!resp.at(PythonConfigConst::ResetExecStatus.data()).get<bool>())
+            try
+            {
+                nlohmann::json resp = this->sendResetCommand(nlohmann::json("reset"));
+                NRPLogger::debug("NestEngineJSONNRPClient:reset()::resp [ {} ]", resp.dump());
+            }
+            catch(std::exception &e)
             {
                 // Write the error message
-                std::string msg = resp.at(PythonConfigConst::ErrorMsg.data());
+                std::string msg = e.what();
                 NRPLogger::error(msg);
 
                 throw NRPException::logCreate("Reset failed: " + msg);
@@ -112,27 +118,24 @@ class PythonEngineJSONNRPClientBase
             this->sendShutdownCommand(nlohmann::json());
         }
 
-        virtual const std::vector<std::string> engineProcStartParams() const override
-        {
-            NRP_LOGGER_TRACE("{} called", __FUNCTION__);
-
-            std::vector<std::string> startParams = this->EngineJSONNRPClient<ENGINE, SCHEMA>::engineProcStartParams();
-
-            // Add JSON Server address (will be used by plugin)
-            std::string server_address = this->engineConfig().at("ServerAddress");
-            startParams.push_back(std::string("--") + EngineJSONConfigConst::EngineServerAddrArg.data() + "=" + server_address);
-
-
-            NRPLogger::debug("{} got the {} start parameters.", __FUNCTION__, startParams.size());
-
-            return startParams;
-        }
-
     private:
         /*!
          * \brief Error message returned by init command
          */
         std::string _initErrMsg = "";
+
+        virtual const std::vector<std::string> engineProcStartParams() const override
+        {
+            NRP_LOGGER_TRACE("{} called", __FUNCTION__);
+
+            std::vector<std::string> startParams = EngineJSONNRPClient<ENGINE, SCHEMA>::engineProcStartParams();
+
+            // Pass any extra server options that were specififed by the user
+            std::string serverOptions = this->engineConfig().at("ServerOptions");
+            startParams.push_back(std::string("--") + PythonConfigConst::ExtraServerOptionsArg.data() + "=" + serverOptions);
+
+            return startParams;
+        }
 };
 
 #endif // PYTHON_ENGINE_JSON_NRP_CLIENT_BASE_H

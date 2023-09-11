@@ -1,7 +1,7 @@
 //
 // NRP Core - Backend infrastructure to synchronize simulations
 //
-// Copyright 2020-2021 NRP Team
+// Copyright 2020-2023 NRP Team
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -29,35 +29,44 @@
 
 #include "nrp_event_loop/utils/graph_utils.h"
 
-EventLoop::EventLoop(const nlohmann::json &graph_config, std::chrono::milliseconds timestep, bool ownGIL, bool spinROS) :
+EventLoop::EventLoop(const nlohmann::json &graph_config, std::chrono::milliseconds timestep, std::chrono::milliseconds timestepThres,
+                     ComputationalGraph::ExecMode execMode, bool ownGIL, bool spinROS) :
+        EventLoopInterface(timestep, timestepThres),
     _graph_config(graph_config),
-    _timestep(timestep),
+    _execMode(execMode),
     _ownGIL(ownGIL),
     _spinROS(spinROS)
-{ this->initialize(); }
+{
+    this->initialize();
+}
 
 EventLoop::~EventLoop()
 { this->shutdown(); }
 
-void EventLoop::runLoop(std::chrono::milliseconds timeout)
+void EventLoop::initializeCB()
 {
-    NRPLogger::debug("in loop");
+    if(!_ownGIL)
+        _pyGILState = PyGILState_Ensure();
 
-    _doRun = true;
-    bool useTimeout = timeout != std::chrono::milliseconds(0);
+    try {
+        boost::python::dict globalDict;
+        createPythonGraphFromConfig(_graph_config, _execMode, globalDict);
+    }
+    catch (std::exception& e) {
+        if(!_ownGIL)
+            PyGILState_Release(_pyGILState);
 
-    auto start = std::chrono::steady_clock::now();
+        throw;
+    }
 
-    while(_doRun && (!useTimeout || std::chrono::steady_clock::now() - start < timeout))
-        runLoopOnce();
+    std::tie(_clock, _iteration) = findTimeNodes();
 
-    NRPLogger::debug("out loop");
+    if(!_ownGIL)
+        PyGILState_Release(_pyGILState);
 }
 
-void EventLoop::runLoopOnce()
+void EventLoop::runLoopCB()
 {
-    auto now = std::chrono::steady_clock::now();
-
     if(!_ownGIL)
         _pyGILState = PyGILState_Ensure();
 
@@ -66,64 +75,27 @@ void EventLoop::runLoopOnce()
         ros::spinOnce();
 #endif
 
-    ComputationalGraphManager::getInstance().compute();
+    if(_clock)
+        _clock->updateClock(_currentTime);
 
+    if(_iteration)
+        _iteration->updateIteration(_iterations);
 
-    if(!_ownGIL)
-        PyGILState_Release(_pyGILState);
-
-    std::this_thread::sleep_until(now + _timestep);
-}
-
-void EventLoop::runLoopAsync(std::chrono::milliseconds timeout)
-{
-    if(!this->isRunning()) {
-        NRPLogger::debug("EventLoop was started");
-        _runFuture = std::async(&EventLoop::runLoop, this, timeout);
+    try {
+        ComputationalGraphManager::getInstance().compute();
     }
-    else
-        NRPLogger::info("EventLoop is already running. You must shut it down before running it again");
-}
+    catch (std::exception& e) {
+        if(!_ownGIL)
+            PyGILState_Release(_pyGILState);
 
-void EventLoop::stopLoop()
-{
-    NRPLogger::debug("Stopping EventLoop");
-    _doRun = false;
-    this->waitForLoopEnd();
-    NRPLogger::debug("EventLoop stopped");
-}
-
-void EventLoop::initialize()
-{
-
-    if(!_ownGIL)
-        _pyGILState = PyGILState_Ensure();
-
-    boost::python::dict globalDict;
-    createPythonGraphFromConfig(_graph_config, globalDict);
+        throw;
+    }
 
     if(!_ownGIL)
         PyGILState_Release(_pyGILState);
 }
 
-void EventLoop::shutdown()
+void EventLoop::shutdownCB()
 {
-    NRPLogger::debug("Shutting down EventLoop");
-    this->stopLoop();
     ComputationalGraphManager::getInstance().clear();
-    NRPLogger::debug("EventLoop was shut down");
-}
-
-void EventLoop::waitForLoopEnd()
-{
-    if(this->isRunning())
-        _runFuture.wait();
-}
-
-bool EventLoop::isRunning()
-{
-    if(!_runFuture.valid())
-        return false;
-    else
-        return _runFuture.wait_for(std::chrono::milliseconds(0)) != std::future_status::ready;
 }

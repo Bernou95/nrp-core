@@ -1,6 +1,6 @@
 /* * NRP Core - Backend infrastructure to synchronize simulations
  *
- * Copyright 2020-2021 NRP Team
+ * Copyright 2020-2023 NRP Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,8 +38,10 @@ class BasicFork
     public:
         ~BasicFork() override;
 
-        pid_t launchProcess(const std::string& procCmd, const std::vector<std::string> &envParams,
-                                  const std::vector<std::string> &startParams, bool appendParentEnv = true) override;
+        pid_t launchProcess(const nlohmann::json &launcherConfig, const std::string& procCmd,
+                            const std::vector<std::string> &envParams,
+                            const std::vector<std::string> &startParams, bool appendParentEnv = true,
+                                          int logFD = -1) override;
 
         pid_t stopProcess(unsigned int killWait) override;
 

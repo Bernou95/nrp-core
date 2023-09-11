@@ -44,8 +44,8 @@ class ExampleEngineClient
          */
         void shutdown() override;
 
-        void sendDataPacksToEngine(const datapacks_ptr_t &datapacksArray) override;
-        datapacks_set_t getDataPacksFromEngine(const datapack_identifiers_set_t &datapackIdentifiers) override;
+        void sendDataPacksToEngine(const datapacks_set_t &dataPacks) override;
+        datapacks_vector_t getDataPacksFromEngine(const datapack_identifiers_set_t &datapackIdentifiers) override;
 
         /*!
          * \brief Returns start parameters that should be passed to the engine server
@@ -57,17 +57,6 @@ class ExampleEngineClient
          *         be strings.
          */
         const std::vector<std::string> engineProcStartParams() const override;
-
-        /*!
-         * \brief Returns environment variables that should be used when starting the engine server
-         *
-         * The function should prepare and return additional environment variables that
-         * will be used when spawning the engine server process.
-         *
-         * \return Vector of start parameters for the engine server. The parameters must
-         *         be strings.
-         */
-        const std::vector<std::string> engineProcEnvParams() const override;
 
     protected:
 

@@ -1,6 +1,6 @@
 /* * NRP Core - Backend infrastructure to synchronize simulations
  *
- * Copyright 2020-2021 NRP Team
+ * Copyright 2020-2023 NRP Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@
 
 #include "nrp_general_library/transceiver_function/transceiver_datapack_interface.h"
 
-#include "nrp_general_library/transceiver_function/transceiver_function_interpreter.h"
+#include "nrp_general_library/transceiver_function/function_manager.h"
 #include "nrp_general_library/engine_interfaces/engine_client_interface.h"
 
 #include <string>
@@ -48,7 +48,7 @@ class TransceiverFunction
 
         const std::string &linkedEngineName() const override;
 
-        bool isPrepocessing() const override;
+        bool isPreprocessing() const override;
 
         /*!
          * \brief Decorator __call__() function. Takes the Transfer Function as a parameter. Moves this class into a shared_ptr.
@@ -63,12 +63,12 @@ class TransceiverFunction
          * \param kwargs Python keywords
          * \return Returns result of TF
          */
-        boost::python::object runTf(boost::python::tuple &args, boost::python::dict &kwargs) override;
+        boost::python::object runTf(boost::python::tuple &args, boost::python::dict &kwargs, datapacks_set_t dataPacks) override;
 
     protected:
-        EngineClientInterface::datapack_identifiers_set_t getRequestedDataPackIDs() const override;
+        datapack_identifiers_set_t getRequestedDataPackIDs() const override;
 
-        EngineClientInterface::datapack_identifiers_set_t updateRequestedDataPackIDs(EngineClientInterface::datapack_identifiers_set_t &&datapackIDs) const override;
+        datapack_identifiers_set_t updateRequestedDataPackIDs(datapack_identifiers_set_t &&datapackIDs) const override;
 
     private:
         /*!

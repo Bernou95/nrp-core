@@ -1,6 +1,6 @@
 /* * NRP Core - Backend infrastructure to synchronize simulations
  *
- * Copyright 2020-2021 NRP Team
+ * Copyright 2020-2023 NRP Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -78,6 +78,23 @@ class EngineJSONRegistrationServer
          * \brief Delete Instance
          */
         static void clearInstance();
+
+        /*!
+         * \brief Attempts to instantiate and start the registration server
+         * \param initialAddress Initial address that the server will try to use
+         * \param numRetries Maximum number of attempts to start the server
+         * \return The actual address of the server. If the first attempt to start was
+         *         successful, then it will be the initialAddress. Otherwise, the address will
+         *         consist of the hostname from the initialAddress and a random port.
+         * \throws When numRetires has been exceeded.
+         *
+         * The function will try to start the registration server at the given address.
+         * If the initial attempt fails, then the function will try again, until numRetries limit
+         * is exceeded. On every attempt, except for the first one, the address will be modified.
+         * The host will be taken from the initialAddress argument, but the port will be changed - the function
+         * will ask the OS to provide an unused port for the server.
+         */
+        static std::string tryInstantiate(const std::string & initialAddress, const unsigned numRetries);
 
         // Delete copy and move operations for singleton
         EngineJSONRegistrationServer(const EngineJSONRegistrationServer&) = delete;

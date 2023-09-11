@@ -1,6 +1,6 @@
 /* * NRP Core - Backend infrastructure to synchronize simulations
  *
- * Copyright 2020-2021 NRP Team
+ * Copyright 2020-2023 NRP Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,9 +34,9 @@
 #define NRP_PYNEST_PATH "@NEST_CMAKE_INSTALL_PYNEST@"
 
 /*!
- * \brief Path to NRP Nest Executable
+ * \brief Path to Nest Server Executable
  */
-#define NRP_NEST_BIN_PATH "@NRP_NEST_CMAKE_INSTALL_BINDIR@"
+#define NRP_NEST_BIN_PATH "@NEST_CMAKE_INSTALL_BINDIR@"
 
 /*!
  * \brief Name of python module
@@ -51,6 +51,6 @@
 /*!
  * \brief Name of NRP Nest Executable
  */
-#define NRP_NEST_EXECUTABLE_PATH "@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_BINDIR@/@NRP_NEST_EXECUTABLE@"
+#define NRP_NEST_EXECUTABLE_PATH "@NRP_NEST_EXECUTABLE@"
 
 #endif // NRP_NEST_CMAKE_CONSTANTS_H

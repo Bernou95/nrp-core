@@ -1,7 +1,7 @@
 //
 // NRP Core - Backend infrastructure to synchronize simulations
 //
-// Copyright 2020-2021 NRP Team
+// Copyright 2020-2023 NRP Team
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@ TEST(ProcessLauncherBasicTest, TestLaunch)
     config["ProcCmd"] = TEST_NRP_PROCESS_EXEC;
     config["ProcStartParams"] = startParams;
     config["ProcEnvParams"] = envVars;
-    json_utils::validate_json(config, "https://neurorobotics.net/process_launcher.json#ProcessLauncher");
+    json_utils::validateJson(config, "json://nrp-core/process_launcher.json#ProcessLauncher");
 
     // Fork engine process
     ASSERT_GE(launcher.launchProcess(config), 0);
@@ -89,8 +89,8 @@ TEST(ProcessLauncherBasicTest, TestEmptyLaunchCommand)
     config["ProcCmd"] = "";
     config["ProcStartParams"] = startParams;
     config["ProcEnvParams"] = envVars;
-    config["LaunchCommand"] = "EmptyLaunchCommand";
-    json_utils::validate_json(config, "https://neurorobotics.net/process_launcher.json#ProcessLauncher");
+    config["LaunchCommand"] = R"({"LaunchType":"EmptyLaunchCommand"})"_json;
+    json_utils::validateJson(config, "json://nrp-core/process_launcher.json#ProcessLauncher");
 
     // the launching of an Engine with an Empty launch command returns -1
     ASSERT_GE(launcher.launchProcess(config), -1);

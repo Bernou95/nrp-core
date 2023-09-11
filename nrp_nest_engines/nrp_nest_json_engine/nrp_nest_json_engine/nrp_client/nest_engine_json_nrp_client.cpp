@@ -1,7 +1,7 @@
 //
 // NRP Core - Backend infrastructure to synchronize simulations
 //
-// Copyright 2020-2021 NRP Team
+// Copyright 2020-2023 NRP Team
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -73,8 +73,6 @@ void NestEngineJSONNRPClient::reset()
         throw NRPException::logCreate("Engine \"" + this->engineName() + "\" reset failed: " + msg);
     }
 
-    this->_datapackCache.clear();
-
     this->resetEngineTime();
     
     NRPLogger::debug("NestEngineJSONNRPClient::reset() engine time: {}", this->getEngineTime().count());
@@ -85,29 +83,4 @@ void NestEngineJSONNRPClient::shutdown()
     NRP_LOGGER_TRACE("{} called", __FUNCTION__);
     
     this->sendShutdownCommand(nlohmann::json());
-}
-
-const std::vector<std::string> NestEngineJSONNRPClient::engineProcEnvParams() const
-{
-    NRP_LOGGER_TRACE("{} called", __FUNCTION__);
-
-    std::vector<std::string> envVars = this->EngineJSONNRPClient::engineProcEnvParams();;
-
-    // Add NRP library path
-    envVars.push_back("LD_LIBRARY_PATH=" NRP_LIB_INSTALL_DIR ":$LD_LIBRARY_PATH");
-
-    return envVars;
-}
-
-const std::vector<std::string> NestEngineJSONNRPClient::engineProcStartParams() const
-{
-    NRP_LOGGER_TRACE("{} called", __FUNCTION__);
-
-    std::vector<std::string> startParams = this->EngineJSONNRPClient::engineProcStartParams();
-
-    // Add JSON Server address (will be used by plugin)
-    std::string address = this->engineConfig().at("ServerAddress");
-    startParams.push_back(std::string("--") + EngineJSONConfigConst::EngineServerAddrArg.data() + "=" + address);
-
-    return startParams;
 }

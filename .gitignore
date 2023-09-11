@@ -22,3 +22,6 @@ reports
 .paho
 .ci/nrp-jsproto/nrp-jsproto.js
 .ci/nrp-jsproto/.npmrc
+.nrp_compile_protobuf
+.build_fn_factory_module
+libFNFactoryModule.so

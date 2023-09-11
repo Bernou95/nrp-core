@@ -1,7 +1,7 @@
 //
 // NRP Core - Backend infrastructure to synchronize simulations
 //
-// Copyright 2020-2021 NRP Team
+// Copyright 2020-2023 NRP Team
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,8 +25,10 @@
 
 #include "nrp_general_library/engine_interfaces/datapack_controller.h"
 #include "nrp_protobuf/engine_grpc.grpc.pb.h"
-#include "nrp_protobuf/dump_msgs.pb.h"
+#include "nrp_protobuf/dump.pb.h"
+#include "nrp_protobuf/proto_ops/protobuf_ops.h"
 
+#include "spdlog/sinks/rotating_file_sink.h"
 #include "nrp_general_library/utils/nrp_logger.h"
 
 #ifdef MQTT_ON
@@ -37,7 +39,7 @@
  * \brief DataPackController class for processing streaming messages
  *
  * The instance of the class in created for every DataPack to be processed by the engine.
- * Dpending on the DataPack, the contoller instance is configured when receiving the first message.
+ * Depending on the DataPack, the controller instance is configured when receiving the first message.
  */
 class StreamDataPackController
     : public DataPackController<google::protobuf::Message>
@@ -50,7 +52,8 @@ class StreamDataPackController
          * \param[in] engineName The engine name
          */
         StreamDataPackController(const std::string & datapackName,
-                                 const std::string & engineName);
+                                 const std::string & engineName,
+                                 const std::vector<std::unique_ptr<protobuf_ops::NRPProtobufOpsIface>>& protoOps);
 
 #ifdef MQTT_ON
         /*!
@@ -60,11 +63,14 @@ class StreamDataPackController
          * \param[in] engineName The engine name
          * \param[in] baseDir output data files location
          * \param[in] mqttClient initialized MQTT client pointer
+         * \param[in] mqttBaseTopic the common MQTT topic name base (prefix)
          */
         StreamDataPackController(const std::string &datapackName,
                                  const std::string &engineName,
+                                 const std::vector<std::unique_ptr<protobuf_ops::NRPProtobufOpsIface>>& protoOps,
                                  const std::string &baseDir,
-                                 const std::shared_ptr<NRPMQTTClient> &mqttClient);
+                                 const std::shared_ptr<NRPMQTTClient> &mqttClient,
+                                 const std::string &mqttBaseTopic);
 
         /*!
          * \brief StreamDataPackController constructor for streaming to network
@@ -72,10 +78,13 @@ class StreamDataPackController
          * \param[in] datapackName The name of the datapack
          * \param[in] engineName The engine name
          * \param[in] mqttClient initialized MQTT client pointer
+         * \param[in] mqttBaseTopic the common MQTT topic name base (prefix)
          */
         StreamDataPackController(const std::string &datapackName,
                                  const std::string &engineName,
-                                 const std::shared_ptr<NRPMQTTClient> &mqttClient);
+                                 const std::vector<std::unique_ptr<protobuf_ops::NRPProtobufOpsIface>>& protoOps,
+                                 const std::shared_ptr<NRPMQTTClient> &mqttClient,
+                                 const std::string &mqttBaseTopic);
 #endif
 
         /*!
@@ -87,6 +96,7 @@ class StreamDataPackController
          */
         StreamDataPackController(const std::string &datapackName,
                                  const std::string &engineName,
+                                 const std::vector<std::unique_ptr<protobuf_ops::NRPProtobufOpsIface>>& protoOps,
                                  const std::string &baseDir);
 
         /*!
@@ -108,6 +118,15 @@ class StreamDataPackController
          */
         google::protobuf::Message * getDataPackInformation() override;
 
+        /*!
+         * \brief Resets the existing streams of the DataPacks
+         * 
+         * The file data stream gets the new file with the incremented name.
+         * The MQTT data stream gets the 'reset' message.
+         *
+         */
+        void resetSinks();
+
     private:
 
         /*!
@@ -117,6 +136,11 @@ class StreamDataPackController
          * \param[in] fmtCallback callback function for the formatting protobuf into string
          */
         void streamToFile(const google::protobuf::Message &data, std::string (StreamDataPackController::*fmtCallback) (const google::protobuf::Message &));
+
+        /*!
+         * \brief Function for initialization of the file logger
+         */
+        void initFileLogger();
 
         /*!
          * \brief Function for formatting Dump::String protobuf to string
@@ -152,6 +176,11 @@ class StreamDataPackController
         std::string _datapackName;
 
         /*!
+         * \brief Name of the directory for the data files storage
+         */
+        std::string _baseDir;
+
+        /*!
          * \brief Name of the engine to which the controller is bound
          */
         std::string _engineName;
@@ -172,6 +201,11 @@ class StreamDataPackController
          */
         std::string _mqttTypeTopic;
 
+        /*!
+         * \brief mpqtt topics name base
+         */
+        std::string _mqttBase;
+
         std::shared_ptr< NRPMQTTClient > _mqttClient;
 #endif
 
@@ -191,6 +225,11 @@ class StreamDataPackController
         bool _initialized;
 
         /*!
+         * \brief the counter for the resets, which is used for the data files naming
+         */
+        unsigned int _rstCnt;
+
+        /*!
          * \brief true if this controller is receiving messages of type DataPackMessage
          */
         bool _isDataPackMessage = false;
@@ -199,6 +238,19 @@ class StreamDataPackController
          * \brief formatting function that is used to convert protobuf to string, it is initialized when the first message is received
          */
         std::string (StreamDataPackController::*_fmtCallback) (const google::protobuf::Message &data);
+
+        /*!
+         * \brief the size of the rotating stream file (5 MB)
+         */
+        const unsigned int NRP_MAX_LOG_FILE_SIZE = 1024 * 1024 * 5;
+
+        /*!
+         * \brief the max number of the rotating stream files (0 - 200000)
+         * A number greater than 200000 will throw an exception
+         */
+        const unsigned int NRP_MAX_LOG_FILE_N = 200000;
+
+        const std::vector<std::unique_ptr<protobuf_ops::NRPProtobufOpsIface>>& _protoOps;
 };
 
 #endif // STREAM_DATATRANSFER_GRPC_DATAPACK_CONTROLLER_SERVER_H

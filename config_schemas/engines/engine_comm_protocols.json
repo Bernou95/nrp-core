@@ -4,7 +4,7 @@
     "description": "Base Json Engine configuration schema",
     "$id": "#EngineJSON",
     "allOf": [
-      { "$ref": "https://neurorobotics.net/engines/engine_base.json#EngineBase" },
+      { "$ref": "json://nrp-core/engines/engine_base.json#EngineBase" },
       {
         "properties" : {
           "ServerAddress": {
@@ -27,13 +27,23 @@
     "description": "Base Grpc Engine configuration schema",
     "$id": "#EngineGRPC",
     "allOf": [
-      { "$ref": "https://neurorobotics.net/engines/engine_base.json#EngineBase" },
+      { "$ref": "json://nrp-core/engines/engine_base.json#EngineBase" },
       {
         "properties" : {
           "ServerAddress": {
             "type": "string",
             "default": "localhost:9004",
             "description": "Address from which the engine server sends/receives data"
+          },
+          "ProtobufPackages": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": "Protobuf Packages containing protobuf msg types that will be exchanged by this Engine. It is assumed that these packages have been compiled with NRPCore",
+            "default": ["EngineTest"]
+          },
+          "ProtobufPluginsPath": {
+            "type": "string",
+            "description": "Path were to search for specified ProtobufPlugin libraries"
           }
         }
       }

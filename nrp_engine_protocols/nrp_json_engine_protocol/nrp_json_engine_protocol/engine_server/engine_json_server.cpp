@@ -1,7 +1,7 @@
 //
 // NRP Core - Backend infrastructure to synchronize simulations
 //
-// Copyright 2020-2021 NRP Team
+// Copyright 2020-2023 NRP Team
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -33,6 +33,7 @@ using json = nlohmann::json;
 EngineJSONServer::EngineJSONServer(const std::string &engineAddress, const std::string &engineName, const std::string &clientAddress)
     : _serverAddress(engineAddress),
       _router(EngineJSONServer::setRoutes(this)),
+      _engineName(engineName),
       _loggerCfg(engineName)
 {
     NRP_LOGGER_TRACE("{} called", __FUNCTION__);
@@ -71,33 +72,13 @@ EngineJSONServer::EngineJSONServer(const std::string &engineAddress, const std::
     while(this->_pEndpoint == nullptr);
 
     // Register port
-    if(!engineName.empty())
+    if(!this->_engineName.empty())
     {
-        if(!EngineJSONRegistrationServer::sendClientEngineRequest(clientAddress, engineName, this->_serverAddress, 20, 1))
-            throw NRPException::logCreate(std::string("Error while trying to register engine \"") + engineName + "\" at " + clientAddress);
+        if(!EngineJSONRegistrationServer::sendClientEngineRequest(clientAddress, this->_engineName, this->_serverAddress, 20, 1))
+            throw NRPException::logCreate(std::string("Error while trying to register engine \"") + this->_engineName + "\" at " + clientAddress);
     }
 
-    NRPLogger::info("EngineJSONServer {} has been created", engineName);
-}
-
-EngineJSONServer::EngineJSONServer(const std::string &engineAddress)
-    : _serverAddress(engineAddress),
-      _router(EngineJSONServer::setRoutes(this)),
-      _pEndpoint(enpoint_ptr_t(new Pistache::Http::Endpoint(Pistache::Address(engineAddress)))),
-      _loggerCfg("EngineJSONServer")
-{
-    NRP_LOGGER_TRACE("{} called", __FUNCTION__);
-
-    RestClientSetup::ensureInstance();
-
-    // Add routes to endpoint
-    this->_pEndpoint->setHandler(this->_router.handler());
-}
-
-EngineJSONServer::EngineJSONServer()
-    : EngineJSONServer("")
-{
-    NRP_LOGGER_TRACE("{} called", __FUNCTION__);
+    NRPLogger::info("EngineJSONServer {} has been created", this->_engineName);
 }
 
 EngineJSONServer::~EngineJSONServer()
@@ -225,12 +206,11 @@ nlohmann::json EngineJSONServer::getDataPackData(const nlohmann::json &reqData)
     return jres;
 }
 
-nlohmann::json EngineJSONServer::setDataPackData(const nlohmann::json &reqData)
+void EngineJSONServer::setDataPackData(const nlohmann::json &reqData)
 {
     // Prevent other datapack reading/setting calls as well as loop execution
     EngineJSONServer::lock_t lock(this->_datapackLock);
 
-    json jres;
     for(nlohmann::json::const_iterator devDataIterator = reqData.begin(); devDataIterator != reqData.end(); ++devDataIterator)
     {
         const std::string &devName = EngineJSONServer::getIteratorKey(devDataIterator);
@@ -240,7 +220,6 @@ nlohmann::json EngineJSONServer::setDataPackData(const nlohmann::json &reqData)
         {
             if(devInterface != this->_datapacksControllers.end())
                 devInterface->second->handleDataPackData(*devDataIterator);
-            jres[devName] = "";
         }
         catch(std::exception &e)
         {
@@ -248,7 +227,12 @@ nlohmann::json EngineJSONServer::setDataPackData(const nlohmann::json &reqData)
         }
     }
 
-    return jres;
+}
+
+bool EngineJSONServer::shutdownFlag()
+{
+    std::lock_guard<std::mutex> shutdown_lock(this->_shutdown_mutex);
+    return this->_shutdownFlag;
 }
 
 Pistache::Rest::Router EngineJSONServer::setRoutes(EngineJSONServer *server)
@@ -310,7 +294,8 @@ void EngineJSONServer::setDataPackProcessorr(const Pistache::Rest::Request &req,
 
     try
     {
-        res.send(Pistache::Http::Code::Ok, this->setDataPackData(jrequest).dump());
+        this->setDataPackData(jrequest);
+        res.send(Pistache::Http::Code::Ok, "{}");
     }
     catch(std::exception &e)
     {
@@ -421,6 +406,15 @@ void EngineJSONServer::resetHandler(const Pistache::Rest::Request &req, Pistache
 void EngineJSONServer::shutdownHandler(const Pistache::Rest::Request &req, Pistache::Http::ResponseWriter res)
 {
     NRP_LOGGER_TRACE("{} called", __FUNCTION__);
+
+    // Guard against the main thread shutting us down before
+    // shutdown activities are finished and the response is sent back to the client
+
+    std::lock_guard<std::mutex> shutdown_lock(this->_shutdown_mutex);
+
+    // Tell the main thread that we ought to shut down
+
+    this->_shutdownFlag = true;
 
     const json jrequest = this->parseRequest(req, res);
 

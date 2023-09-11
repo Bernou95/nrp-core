@@ -1,7 +1,7 @@
 //
 // NRP Core - Backend infrastructure to synchronize simulations
 //
-// Copyright 2020-2021 NRP Team
+// Copyright 2020-2023 NRP Team
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -35,14 +35,17 @@
 
 BasicFork::~BasicFork()
 {
-    NRP_LOGGER_TRACE("{} called", __FUNCTION__);
+    NRP_LOGGER_TRACE("{} called (PID {})", __FUNCTION__, this->_PID);
 
     // Stop process if it's still running
     this->stopProcess(60);
 }
 
-pid_t BasicFork::launchProcess(const std::string& procCmd, const std::vector<std::string> &envParams,
-                                     const std::vector<std::string> &startParams, bool appendParentEnv)
+pid_t BasicFork::launchProcess(const nlohmann::json &/*launcherConfig*/, const std::string& procCmd,
+                               const std::vector<std::string> &envParams,
+                               const std::vector<std::string> &startParams,
+                               bool appendParentEnv,
+                               int logFD)
 {
     NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
@@ -73,6 +76,10 @@ pid_t BasicFork::launchProcess(const std::string& procCmd, const std::vector<std
             exit(-1);
         }
 
+        // clear signals block mask
+        sigset_t valid_signals;
+        sigfillset( &valid_signals );
+        sigprocmask( SIG_UNBLOCK, &valid_signals, NULL);
 
         // Setup environment variables in a char* vector. See definition of execvpe() for details
 
@@ -105,9 +112,24 @@ pid_t BasicFork::launchProcess(const std::string& procCmd, const std::vector<std
         // Parameter end
         startParamPtrs.push_back(nullptr);
 
+        // Replace the child's stdout and stderr handles with the log file handle
+        if(logFD >= 0)
+        {
+            if (dup2(logFD, STDOUT_FILENO) < 0) {
+                std::perror("dup2 (stdout)");
+                std::exit(1);
+            }
+            if (dup2(logFD, STDERR_FILENO) < 0) {
+                std::perror("dup2 (stderr)");
+                std::exit(1);
+            }
+        }
         // Run command, stop current execution
         NRPLogger::debug("Launching process with cmd: {}",  startParamStr.c_str());
         auto res = execvp(BasicFork::EnvCfgCmd.data(), const_cast<char *const *>(startParamPtrs.data()));
+
+        if(logFD >= 0)
+            close(logFD);
 
         // Don't use the logger here, as this is a separate process
         std::cerr << "Couldn't start Process with cmd \"" << procCmd.data() << "\"\n Error code: " << res << std::endl;
@@ -122,6 +144,7 @@ pid_t BasicFork::launchProcess(const std::string& procCmd, const std::vector<std
     {
         // Parent process, return child PID
         this->_PID = pid;
+        NRPLogger::debug("BasicFork::launchProcess(...): The process with PID {} was forked", this->_PID);
         return pid;
     }
     else
@@ -135,9 +158,11 @@ pid_t BasicFork::stopProcess(unsigned int killWait)
 {
     NRP_LOGGER_TRACE("{} called", __FUNCTION__);
 
+    NRPLogger::debug("BasicFork::stopProcess(...): The process with PID {} is to be terminated", this->_PID);
+
     if(this->_PID > 0)
     {
-        // Send SIGTERM to gracefully stop Nest process
+        // Send SIGTERM to gracefully stop the process
         kill(this->_PID, SIGTERM);
 
         // Set to maximum wait time if time is set to 0
@@ -157,8 +182,8 @@ pid_t BasicFork::stopProcess(unsigned int killWait)
                 break;
             }
 
-            // Sleep for 10ms between checks
-            usleep(10*1000);
+            // Sleep for 500ms between checks
+            usleep(500*1000);
         }
         while(std::chrono::system_clock::now() < end);
 

@@ -1,6 +1,6 @@
 /* * NRP Core - Backend infrastructure to synchronize simulations
  *
- * Copyright 2020-2021 NRP Team
+ * Copyright 2020-2023 NRP Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@
 struct NestConfigConst
 {
     static constexpr char EngineType[] = "nest_json";
-    static constexpr char EngineSchema[] = "https://neurorobotics.net/engines/engines_nest.json#/engine_nest_json";
+    static constexpr char EngineSchema[] = "json://nrp-core/engines/engines_nest.json#/engine_nest_json";
 
     /*!
      * \brief Python Path to Nest. Automatically generated via cmake on installation
@@ -37,7 +37,7 @@ struct NestConfigConst
     static constexpr std::string_view NestPythonPath = "PYTHONPATH=" NRP_PYNEST_PATH ":$PYTHONPATH";
 
     /*!
-     * \brief Path to NRP Nest Server Executable. Automatically generated via cmake on installation
+     * \brief Path to Nest Server Executable. Automatically generated via cmake on installation
      */
     static constexpr std::string_view NestExecutablePath = "PATH=$PATH:" NRP_NEST_BIN_PATH;
 

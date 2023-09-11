@@ -1,11 +1,11 @@
-set(PROJECT_NAME "NRPOpenSimEngine")
-set(HEADER_DIRECTORY "nrp_opensim_engine")
+set(PROJECT_NAME "NRPPySimEngine")
+set(HEADER_DIRECTORY "nrp_pysim_engine")
 
 set(NAMESPACE_NAME "${PROJECT_NAME}")
 
 set(LIBRARY_NAME "${PROJECT_NAME}")
-set(PYTHON_MODULE_NAME "opensim")
-set(EXECUTABLE_NAME "NRPOpenSimExecutable")
+set(PYTHON_MODULE_NAME "py_sim")
+set(EXECUTABLE_NAME "NRPPySimExecutable")
 set(TEST_NAME "${PROJECT_NAME}Tests")
 
 set(LIB_EXPORT_NAME "${LIBRARY_NAME}Targets")
@@ -21,12 +21,13 @@ include(ExternalProject)
 
 # List library build files
 set(LIB_SRC_FILES
-    nrp_opensim_engine/config/opensim_config.cpp
-    nrp_opensim_engine/nrp_client/opensim_nrp_client.cpp
+    nrp_pysim_engine/config/pysim_config.cpp
+    nrp_pysim_engine/nrp_client/pysim_nrp_client.cpp
 )
 
 # List of python module build files
 set(PYTHON_MODULE_SRC_FILES
+        "${CMAKE_CURRENT_BINARY_DIR}/src/python_module.cpp"
 )
 
 # List executable build files
@@ -56,6 +57,10 @@ endif()
 
 ##########################################
 ## Header configuration
+
+# Python Module defines
+configure_file("nrp_pysim_engine/python/__init__.py.in" "${CMAKE_CURRENT_BINARY_DIR}/src/__init__.py" @ONLY)
+configure_file("nrp_pysim_engine/python/python_module.cpp.in" "${CMAKE_CURRENT_BINARY_DIR}/src/python_module.cpp" @ONLY)
 
 ##########################################
 # Library
@@ -155,18 +160,20 @@ install(DIRECTORY "${HEADER_DIRECTORY}" "${CMAKE_CURRENT_BINARY_DIR}/include/${H
 )
 
 # Install python module
-if(TARGET ${PYTHON_MODULE_NAME})
-    install(TARGETS ${PYTHON_MODULE_NAME}
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/src/__init__.py"
         DESTINATION "${PYTHON_INSTALL_DIR_REL}/${NRP_PYTHON_MODULE_NAME}/engines/${PYTHON_MODULE_NAME}")
-endif()
-
-install(FILES "nrp_opensim_engine/python/__init__.py"
+install(FILES "nrp_pysim_engine/python/SimManager.py"
+        DESTINATION "${PYTHON_INSTALL_DIR_REL}/${NRP_PYTHON_MODULE_NAME}/engines/${PYTHON_MODULE_NAME}")
+install(FILES "nrp_pysim_engine/python/OpensimLib.py"
+        DESTINATION "${PYTHON_INSTALL_DIR_REL}/${NRP_PYTHON_MODULE_NAME}/engines/${PYTHON_MODULE_NAME}")
+install(FILES "nrp_pysim_engine/python/OpenAIGymLib.py"
+        DESTINATION "${PYTHON_INSTALL_DIR_REL}/${NRP_PYTHON_MODULE_NAME}/engines/${PYTHON_MODULE_NAME}")
+install(FILES "nrp_pysim_engine/python/MujocoLib.py"
+        DESTINATION "${PYTHON_INSTALL_DIR_REL}/${NRP_PYTHON_MODULE_NAME}/engines/${PYTHON_MODULE_NAME}")
+install(FILES "nrp_pysim_engine/python/BulletLib.py"
         DESTINATION "${PYTHON_INSTALL_DIR_REL}/${NRP_PYTHON_MODULE_NAME}/engines/${PYTHON_MODULE_NAME}")
 
-install(FILES "nrp_opensim_engine/python/SimManager.py"
-        DESTINATION "${PYTHON_INSTALL_DIR_REL}/${NRP_PYTHON_MODULE_NAME}/engines/${PYTHON_MODULE_NAME}")
-
-install(FILES "nrp_opensim_engine/python/OpensimLib.py"
+install(TARGETS ${PYTHON_MODULE_NAME}
         DESTINATION "${PYTHON_INSTALL_DIR_REL}/${NRP_PYTHON_MODULE_NAME}/engines/${PYTHON_MODULE_NAME}")
 
 # Install executable files
@@ -174,6 +181,11 @@ if(TARGET ${EXECUTABLE_NAME})
     install(TARGETS ${EXECUTABLE_NAME}
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 endif()
+
+install(FILES
+        "nrp_pysim_engine/python/async_pysim_engine.py"
+        PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
+        DESTINATION ${CMAKE_INSTALL_BINDIR})
 
 # create cmake version and config files
 include(CMakePackageConfigHelpers)

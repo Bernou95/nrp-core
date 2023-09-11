@@ -1,6 +1,6 @@
 /* * NRP Core - Backend infrastructure to synchronize simulations
  *
- * Copyright 2020-2021 NRP Team
+ * Copyright 2020-2023 NRP Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,39 +35,64 @@
 #include <stdexcept>
 #include <unistd.h>
 #include <boost/python.hpp>
-
+#include <boost/asio.hpp>
 
 /*!
- * \brief Searchs for an unbound port starting from startPort. Returns the first unbound port found as a uint16_t
+ * \brief Attempts to bind to a given address
+ * \param hostIpv4 IP4 address of the host
+ * \param port Port to connect to, if 0 a free port is searched and used
+ * \return Port used in the connection, same as "port" argument or found free port
+ *
+ * When "port" is 0, the function asks the OS to look for a free port number. Throws an exception
+ * if the connection is not successful
  */
-inline uint16_t findUnboundPort(uint16_t startPort)
+inline int bindOrFindFreePort(std::string hostIpv4, int port = 0)
 {
-    int sock = socket(AF_INET, SOCK_STREAM, 0);
-    if(sock < 0)
-        throw std::runtime_error(std::string("Socket Error: ") + strerror(errno));
+    using namespace boost::asio;
 
-    struct sockaddr_in serv_addr;
-    do
+    ip::address addressStruct;
+
+    if(hostIpv4 == "localhost")
     {
-        bzero((char *) &serv_addr, sizeof(serv_addr));
-        serv_addr.sin_family = AF_INET;
-        serv_addr.sin_addr.s_addr = INADDR_ANY;
-        serv_addr.sin_port = htons(startPort);
-        if(bind(sock, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) >= 0)
-            break;
-
-        if(errno != EADDRINUSE)
-            throw std::runtime_error("Failed to bind port " + std::to_string(startPort) + ": " + strerror(errno));
-
-        startPort += 1;
+        addressStruct = ip::address_v4::loopback();
     }
-    while(true);
+    else
+    {
+        addressStruct = ip::address::from_string(hostIpv4);
+    }
 
-    if(close(sock) < 0)
-        throw std::runtime_error("Failed to close socket at port " + std::to_string(startPort) + ": " + strerror(errno));
+    io_service service;
+    ip::tcp::socket socket(service);
+    socket.open(ip::tcp::v4());
+    socket.bind(ip::tcp::endpoint(addressStruct, port));
 
-    return startPort++;
+    int newPort = socket.local_endpoint().port();
+
+    // Close the socket, so that the port can be used by the caller
+    socket.close();
+
+    return newPort;
 }
+
+/*!
+ * \brief Attempts to bind to a given address
+ * \param hostIpv4 IP4 address of the host
+ * \param port Port to connect to
+ *
+ * Throws an exception if the connection is not successful
+ */
+inline void bindToAddress(std::string hostIpv4, int port)
+{ bindOrFindFreePort(hostIpv4, port); }
+
+/*!
+ * \brief Returns a free port number
+ * \param hostIpv4 IP4 address of the host
+ * \return Free port number
+ *
+ * Asks the OS to look for a free port number
+ */
+inline int getFreePort(std::string hostIpv4)
+{ return bindOrFindFreePort(hostIpv4); }
 
 /*!
  * \brief Appends 'path' to PYTHON_PATH env variable

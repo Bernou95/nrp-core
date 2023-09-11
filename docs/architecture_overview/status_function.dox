@@ -1,0 +1,117 @@
+/*! \page status_function Status Functions
+
+A Status Function is a user-defined Python function used to enable and manage the exchange of simulation observations between
+the Engines involved in the simulation, and a Python script (referred to in the following as the Master Script)
+that controls an NRP Core experiment (using the \ref python_client "NRP Core Python Client").
+A diagram showing the data exchange flows in this case can be found \ref supported_workflows_client "here".
+
+The Status Function can be used with the `run_until_timeout()` call available in the Python client, in which case
+it allows to work with episodic simulations and to generate trajectories that consist of observations from multiple timesteps.
+It can also be used together with the `run_loop(1)` call, where the simulation is executed step-by-step, and the observations
+are returned continuously. In the case of running the simulation using the former, the Status Function provides a mechanism (the `done flag`)
+of signaling the end of an episode and giving the control back to the Master Script.
+
+
+\section status_function_definition Status Function definition
+
+A Status Function is quite similar to the \ref transceiver_function "Transceiver Functions" used by NRP Core.
+However, there is one important difference between the two insofar as the Status Function is not assigned to any particular engine.
+As such, the status function is called on every Simulation Timestep of NRP-core instead of an Engine Timestep.
+Furthermore, there may also be only one Status Function defined per simulation.
+
+To define a Status Function, one decorates a regular Python function with a special decorator, which is provided by NRP Core Python modules:
+
+\code{.py}
+from nrp_core import *
+
+@StatusFunction()
+def status_function(client_data):
+\endcode
+
+
+\section status_function_input Input arguments
+
+The Status Function can accept DataPacks from both engines and preprocessing functions as arguments.
+Defining these extra parameters is done in the same way as in the Transceiver Functions - by using proper decorators
+and adding the `keywords` as parameters to the function definition.
+
+\code{.py}
+@EngineDataPack(keyword1, id1)        # DataPack coming directly from an engine
+@PreprocessedDataPack(keyword2, id2)  # DataPack coming from a Preprocessing Function
+@StatusFunction()
+def status_function(keyword1, keyword2):
+\endcode
+
+
+\section status_function_return Return values
+
+Status Function returns observations, that may be accumulated by NRP Core and form trajectories.
+Observations are stored in `RawData` objects, that are very similar to `DataPacks`. The main difference
+is that `RawData` objects don't require any identifiers - they aren't assigned to any particular engine,
+and they don't have a name themselves. The `RawData` classes are generated automatically, and there's
+one `RawData` class corresponding to each `DataPack` class. For example, the `JsonRawData` Python class
+corresponds to `JsonDataPack` Python class. They are both available in the same Python module. The data
+of `RawData` objects can be accessed in the same way as in the corresponding `DataPack` class.
+
+Observations are returned from the Status Function on every iteration, but they are not always sent back
+to the Master Script immediately. They can be stored internally by NRP Core and sent back only when
+arbitrary simulation conditions are met - for example a predefined number of iterations has passed,
+or an agent has reached a certain position in the simulation world. These conditions should be evaluated
+inside of the Status Function, and a boolean flag with the result of this evaluation should be returned.
+The flag is called the `done flag`. If it's set to `True`, the simulation will be stopped, the control
+will return to the Master Script, together with all observations stored in the trajectory buffer
+of the NRP Core (including the observations from the current iteration). If the flag is set to `False`,
+then the observations from the current iteration will be appended to the trajectory buffer of the NRP Core.
+Multiple `RawData` objects can be returned in each iteration. The order of observations in thetrajectory
+buffer is preserved. 
+
+The return value should be a tuple that consists of the `done flag` and a list of `RawData` objects,
+which form the observation for the current iteration. The list can be empty when there is no data
+that should be passed to the Master Script.
+
+Below is an example Status Function that returns a single `JsonRawData` object on each iteration.
+The `done flag` will be set to `True` on the 4th iteration (the iteration counter starts at 0),
+which will trigger return of the trajectory data back to the Master Script.
+
+\code{.py}
+from nrp_core import *
+from nrp_core.data.nrp_json import JsonRawData
+
+
+@StatusFunction()
+def status_function():
+    iteration = getSimulationIteration()
+
+    done_flag = (iteration == 3)
+
+    ret = JsonRawData()
+    ret.data["iteration"] = iteration
+
+    return done_flag, [ret]
+\endcode
+
+
+\section status_function_example Examples
+
+A set of example Status Functions can be found in `examples/status_function_test` directory:
+- `status_function_trajectory_json.py` - shows how to return observations using JSON objects.
+- `status_function_trajectory_proto.py` - shows how to return observations using protobuf objects.
+- `status_function_trajectory_mixed.py` - shows how to return observations using mixed JSON and protobuf objects.
+
+
+\section status_function_configuration Configuration
+
+In order to link a Status Function to a simulation, one needs to use the `StatusFunction` parameter in the \ref simulation_schema "simulation configuration".
+The parameters that describe a Status Function are the same as for \ref transceiver_function_schema "Transceiver Functions".
+
+Example Status Function configuration (must be a part of the simulation schema):
+
+\code
+"StatusFunction":
+{
+	"Name": "status_function",
+	"FileName": "status_function.py"
+}
+\endcode
+
+*/

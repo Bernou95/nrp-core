@@ -4,4 +4,13 @@ gnupg2
 software-properties-common
 git
 curl
-libgmock-dev
+doxygen
+cmake
+g++
+net-tools
+inetutils-tools
+inetutils-traceroute
+inetutils-ping
+python3-urllib3
+nano
+libclang-dev

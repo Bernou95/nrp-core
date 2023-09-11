@@ -1,7 +1,7 @@
 //
 // NRP Core - Backend infrastructure to synchronize simulations
 //
-// Copyright 2020-2021 NRP Team
+// Copyright 2020-2023 NRP Team
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -42,26 +42,23 @@ TEST(EventLoop, EVENT_LOOP) {
     Py_Initialize();
 
     std::chrono::milliseconds timestep(10);
+    std::chrono::milliseconds timestepThres(1);
     nlohmann::json graph_config;
     std::stringstream py_file;
-    py_file << TEST_EVENT_LOOP_PYTHON_FUNCTIONS_MODULE_PATH << "/test_decorators.py";
+    py_file << TEST_EVENT_LOOP_PYTHON_FUNCTIONS_MODULE_PATH << "/test_time_nodes.py";
     graph_config.push_back(py_file.str());
-    EventLoop e_l(graph_config, timestep, true, false);
-
-    // Note: the tests below are a bit risky since they assume that the EventLoop is
-    // running at realtime, which should be the case given the graph
-    // used for testing and the timestep specified.
-    // Once monitoring tools are implemented in the EventLoop these tests can be made more
-    // robust.
+    EventLoop e_l(graph_config, timestep, timestepThres, ComputationalGraph::ALL_NODES, true, false);
 
     // run loop once
     auto now = std::chrono::steady_clock::now();
-    e_l.runLoopOnce();
+    e_l.runLoopOnce(now);
     auto time_lapse = std::chrono::steady_clock::now() - now;
 
-    auto odummy_p = dynamic_cast<OutputDummy*>(ComputationalGraphManager::getInstance().getNode("odummy1"));
-    ASSERT_EQ(bpy::extract<int>(*(odummy_p->lastData)), 10);
-    ASSERT_TRUE(time_lapse.count() >= 10000000 && time_lapse.count() < 11000000);
+    auto clockOut = dynamic_cast<OutputDummy*>(ComputationalGraphManager::getInstance().getNode("clock_out"));
+    auto iterOut = dynamic_cast<OutputDummy*>(ComputationalGraphManager::getInstance().getNode("iteration_out"));
+    ASSERT_TRUE(time_lapse.count() >= 10000000);
+    ASSERT_EQ(clockOut->call_count, 1);
+    ASSERT_EQ(iterOut->call_count, 1);
 
     // run loop async
     ASSERT_FALSE(e_l.isRunning());
@@ -70,16 +67,17 @@ TEST(EventLoop, EVENT_LOOP) {
     ASSERT_TRUE(e_l.isRunning());
     std::this_thread::sleep_until(now + std::chrono::seconds(1));
     e_l.stopLoop();
-
     ASSERT_FALSE(e_l.isRunning());
-    ASSERT_TRUE(odummy_p->call_count == 100 || odummy_p->call_count == 101);
 
     // run loop with timeout
     now = std::chrono::steady_clock::now();
     e_l.runLoopAsync(std::chrono::seconds(1));
     e_l.waitForLoopEnd();
     time_lapse = std::chrono::steady_clock::now() - now;
-    ASSERT_TRUE(time_lapse.count() >= 1000000000);
+
+    ASSERT_GE(time_lapse.count(), 1000000000);
+    ASSERT_GE(std::chrono::duration_cast<std::chrono::milliseconds>(time_lapse).count(), bpy::extract<ulong>(*(clockOut->lastData)) + timestep.count());
+    ASSERT_GE(bpy::extract<ulong>(*(clockOut->lastData)), bpy::extract<ulong>(*(iterOut->lastData)) * timestep.count());
 }
 
 // EOF

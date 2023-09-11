@@ -1,6 +1,6 @@
 /* * NRP Core - Backend infrastructure to synchronize simulations
  *
- * Copyright 2020-2021 NRP Team
+ * Copyright 2020-2023 NRP Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@
 struct PythonConfigConst
 {
     static constexpr char EngineType[] = "python_json";
-    static constexpr char EngineSchema[] = "https://neurorobotics.net/engines/engine_python.json#/python_json";
+    static constexpr char EngineSchema[] = "json://nrp-core/engines/engine_python.json#/python_json";
 
     /*!
      * \brief After the server executes the init file, this status flag will either be 1 for success or 0 for fail. If the execution fails, a JSON message with more details will be passed as well (under ErrorMsg).
@@ -45,6 +45,11 @@ struct PythonConfigConst
      * \brief If the init file could not be parsed, the python error message will be stored under this JSON property name
      */
     static constexpr std::string_view ErrorMsg = "Message";
+
+    /*!
+    * \brief Parameter name that is used to pass along the server address
+    */
+    static constexpr std::string_view ExtraServerOptionsArg = "options";
 
     /*!
      * \brief Ratio used by SimulationTime

@@ -1,6 +1,6 @@
 /* * NRP Core - Backend infrastructure to synchronize simulations
  *
- * Copyright 2020-2021 NRP Team
+ * Copyright 2020-2023 NRP Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -204,6 +204,12 @@ public:
             n_send_warnings++;
             return;
         }
+
+        if(n_send_warnings > 0) {
+            NRPLogger::warn("SpiNNaker is running, sending enabled");
+            n_send_warnings = 0;
+        }
+
         std::vector<int> spikes;
         if (data->contains("neuron_ids")) {
             nlohmann::json neuron_ids = data->at("neuron_ids");

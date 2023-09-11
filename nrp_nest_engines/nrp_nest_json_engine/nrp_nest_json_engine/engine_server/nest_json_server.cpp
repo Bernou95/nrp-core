@@ -1,7 +1,7 @@
 //
 // NRP Core - Backend infrastructure to synchronize simulations
 //
-// Copyright 2020-2021 NRP Team
+// Copyright 2020-2023 NRP Team
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -37,13 +37,6 @@
 namespace python = boost::python;
 
 
-NestJSONServer::NestJSONServer(const std::string &serverAddress, python::dict globals)
-    : EngineJSONServer(serverAddress),
-      _pyGlobals(globals)
-{
-    NRP_LOGGER_TRACE("{} called", __FUNCTION__);
-}
-
 NestJSONServer::NestJSONServer(const std::string &serverAddress, const std::string &engineName, const std::string &registrationAddress, python::dict globals)
     : EngineJSONServer(serverAddress, engineName, registrationAddress),
       _pyGlobals(globals)
@@ -65,7 +58,7 @@ NestJSONServer::~NestJSONServer()
         }
 
         // Shutdown any running threads
-        this->_shutdownFlag = true;
+
         this->shutdownServer();
     }
     catch(python::error_already_set &)
@@ -82,11 +75,6 @@ NestJSONServer::~NestJSONServer()
 bool NestJSONServer::initRunFlag() const
 {
     return this->_initRunFlag;
-}
-
-bool NestJSONServer::shutdownFlag() const
-{
-    return this->_shutdownFlag;
 }
 
 SimulationTime NestJSONServer::runLoopStep(SimulationTime timeStep)
@@ -132,6 +120,7 @@ nlohmann::json NestJSONServer::initialize(const nlohmann::json &data, EngineJSON
 
         this->_pyGlobals["nest"] = nestModule;
         this->_pyGlobals[NRP_NEST_PYTHON_MODULE_STR] = nrpNestModule;
+        this->_pyGlobals["sys"] = python::import("sys");
         NRPLogger::debug("NestJSONServer: importing nest module is finished");
     }
     catch(python::error_already_set &)
@@ -230,6 +219,9 @@ nlohmann::json NestJSONServer::initialize(const nlohmann::json &data, EngineJSON
 
     NRPLogger::debug("NestJSONServer::initialize(...) completed with no errors.");
 
+    // Flush stdout and stderr, when they are redirected externally they need to be flushed manually
+    python::exec("sys.stdout.flush(); sys.stderr.flush()", this->_pyGlobals, this->_pyGlobals);
+
     // Return success and parsed devmap
     return nlohmann::json({{NestConfigConst::InitFileExecStatus, true}, {NestConfigConst::InitFileParseDevMap, jsonDevMap}});
 }
@@ -248,10 +240,6 @@ nlohmann::json NestJSONServer::reset(EngineJSONServer::lock_t &simLock)
     try
     {   
         this->shutdown(_initData);
-
-        // Revert _shutdownFlag in order the surver could survive
-        this->_shutdownFlag = false;
-        
         this->initialize(_initData, simLock);
 
         return nlohmann::json({{NestConfigConst::ResetExecStatus, true}});
@@ -270,8 +258,6 @@ nlohmann::json NestJSONServer::shutdown(const nlohmann::json &)
     
     PythonGILLock lock(this->_pyGILState, true);
 
-    this->_shutdownFlag = true;
-
     this->_pyNest["ResetKernel"]();
 
     // TODO: _nestPreparedFlag can't be tru currently.
@@ -285,6 +271,9 @@ nlohmann::json NestJSONServer::shutdown(const nlohmann::json &)
     // Remove datapack controllers
     this->clearRegisteredDataPacks();
     this->_datapackControllerPtrs.clear();
+
+    // Flush stdout and stderr, when they are redirected externally they need to be flushed manually
+    python::exec("sys.stdout.flush(); sys.stderr.flush()", this->_pyGlobals, this->_pyGlobals);
 
     return nlohmann::json();
 }
@@ -300,8 +289,8 @@ nlohmann::json NestJSONServer::getDataPackData(const nlohmann::json &reqData)
     return this->EngineJSONServer::getDataPackData(reqData);
 }
 
-nlohmann::json NestJSONServer::setDataPackData(const nlohmann::json &reqData)
+void NestJSONServer::setDataPackData(const nlohmann::json &reqData)
 {
     PythonGILLock lock(this->_pyGILState, true);
-    return this->EngineJSONServer::setDataPackData(reqData);
+    this->EngineJSONServer::setDataPackData(reqData);
 }
