@@ -197,8 +197,8 @@ function(GENERATE_PROTO_JS PROTO_FILE_NAME PROTO_JS_LIBNAME PROTO_JS_FILES_VAR)
             COMMAND "mkdir" ARGS -p "${js_lib_path}"
             COMMAND ${PROTOC}
             ARGS "--js_out=import_style=commonjs,binary:${js_lib_path}"
-            --proto_path "${CMAKE_CURRENT_SOURCE_DIR}/nrp_proto_defs"
-            --proto_path "${CMAKE_CURRENT_SOURCE_DIR}/engine_proto_defs"
+            --proto_path "${NRP_CORE_MSGS_PROTO_PATH}/nrp_proto_defs"
+            --proto_path "${NRP_CORE_MSGS_PROTO_PATH}/engine_proto_defs"
             "${hw_proto}"
             DEPENDS "${hw_proto}")
 
@@ -233,7 +233,7 @@ file(COPY ${PYTHON_MODULE_ROOT_FILES} DESTINATION "${PYTHON_MODULE_CMAKE_ROOT_DI
 
 # add_subdirectory(python_module)
 
-generate_proto_js("${CMAKE_CURRENT_SOURCE_DIR}/*/*.proto" "nrp-jsproto" PROTO_JS_FILES)
+generate_proto_js("${NRP_CORE_MSGS_PROTO_PATH}/*/*.proto" "nrp-jsproto" PROTO_JS_FILES)
 
 # js protobuf package generation
 add_custom_target(
