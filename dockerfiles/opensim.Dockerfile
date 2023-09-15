@@ -58,7 +58,7 @@ ENV NRP_OPENSIM_GIT_DIR ${HOME}/opensim-core
 
 RUN git clone https://github.com/opensim-org/opensim-core.git ${NRP_OPENSIM_GIT_DIR}
 WORKDIR ${NRP_OPENSIM_GIT_DIR}
-RUN git checkout 4.4
+RUN git checkout 4.3
 RUN mkdir opensim_dependencies_build 
 RUN cd opensim_dependencies_build \
     && cmake ${HOME}/opensim-core/dependencies/ \
