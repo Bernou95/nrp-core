@@ -23,7 +23,7 @@ RUN sudo apt install -y libpcre2-dev bison byacc
 WORKDIR ${HOME}
 RUN git clone https://github.com/swig/swig
 WORKDIR ${HOME}/swig
-RUN ./autogen.sh
+RUN git checkout 4.1.1 && ./autogen.sh
 RUN ./configure
 RUN make -j4
 RUN sudo make install
