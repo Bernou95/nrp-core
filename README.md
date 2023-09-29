@@ -1,3 +1,5 @@
+**NOTE:** This repository was transferred from the original nrp-core reposistory *https://bitbucket.org/hbpneurorobotics/nrp-core* at the time of the official end date of the Human Brain Project, 30/09/2023
+
 This README file contains information on how to get nrp-core installed in your system. Information on how to get started with nrp-core, architecture details, and much more can be found at the nrp-core [online documentation](https://hbpneurorobotics.bitbucket.io/)
 
 **WARNING:** nrp-core has only been tested on Ubuntu 20.04 at the moment and this OS and version are assumed in the instructions below. Installation in other environments might be possible but has not been tested yet.
