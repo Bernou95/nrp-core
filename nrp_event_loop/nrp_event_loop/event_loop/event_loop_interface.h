@@ -176,9 +176,9 @@ class EventLoopInterface
 
         const std::string EVENT_LOOP_TIME_REF_MQTT_TOPIC = "nrp_event_loop/time_ref";
 
-        void sendTimeRef(const std::chrono::time_point<std::chrono::system_clock>& timeRef);
+        void sendTimeRef(const std::chrono::time_point<std::chrono::steady_clock>& timeRef);
 
-        std::chrono::time_point<std::chrono::system_clock> waitForTimeRef();
+        std::chrono::time_point<std::chrono::steady_clock> waitForTimeRef();
 
 #endif
 

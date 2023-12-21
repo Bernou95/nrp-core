@@ -45,7 +45,7 @@ void EventLoopInterface::runLoop(std::chrono::milliseconds timeout)
 
     _iterations = 0L;
     _currentTime = std::chrono::milliseconds(0);
-    auto startLoopTime = std::chrono::system_clock::now();
+    auto startLoopTime = std::chrono::steady_clock::now();//std::chrono::system_clock::now();
     if(_syncTimeRef) {
 #ifdef MQTT_ON
         if(_isTimeSyncMaster)
@@ -59,7 +59,6 @@ void EventLoopInterface::runLoop(std::chrono::milliseconds timeout)
 
     auto startStepTime = startLoopTime;
     auto endStepTime = startLoopTime;
-    auto stepDuration = endStepTime - startStepTime;
 
     long int stepDurationInt = 0;
     long int stepDurationAverage = 0;
@@ -73,11 +72,11 @@ void EventLoopInterface::runLoop(std::chrono::milliseconds timeout)
 
     while(_doRun) {
         // Mark step start time
-        startStepTime = std::chrono::system_clock::now();
+        startStepTime = std::chrono::steady_clock::now();//std::chrono::system_clock::now();
         // Run loop computations
         this->runLoopCB();
         // Control step duration, threshold and rt deviation
-        endStepTime = std::chrono::system_clock::now();
+        endStepTime = std::chrono::steady_clock::now();//std::chrono::system_clock::now();
         _currentTime = std::chrono::duration_cast<std::chrono::milliseconds>(endStepTime - startLoopTime);
         _iterations++;
         stepDuration = endStepTime -  startStepTime;
@@ -104,7 +103,7 @@ void EventLoopInterface::runLoop(std::chrono::milliseconds timeout)
         if(!_delegateRTControl) {
             // TODO: add average window parameter and probably change sleep_until by sleep_for and move to derived classes?
             realtimeDeltaCB(std::chrono::duration_cast<std::chrono::milliseconds>(rtDev));
-            std::this_thread::sleep_until(startStepTime + _timestep);
+            std::this_thread::sleep_until(startLoopTime+(_timestep*_iterations));
         }
     }
 
@@ -188,7 +187,7 @@ bool EventLoopInterface::isRunningNotAsync()
 
 #ifdef MQTT_ON
 
-void EventLoopInterface::sendTimeRef(const std::chrono::time_point<std::chrono::system_clock>& timeRef)
+void EventLoopInterface::sendTimeRef(const std::chrono::time_point<std::chrono::steady_clock>& timeRef)
 {
     auto mqttProxy = &(NRPMQTTProxy::getInstance());
     if(!mqttProxy || !mqttProxy->isConnected())
@@ -203,7 +202,7 @@ void EventLoopInterface::sendTimeRef(const std::chrono::time_point<std::chrono::
                        timeRefStr, true);
 }
 
-std::chrono::time_point<std::chrono::system_clock> EventLoopInterface::waitForTimeRef()
+std::chrono::time_point<std::chrono::steady_clock> EventLoopInterface::waitForTimeRef()
 {
     auto mqttProxy = &(NRPMQTTProxy::getInstance());
     if(!mqttProxy || !mqttProxy->isConnected())
@@ -219,13 +218,13 @@ std::chrono::time_point<std::chrono::system_clock> EventLoopInterface::waitForTi
     while(!gotTimeRef) {
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
         if(!_doRun)
-            return std::chrono::system_clock::now();
+            return std::chrono::steady_clock::now();
     }
 
     NRPLogger::debug("Got time reference: " + timeRefStr);
 
     long timeRefLong = std::stol(timeRefStr);
-    return std::chrono::time_point<std::chrono::system_clock>(std::chrono::microseconds(timeRefLong));
+    return std::chrono::time_point<std::chrono::steady_clock>(std::chrono::microseconds(timeRefLong));
 }
 
 #endif
