@@ -165,6 +165,11 @@ class EdlutEngine
 
         std::future<void> _watchdog;
 
+        float _lastRTClock = 0;
+
+        float _saveWeightsPeriod = 0;
+
+
 };
 
 #endif // EDLUT_GRPC_SERVER_H

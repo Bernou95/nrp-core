@@ -31,7 +31,7 @@
 // Const values taken from original edlut baxter experiment, simulator_node2.cpp parameter values
 // used in all launch files, can be make engine parameters
 const double OUTPUT_DELAY = 0.0;
-const double SENSORIAL_DELAY = 0.4;
+const double SENSORIAL_DELAY = 0.04;
 const double MAX_SIM_TIME_ADVANCE = SENSORIAL_DELAY * 0.9;
 const float RT1_GAP = 0.7;
 const float RT2_GAP = 0.9;
@@ -96,7 +96,7 @@ void EdlutEngine::initEdlutEngine(const nlohmann::json &data)
         auto simTimestep = data.at("EngineTimestep").get<double>();
         auto numThreads = data.at("NumThreads").get<int>();
         this->_sensorialDelay = data.at("SensorialDelay").get<float>();
-        auto saveWeightsPeriod = data.at("SaveWeightsPeriod").get<float>();
+        this->_saveWeightsPeriod = data.at("SaveWeightsPeriod").get<float>();
 
         this->_edlutSimul = std::make_shared<Simulation> (networkFile.c_str(), weightFile.c_str(), std::numeric_limits<double>::max(), simTimestep, numThreads);
 
@@ -107,8 +107,8 @@ void EdlutEngine::initEdlutEngine(const nlohmann::json &data)
 
         std::string weight_file = "output_weight.dat";
         this->_edlutSimul->AddOutputWeightDriver(new FileOutputWeightDriver(weight_file.c_str()));
-        if(saveWeightsPeriod>0.0){
-            this->_edlutSimul->SetSaveStep(saveWeightsPeriod);
+        if(this->_saveWeightsPeriod>0.0){
+            this->_edlutSimul->SetSaveStep(this->_saveWeightsPeriod);
             this->_edlutSimul->GetQueue()->InsertEventWithSynchronization(new SaveWeightsEvent(this->_edlutSimul->GetSaveStep(), this->_edlutSimul.get()));
         }
 
@@ -134,7 +134,8 @@ void EdlutEngine::shutdown()
     if(_watchdog.valid())
         _watchdog.wait();
 
-    this->_edlutSimul->SaveWeights();
+    if(this->_saveWeightsPeriod<0)
+        this->_edlutSimul->SaveWeights();
     this->_shutdownFlag = true;
 }
 
@@ -172,7 +173,14 @@ void EdlutEngine::handleRTDelta(const SimulationTime timeDelta)
 
 void EdlutEngine::rtClockUpdate(const SimulationTime newClock)
 {
+    NRPLogger::debug("Real time: "+std::to_string(fromSimulationTime<float, std::ratio<1>>(newClock))+" Sim time: "+std::to_string(fromSimulationTime<float, std::ratio<1>>(EdlutEngine::_simulationTime))+" Dif: "+std::to_string(fromSimulationTime<float, std::ratio<1>>(EdlutEngine::_simulationTime)-fromSimulationTime<float, std::ratio<1>>(newClock)));
+    //NRPLogger::debug("Sim time: "+std::to_string(fromSimulationTime<float, std::ratio<1>>(EdlutEngine::_simulationTime)));
     this->_edlutSimul->RealTimeRestrictionObject->NextStepWatchDog(fromSimulationTime<float, std::ratio<1>>(newClock) - OUTPUT_DELAY * 0.9);
-}
+    if(fromSimulationTime<float, std::ratio<1>>(newClock)-this->_lastRTClock>=1){
+        this->_edlutSimul->RealTimeRestrictionObject->ShowLocalStatistics();
+        this->_edlutSimul->RealTimeRestrictionObject->ShowGlobalStatistics();
+        this->_lastRTClock = fromSimulationTime<float, std::ratio<1>>(newClock);
+    }
 
+}
 // EOF
