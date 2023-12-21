@@ -50,7 +50,8 @@ namespace gazebo
                 const auto &j = dynamic_cast<const Gazebo::Joint &>(data);
 
                 if(!std::isnan(j.position()))
-                    this->_jointController->SetPositionTarget(_name, j.position());
+                    this->_jointController->SetJointPosition(_name, j.position());
+                    //this->_jointController->SetPositionTarget(_name, j.position());
 
                 if(!std::isnan(j.velocity()))
                     this->_jointController->SetVelocityTarget(_name, j.velocity());
