@@ -90,8 +90,8 @@ sudo ldconfig && cd ..
 # In order to ensure that you can follow these steps which install CUDA 12.0:
 sudo apt-get --purge -y remove 'cuda*' 
 sudo apt-get --purge -y remove 'nvidia*'
-wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/cuda-keyring_1.0-1_all.deb
-sudo dpkg -i cuda-keyring_1.0-1_all.deb
+wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/cuda-keyring_1.1-1_all.deb
+sudo dpkg -i cuda-keyring_1.1-1_all.deb
 sudo apt update
 sudo apt install cuda
 echo 'export PATH=/usr/local/cuda/bin${PATH:+:${PATH}}' >> ~/.bashrc
