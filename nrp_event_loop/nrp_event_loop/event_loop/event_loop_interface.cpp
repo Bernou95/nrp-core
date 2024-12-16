@@ -79,7 +79,7 @@ void EventLoopInterface::runLoop(std::chrono::milliseconds timeout)
         endStepTime = std::chrono::steady_clock::now();//std::chrono::system_clock::now();
         _currentTime = std::chrono::duration_cast<std::chrono::milliseconds>(endStepTime - startLoopTime);
         _iterations++;
-        stepDuration = endStepTime -  startStepTime;
+        auto stepDuration = endStepTime -  startStepTime;
         auto rtDev = stepDuration - _timestep;
 
         if(_logRTInfo) {
