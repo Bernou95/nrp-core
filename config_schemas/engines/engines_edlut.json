@@ -24,7 +24,7 @@
           },
           "SensorialDelay": {
             "type": "number",
-            "default": 0.00,
+            "default": 0.04,
             "description": "Sensorial delay used to compute future spikes"
           },
           "SaveWeightsPeriod": {

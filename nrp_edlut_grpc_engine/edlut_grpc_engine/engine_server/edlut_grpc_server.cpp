@@ -30,8 +30,8 @@
 
 // Const values taken from original edlut baxter experiment, simulator_node2.cpp parameter values
 // used in all launch files, can be make engine parameters
-const double OUTPUT_DELAY = 0.0;
-const double SENSORIAL_DELAY = 0.04;
+//const double OUTPUT_DELAY = 0.0;
+//const double SENSORIAL_DELAY = 0.04;
 const double MAX_SIM_TIME_ADVANCE = SENSORIAL_DELAY * 0.9;
 const float RT1_GAP = 0.7;
 const float RT2_GAP = 0.9;
@@ -58,7 +58,7 @@ SimulationTime EdlutEngine::runLoopStep(SimulationTime timeStep)
     this->_simulationTime += timeStep;
 
     /* Run edlut simulator */
-    this->_edlutSimul->RunSimulationSlot(fromSimulationTime<float, std::ratio<1>>(EdlutEngine::_simulationTime)+this->_sensorialDelay);
+    this->_edlutSimul->RunSimulationSlot(fromSimulationTime<float, std::ratio<1>>(EdlutEngine::_simulationTime));
 
     return this->_simulationTime;
 }
@@ -76,7 +76,7 @@ void EdlutEngine::initialize(const nlohmann::json &data)
         //  is not important
         auto step = this->_engineConfig.at("EngineTimestep").get<float>();
         this->_edlutSimul->RealTimeRestrictionObject->SetParameterWatchDog(step,
-                                                                           (SENSORIAL_DELAY + OUTPUT_DELAY) * 0.9,
+                                                                           (this->_sensorialDelay) * 0.9,
                                                                            RT1_GAP, RT2_GAP, RT3_GAP);
         this->_edlutSimul->RealTimeRestrictionObject->SetExternalClockOption();
         this->_edlutSimul->RealTimeRestrictionObject->SetSleepPeriod(0.001);
