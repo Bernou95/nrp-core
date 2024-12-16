@@ -32,7 +32,7 @@
 // used in all launch files, can be make engine parameters
 //const double OUTPUT_DELAY = 0.0;
 //const double SENSORIAL_DELAY = 0.04;
-const double MAX_SIM_TIME_ADVANCE = SENSORIAL_DELAY * 0.9;
+//const double MAX_SIM_TIME_ADVANCE = SENSORIAL_DELAY * 0.9;
 const float RT1_GAP = 0.7;
 const float RT2_GAP = 0.9;
 const float RT3_GAP = 0.95;
@@ -152,6 +152,7 @@ void EdlutEngine::handleRTDelta(const SimulationTime timeDelta)
 {
     auto* rtRestrObj = this->_edlutSimul->RealTimeRestrictionObject;
     auto gap = fromSimulationTime<float, std::ratio<1>>(timeDelta);
+    auto MAX_SIM_TIME_ADVANCE = (0.9*this->_sensorialDelay);
 
     if (gap>(1-RT1_GAP) * MAX_SIM_TIME_ADVANCE){
         //The simulation time is fine.
@@ -175,7 +176,8 @@ void EdlutEngine::rtClockUpdate(const SimulationTime newClock)
 {
     NRPLogger::debug("Real time: "+std::to_string(fromSimulationTime<float, std::ratio<1>>(newClock))+" Sim time: "+std::to_string(fromSimulationTime<float, std::ratio<1>>(EdlutEngine::_simulationTime))+" Dif: "+std::to_string(fromSimulationTime<float, std::ratio<1>>(EdlutEngine::_simulationTime)-fromSimulationTime<float, std::ratio<1>>(newClock)));
     //NRPLogger::debug("Sim time: "+std::to_string(fromSimulationTime<float, std::ratio<1>>(EdlutEngine::_simulationTime)));
-    this->_edlutSimul->RealTimeRestrictionObject->NextStepWatchDog(fromSimulationTime<float, std::ratio<1>>(newClock) - OUTPUT_DELAY * 0.9);
+    //this->_edlutSimul->RealTimeRestrictionObject->NextStepWatchDog(fromSimulationTime<float, std::ratio<1>>(newClock) - OUTPUT_DELAY * 0.9);
+    this->_edlutSimul->RealTimeRestrictionObject->NextStepWatchDog(fromSimulationTime<float, std::ratio<1>>(newClock));
     if(fromSimulationTime<float, std::ratio<1>>(newClock)-this->_lastRTClock>=1){
         this->_edlutSimul->RealTimeRestrictionObject->ShowLocalStatistics();
         this->_edlutSimul->RealTimeRestrictionObject->ShowGlobalStatistics();
