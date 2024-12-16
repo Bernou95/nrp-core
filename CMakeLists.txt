@@ -167,6 +167,7 @@ endif()
 add_subdirectory(nrp_protobuf)
 
 # ROS
+set(NRP_ROS_MSGS_PACKAGES "baxter_core_msgs;rosgraph_msgs;franka_msgs;franka_core_msgs;intera_core_msgs")
 if(NOT DEFINED NRP_ROS_MSGS_PACKAGES)
     set(NRP_ROS_MSGS_PACKAGES "")
 endif()
