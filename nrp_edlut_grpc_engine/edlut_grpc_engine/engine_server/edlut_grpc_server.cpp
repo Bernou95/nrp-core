@@ -56,9 +56,10 @@ SimulationTime EdlutEngine::runLoopStep(SimulationTime timeStep)
     NRP_LOGGER_TRACE("EdlutEngine::runLoopStep called");
 
     this->_simulationTime += timeStep;
+    //NRPLogger::info("Sim time: "+std::to_string(fromSimulationTime<float, std::ratio<1>>(EdlutEngine::_simulationTime))+" rounded sim time: "+std::to_string((static_cast<double>(round(1000*fromSimulationTime<double, std::ratio<1>>(EdlutEngine::_simulationTime)))/1000)));
 
     /* Run edlut simulator */
-    this->_edlutSimul->RunSimulationSlot(fromSimulationTime<float, std::ratio<1>>(EdlutEngine::_simulationTime));
+    this->_edlutSimul->RunSimulationSlot((static_cast<double>(round(1000*fromSimulationTime<double, std::ratio<1>>(EdlutEngine::_simulationTime)))/1000));
 
     return this->_simulationTime;
 }
@@ -178,7 +179,7 @@ void EdlutEngine::rtClockUpdate(const SimulationTime newClock)
     //NRPLogger::debug("Sim time: "+std::to_string(fromSimulationTime<float, std::ratio<1>>(EdlutEngine::_simulationTime)));
     //this->_edlutSimul->RealTimeRestrictionObject->NextStepWatchDog(fromSimulationTime<float, std::ratio<1>>(newClock) - OUTPUT_DELAY * 0.9);
     this->_edlutSimul->RealTimeRestrictionObject->NextStepWatchDog(fromSimulationTime<float, std::ratio<1>>(newClock));
-    if(fromSimulationTime<float, std::ratio<1>>(newClock)-this->_lastRTClock>=1){
+    if(fromSimulationTime<float, std::ratio<1>>(newClock)-this->_lastRTClock>=10){
         this->_edlutSimul->RealTimeRestrictionObject->ShowLocalStatistics();
         this->_edlutSimul->RealTimeRestrictionObject->ShowGlobalStatistics();
         this->_lastRTClock = fromSimulationTime<float, std::ratio<1>>(newClock);
