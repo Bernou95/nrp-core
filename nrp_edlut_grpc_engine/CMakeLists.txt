@@ -57,8 +57,8 @@ if(BUILD_EDLUT_ENGINE_SERVER)
     message("Configuring EDLUT...")
     #If EDLUT is already installed FetchContent does not download it again
     FetchContent_Declare(edlut_sim
-            GIT_REPOSITORY https://github.com/EduardoRosLab/edlut.git
-            GIT_TAG 74220e77600b7fe7c233199e08e1627769068682
+            GIT_REPOSITORY https://github.com/Bernou95/edlut3
+            GIT_TAG master
             )
     FetchContent_GetProperties(edlut_sim)
     if(NOT edlut_sim_POPULATED)
