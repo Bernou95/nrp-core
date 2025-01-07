@@ -59,7 +59,7 @@ SimulationTime EdlutEngine::runLoopStep(SimulationTime timeStep)
     //NRPLogger::info("Sim time: "+std::to_string(fromSimulationTime<float, std::ratio<1>>(EdlutEngine::_simulationTime))+" rounded sim time: "+std::to_string((static_cast<double>(round(1000*fromSimulationTime<double, std::ratio<1>>(EdlutEngine::_simulationTime)))/1000)));
 
     /* Run edlut simulator */
-    this->_edlutSimul->RunSimulationSlot((static_cast<double>(round(1000*fromSimulationTime<double, std::ratio<1>>(EdlutEngine::_simulationTime)))/1000));
+    this->_edlutSimul->RunSimulationSlot((fromSimulationTime<double, std::ratio<1>>(EdlutEngine::_simulationTime)));
 
     return this->_simulationTime;
 }
