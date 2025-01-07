@@ -45,7 +45,7 @@ void EventLoopInterface::runLoop(std::chrono::milliseconds timeout)
 
     _iterations = 0L;
     _currentTime = std::chrono::milliseconds(0);
-    auto startLoopTime = std::chrono::steady_clock::now();//std::chrono::system_clock::now();
+    auto startLoopTime = std::chrono::steady_clock::now();
     if(_syncTimeRef) {
 #ifdef MQTT_ON
         if(_isTimeSyncMaster)
@@ -72,11 +72,11 @@ void EventLoopInterface::runLoop(std::chrono::milliseconds timeout)
 
     while(_doRun) {
         // Mark step start time
-        startStepTime = std::chrono::steady_clock::now();//std::chrono::system_clock::now();
+        startStepTime = std::chrono::steady_clock::now();
         // Run loop computations
         this->runLoopCB();
         // Control step duration, threshold and rt deviation
-        endStepTime = std::chrono::steady_clock::now();//std::chrono::system_clock::now();
+        endStepTime = std::chrono::steady_clock::now();
         _currentTime = std::chrono::duration_cast<std::chrono::milliseconds>(endStepTime - startLoopTime);
         _iterations++;
         auto stepDuration = endStepTime -  startStepTime;
@@ -103,7 +103,18 @@ void EventLoopInterface::runLoop(std::chrono::milliseconds timeout)
         if(!_delegateRTControl) {
             // TODO: add average window parameter and probably change sleep_until by sleep_for and move to derived classes?
             realtimeDeltaCB(std::chrono::duration_cast<std::chrono::milliseconds>(rtDev));
-            std::this_thread::sleep_until(startLoopTime+(_timestep*_iterations));
+            //if(startLoopTime+(_timestep*_iterations)>std::chrono::steady_clock::now())
+
+            auto durationIO = std::chrono::duration<double, std::micro>(
+                    startLoopTime - std::chrono::steady_clock::now()
+            ) + std::chrono::duration<double, std::micro>(
+                    _timestep * _iterations
+            );
+            //NRPLogger::info("EventLoop sleeping for: "+std::to_string(durationIO.count()));
+            if(durationIO>= std::chrono::microseconds(30))
+                std::this_thread::sleep_for((startLoopTime+(_timestep*_iterations)-std::chrono::steady_clock::now()));
+            else
+                std::this_thread::sleep_until((startLoopTime+(_timestep*_iterations)));
         }
     }
 
