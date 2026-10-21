@@ -363,6 +363,8 @@ TEST(EngineGrpc, RunLoopStepCommand)
     ASSERT_THROW(client.runLoopStepCallback(timeStep), std::runtime_error);
 
     server.startServer();
+    // TODO Investigate why this is needed. It seems to be caused by the previous call to runLoopStepCallback function
+    testSleep(1500);
 
     // Engine time should never be smaller than 0
 
