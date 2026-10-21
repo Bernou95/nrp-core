@@ -349,9 +349,13 @@ endif()
 
 ##########################################
 ## generateFNFactoryModule
+find_program(LLVM_CONFIG_EXECUTABLE NAMES llvm-config REQUIRED)
+execute_process(COMMAND ${LLVM_CONFIG_EXECUTABLE} --includedir OUTPUT_VARIABLE LLVM_INCLUDE_DIR OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND ${LLVM_CONFIG_EXECUTABLE} --libdir OUTPUT_VARIABLE LLVM_LIB_DIR OUTPUT_STRIP_TRAILING_WHITESPACE)
+
 add_custom_command(
         OUTPUT generateFNFactoryModule
-        COMMAND g++ -I/usr/lib/llvm-10/include/ -L/usr/lib/llvm-10/lib ${CMAKE_CURRENT_SOURCE_DIR}/fn_factory_module/generate_fn_factory_module.cpp -x c++ -std=c++17 -lclang -o generateFNFactoryModule)
+        COMMAND g++ -I${LLVM_INCLUDE_DIR} -L${LLVM_LIB_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/fn_factory_module/generate_fn_factory_module.cpp -x c++ -std=c++17 -lclang -Wl,-rpath,${LLVM_LIB_DIR} -o generateFNFactoryModule)
 
 # Forces the generation of generateFNFactoryModule
 add_custom_target(

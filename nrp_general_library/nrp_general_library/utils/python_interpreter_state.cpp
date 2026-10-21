@@ -27,7 +27,8 @@
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
 
-void setup_venv() {
+// Returns the first "python" found in PATH (e.g. an active venv), or an empty string
+std::wstring find_venv_python() {
     std::vector<std::string> paths;
     std::string pathEnv = getenv("PATH");
     boost::split(paths, pathEnv, boost::is_any_of(";:"));
@@ -37,10 +38,51 @@ void setup_venv() {
       if (boost::filesystem::exists(pythonPath))
       {
         std::string pythonProgramName = pythonPath.string();
-        std::wstring widestring = std::wstring(pythonProgramName.begin(), pythonProgramName.end());
-        Py_SetProgramName(widestring.c_str());
-        break;
+        return std::wstring(pythonProgramName.begin(), pythonProgramName.end());
       }
+    }
+    return std::wstring();
+}
+
+void check_py_status(PyConfig &config, const PyStatus &status) {
+    if(PyStatus_Exception(status))
+    {
+        PyConfig_Clear(&config);
+        Py_ExitStatusException(status);
+    }
+}
+
+// Initializes Python with the PyConfig API (Py_SetProgramName and PySys_SetArgv are deprecated since Python 3.11)
+void initialize_python(int argc, wchar_t **argv) {
+    PyConfig config;
+    PyConfig_InitPythonConfig(&config);
+
+    // Arguments are parsed by NRP, Python must not interpret them
+    config.parse_argv = 0;
+
+    if(argc >= 1)
+        check_py_status(config, PyConfig_SetString(&config, &config.program_name, argv[0]));
+
+    const std::wstring venvPython = find_venv_python();
+    if(!venvPython.empty())
+        check_py_status(config, PyConfig_SetString(&config, &config.program_name, venvPython.c_str()));
+
+    if(argc >= 1)
+        check_py_status(config, PyConfig_SetArgv(&config, argc, argv));
+
+    check_py_status(config, Py_InitializeFromConfig(&config));
+    PyConfig_Clear(&config);
+
+    // Prepend the directory of argv[0] to sys.path, as PySys_SetArgv used to do
+    if(argc >= 1)
+    {
+        boost::filesystem::path scriptPath(argv[0]);
+        if(boost::filesystem::is_symlink(scriptPath))
+            scriptPath = boost::filesystem::absolute(boost::filesystem::read_symlink(scriptPath), scriptPath.parent_path());
+
+        PyObject *pathEntry = PyUnicode_FromWideChar(scriptPath.parent_path().wstring().c_str(), -1);
+        PyList_Insert(PySys_GetObject("path"), 0, pathEntry);
+        Py_XDECREF(pathEntry);
     }
 }
 
@@ -50,13 +92,9 @@ PythonInterpreterState::PythonInterpreterState(int argc, const char *const *argv
 {
     assert(argc >= 1);
 
-    Py_SetProgramName(this->_wcharArgs.getWCharTPointers()[0]);
-    setup_venv();
-    Py_Initialize();
+    initialize_python(this->_wcharArgs.getWCharSize(), this->_wcharArgs.getWCharTPointers());
     json_converter::initNumpy();
     boost::python::numpy::initialize();
-
-    PySys_SetArgv(this->_wcharArgs.getWCharSize(), this->_wcharArgs.getWCharTPointers());
 
     if(allowThreads)
         this->_state = PyEval_SaveThread();
@@ -71,8 +109,7 @@ PythonInterpreterState::PythonInterpreterState(int argc, const std::vector<const
 PythonInterpreterState::PythonInterpreterState(bool allowThreads)
     : _wcharArgs(0, nullptr)
 {
-    setup_venv();
-    Py_Initialize();
+    initialize_python(0, nullptr);
     json_converter::initNumpy();
     boost::python::numpy::initialize();
 

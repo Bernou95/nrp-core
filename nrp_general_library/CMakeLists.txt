@@ -84,7 +84,7 @@ set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(FetchContent)
 
 # Python 3 libraries
-find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
+find_package(Python3 REQUIRED COMPONENTS Interpreter Development NumPy)
 
 set(PYTHON_INSTALL_DIR_REL "${CMAKE_INSTALL_LIBDIR}/python${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}/site-packages" CACHE INTERNAL "Relative install location for python libraries")
 
@@ -137,12 +137,12 @@ pkg_check_modules(Pistache REQUIRED IMPORTED_TARGET libpistache)
 find_package(nlohmann_json REQUIRED)
 
 # nlohmann_json schema validator
-find_package(nlohmann_json_schema_validator 2.1.0 EXACT QUIET PATHS ${NRP_DEP_CMAKE_INSTALL_PREFIX} NO_DEFAULT_PATH)
+find_package(nlohmann_json_schema_validator 2.3.0 EXACT QUIET PATHS ${NRP_DEP_CMAKE_INSTALL_PREFIX} NO_DEFAULT_PATH)
 if(NOT ${nlohmann_json_schema_validator_FOUND})
     message("Please wait. Downloading nlohmann_json_schema_validator...")
     ExternalProject_Add(nlohmann_json_schema_validator
             GIT_REPOSITORY https://github.com/pboettch/json-schema-validator.git
-            GIT_TAG 2.1.0
+            GIT_TAG 2.3.0
             INSTALL_DIR ${NRP_DEP_CMAKE_INSTALL_PREFIX}
             CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${NRP_DEP_CMAKE_INSTALL_PREFIX} -DBUILD_SHARED_LIBS=ON)
 
@@ -203,6 +203,8 @@ set(NRP_ENV_VARS ${NRP_ENV_VARS} PARENT_SCOPE)
 add_library("${LIBRARY_NAME}" SHARED ${LIB_SRC_FILES})
 add_library(${NAMESPACE_NAME}::${LIBRARY_NAME} ALIAS ${LIBRARY_NAME})
 target_compile_options(${LIBRARY_NAME} PUBLIC $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:GNU>>:${NRP_COMMON_COMPILATION_FLAGS}>)
+# Propagate to in-tree consumers built with -fconcepts (Boost >= 1.83 asio fails with GCC 13 otherwise)
+target_compile_definitions(${LIBRARY_NAME} PUBLIC BOOST_ASIO_DISABLE_CONCEPTS)
 
 add_library(lib_restclient STATIC IMPORTED )
 set_property(TARGET lib_restclient PROPERTY
@@ -242,6 +244,7 @@ target_link_libraries(${LIBRARY_NAME}
         PkgConfig::LibZip
         Python3::Module
         Python3::Python
+        Python3::NumPy
         lib_nlohmann_json_schema_validator
         lib_restclient
         lib_spdlog

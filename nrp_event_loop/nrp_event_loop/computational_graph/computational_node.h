@@ -24,6 +24,7 @@
 
 #include <string>
 #include <map>
+#include <stdexcept>
 
 /*!
  * \brief Base class implementing a node in the computational graph
