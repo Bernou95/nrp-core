@@ -51,12 +51,13 @@ class FunctionManagerTest : public testing::Test {
                 Py_Initialize();
                 json_converter::initNumpy();
                 boost::python::numpy::initialize();
+                globals.reset(new python::dict());
 
                 python::object main(python::import("__main__"));
                 python::object nrpModule(python::import(PYTHON_MODULE_NAME_STR));
 
-                globals.update(main.attr("__dict__"));
-                globals.update(nrpModule.attr("__dict__"));
+                globals->update(main.attr("__dict__"));
+                globals->update(nrpModule.attr("__dict__"));
             }
             catch(boost::python::error_already_set &)
             {
@@ -64,7 +65,7 @@ class FunctionManagerTest : public testing::Test {
                 throw;
             }
 
-            functionManager.reset(new FunctionManager(globals));
+            functionManager.reset(new FunctionManager(*globals));
 
             TransceiverDataPackInterface::setTFInterpreter(functionManager.get());
 
@@ -90,7 +91,7 @@ class FunctionManagerTest : public testing::Test {
 
         inline static const std::string engineName = "engine";
 
-        python::dict globals;
+        std::unique_ptr<python::dict> globals;
         FunctionManagerSharedPtr functionManager;
         datapacks_set_t dataPacks;
 };

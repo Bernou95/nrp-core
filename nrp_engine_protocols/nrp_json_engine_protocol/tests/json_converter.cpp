@@ -91,7 +91,8 @@ class JsonConverter : public testing::Test
                 PyObject *ptype, *pvalue, *ptraceback;
                 PyErr_Fetch(&ptype, &pvalue, &ptraceback);
 
-                const char *pStrErrorMessage = PyUnicode_AsUTF8(pvalue);
+                PyObject *pargs = PyObject_GetAttrString(pvalue, "args");
+                const char *pStrErrorMessage = PyUnicode_AsUTF8(PyTuple_GetItem(pargs, 0));
                 return std::string(pStrErrorMessage);
             }
 
