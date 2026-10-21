@@ -31,10 +31,16 @@
 
 namespace
 {
+    /*!
+     * \brief Whether a PID setting is given, either as attribute (<joint P="10" .../>) or as child element (<joint><P>10</P></joint>)
+     */
+    bool hasValue(const sdf::ElementPtr &pluginData, const std::string &key)
+    {   return pluginData->HasAttribute(key) || pluginData->HasElement(key);    }
+
     template<class T>
     T getOptionalValue(const sdf::ElementPtr &pluginData, const std::string &key, T defaultValue)
     {
-        if(pluginData->HasElement(key))
+        if(hasValue(pluginData, key))
             return pluginData->Get<T>(key);
 
         return defaultValue;
@@ -88,7 +94,7 @@ void nrp_gz::NRPJointController::Configure(const gz::sim::Entity &entity,
                                  getOptionalValue<double>(pJointPID, "IMax", 0), getOptionalValue<double>(pJointPID, "IMin", 0));
             jointConfig.type = PIDConfig::convertStringToType(pJointPID->Get<std::string>("Type"));
 
-            if(pJointPID->HasElement("Target"))
+            if(hasValue(pJointPID, "Target"))
                 jointConfig.initialTarget = pJointPID->Get<double>("Target");
 
             // Save config for later
