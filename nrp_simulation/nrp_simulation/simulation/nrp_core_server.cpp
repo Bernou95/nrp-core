@@ -73,6 +73,11 @@ void NrpCoreServer::runServerLoop()
     while(true)
     {
         this->waitForRequest();
+
+        // Clear the trajectory sent in the previous response here, in the main thread, which holds the GIL.
+        // It may contain DataPacks created in Python, which can't be released from the gRPC server threads
+        this->_manager->getSimulationDataManager().clearTrajectory();
+
         SimulationManager::RequestResult result;
 
         // Check the request type and handle it accordingly
@@ -256,8 +261,6 @@ void NrpCoreServer::prepareTrajectory(NrpCore::Trajectory * trajectory)
             }
         }
     }
-
-    this->_manager->getSimulationDataManager().clearTrajectory();
 }
 
 
