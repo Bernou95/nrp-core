@@ -26,6 +26,8 @@ cmake_dependent_option(BUILD_NEST_ENGINE_SERVER "Build the server part of the ne
 option(ENABLE_GAZEBO "Enable Gazebo support" ON)
 cmake_dependent_option(BUILD_GAZEBO_ENGINE_SERVER "Build the server part of the Gazebo engines" ON "ENABLE_GAZEBO" OFF)
 
+option(ENABLE_GZ_SIM "Enable Gazebo Harmonic (gz-sim) support" OFF)
+
 option(ENABLE_EDLUT "Enable EDLUT support" ON)
 option(EDLUT_WITH_CUDA "Enable EDLUT with cuda support" OFF)
 cmake_dependent_option(BUILD_EDLUT_ENGINE_SERVER "Build the server part of the EDLUT engine" ON "ENABLE_EDLUT" OFF)
@@ -232,6 +234,14 @@ if(ENABLE_GAZEBO)
     add_subdirectory(nrp_gazebo_engines)
 else()
     message(STATUS "Gazebo engines will not be built")
+endif()
+
+## Gazebo Harmonic (gz-sim) targets
+if(ENABLE_GZ_SIM)
+    message(STATUS "Building Gazebo Harmonic engines")
+    add_subdirectory(nrp_gz_engines)
+else()
+    message(STATUS "Gazebo Harmonic engines will not be built")
 endif()
 
 ## NEST Engines
