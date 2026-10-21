@@ -1,6 +1,6 @@
 This README file contains information on how to get nrp-core installed in your system. Information on how to get started with nrp-core, architecture details, and much more can be found at the nrp-core [online documentation](https://hbpneurorobotics.bitbucket.io/)
 
-**WARNING:** nrp-core has only been tested on Ubuntu 20.04 at the moment and this OS and version are assumed in the instructions below. Installation in other environments might be possible but has not been tested yet.
+**WARNING:** nrp-core has only been tested on Ubuntu 20.04 at the moment and this OS and version are assumed in the instructions below. Installation in other environments might be possible but has not been tested yet. For an installation on Ubuntu 24.04, see the section **Ubuntu 24.04 installation** below.
 
  * Before starting the installation, define, please, the nrp-core installation directory:
  
@@ -8,6 +8,102 @@ This README file contains information on how to get nrp-core installed in your s
 export NRP_INSTALL_DIR="/home/${USER}/.local/nrp"
 export NRP_DEPS_INSTALL_DIR="/home/${USER}/.local/nrp_deps"
  ```
+
+## Ubuntu 24.04 installation
+
+nrp-core has also been built and tested on Ubuntu 24.04 (noble). The steps below replace the Ubuntu 20.04 sections **Dependency Installation** and **Installation**.
+
+Current status on Ubuntu 24.04:
+
+ - Gazebo Classic (gazebo11) and ROS Noetic aren't available on Ubuntu 24.04. They are disabled, and Gazebo Harmonic engines are in progress.
+ - NEST, MQTT and SpiNNaker are disabled for now. EDLUT is enabled with CUDA support (tested on an RTX 3060, compute capability 8.6).
+ - 92/93 tests pass. `EventLoop.EVENT_LOOP` still fails.
+
+Versions used:
+
+| Component | Version |
+|---|---|
+| GCC | 13.3 |
+| CMake | 3.28.3 |
+| Python | 3.12.3 |
+| Boost | 1.83 |
+| LLVM / libclang | 18 |
+| gRPC (C++, `libgrpc++-dev`) | 1.51.1 |
+| protobuf (C++, `libprotobuf-dev`) | 3.21.12 |
+| nlohmann-json | 3.11.3 |
+| pistache (`libpistache-dev`) | 0.0.5 |
+| json-schema-validator (built by nrp-core) | 2.3.0 |
+| CUDA toolkit | 13.2 (NVIDIA driver 595.58.03) |
+| EDLUT (fetched by nrp-core from github.com/Bernou95/edlut3) | master @ 0c5b35f |
+
+```bash
+# Start of Ubuntu 24.04 installation
+export NRP_INSTALL_DIR="/home/${USER}/.local/nrp"
+export NRP_DEPS_INSTALL_DIR="/home/${USER}/.local/nrp_deps"
+
+# 1- System dependencies (all from the noble repositories, no PPAs needed)
+sudo apt update
+sudo apt install cmake build-essential pkg-config git libpistache-dev libboost-python-dev libboost-filesystem-dev libboost-numpy-dev libcurl4-openssl-dev nlohmann-json3-dev libzip-dev cython3 python3-numpy libgrpc++-dev protobuf-compiler-grpc libprotobuf-dev doxygen libgsl-dev libopencv-dev python3-opencv python3-pil python3-pip python3-venv python3-dev libgmock-dev libgtest-dev libclang-dev libomp-dev llvm-dev python3-restrictedpython uwsgi-core uwsgi-plugin-python3
+
+# 2- Python virtual environment
+# Ubuntu 24.04 doesn't allow "pip install" into the system Python (PEP 668), so a venv is required.
+# --system-site-packages is needed so that the apt packages python3-numpy, python3-opencv, python3-pil, etc. stay visible.
+# The venv has to be active when building nrp-core and when running it or its tests.
+python3 -m venv --system-site-packages ~/.venvs/nrp
+. ~/.venvs/nrp/bin/activate
+
+# 3- Python packages
+pip install flask gunicorn paho-mqtt flask_cors docopt pytest psutil docker paramiko python-on-whales pyyaml
+# grpcio-tools generates the Python protobuf modules during the build. It must match the protobuf Python runtime,
+# and protobuf >= 5 removed MessageFactory.GetMessages (used by nrp_client). Pin both:
+pip install "grpcio==1.62.*" "grpcio-tools==1.62.*" "protobuf<5"
+# Tested with: grpcio 1.62.3, grpcio-tools 1.62.3, protobuf 4.25.9, flask 3.1.3, gunicorn 26.2.0, pytest 9.1.1
+# If these packages are changed after building, do a clean rebuild so that the Python protobuf modules are regenerated.
+
+# 4- CUDA toolkit (for EDLUT with GPU support)
+# Unlike the Ubuntu 20.04 instructions, do NOT purge the existing NVIDIA packages and do NOT install the "cuda" meta-package,
+# which also installs a driver. With a working NVIDIA driver already installed, only the toolkit is needed:
+wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/cuda-keyring_1.1-1_all.deb
+sudo dpkg -i cuda-keyring_1.1-1_all.deb
+sudo apt update
+sudo apt install cuda-toolkit-13-2
+echo 'export PATH=/usr/local/cuda/bin${PATH:+:${PATH}}' >> ~/.bashrc
+# Inside a chroot or container (which uses the host's kernel driver) the NVIDIA user-space libraries must match the host driver
+# version exactly. E.g. for driver 595.58.03:
+#   V=595.58.03-1ubuntu1
+#   sudo apt install libnvidia-compute=$V libnvidia-cfg1=$V libnvidia-gpucomp=$V nvidia-persistenced=$V
+#   sudo apt-mark hold libnvidia-compute libnvidia-cfg1 libnvidia-gpucomp nvidia-persistenced
+
+# 5- Clone (including the nrp-core-msgs submodule)
+git clone https://bitbucket.org/hbpneurorobotics/nrp-core.git
+cd nrp-core
+# The GitHub URL in .gitmodules may ask for credentials. In that case, redirect the submodule to Bitbucket
+# (same commit) with a local configuration only:
+git config submodule.nrp-core-msgs.url https://bitbucket.org/hbpneurorobotics/nrp-core-msgs.git
+git submodule update --init
+
+# 6- Build and install
+mkdir build && cd build
+export LD_LIBRARY_PATH=${NRP_DEPS_INSTALL_DIR}/lib:${LD_LIBRARY_PATH}
+cmake .. -DCMAKE_INSTALL_PREFIX="${NRP_INSTALL_DIR}" -DNRP_DEP_CMAKE_INSTALL_PREFIX="${NRP_DEPS_INSTALL_DIR}" \
+    -DENABLE_ROS=OFF -DENABLE_MQTT=OFF -DENABLE_SPINNAKER=OFF -DENABLE_GAZEBO=OFF \
+    -DENABLE_NEST=OFF -DENABLE_EDLUT=ON -DEDLUT_WITH_CUDA=ON -DCOVERAGE=OFF
+# EDLUT is downloaded and built as part of nrp-core. Its optional Python bindings (pyedlut) fail to install with
+# "InvalidVersion: ''" during "make install". This doesn't affect nrp-core, which only uses libedlut.so.
+make -j$(nproc)
+make install
+
+# 7- Environment (optionally add these lines at the end of ~/.bashrc; the venv still has to be activated)
+export NRP_INSTALL_DIR=$HOME/.local/nrp
+export NRP_DEPS_INSTALL_DIR=$HOME/.local/nrp_deps
+export LD_LIBRARY_PATH=$NRP_DEPS_INSTALL_DIR/lib:$LD_LIBRARY_PATH
+[ -f $NRP_INSTALL_DIR/bin/.nrp_env ] && source $NRP_INSTALL_DIR/bin/.nrp_env
+
+# 8- Tests (run them serially: running them in parallel with -j causes port collisions)
+ctest --output-on-failure
+
+# End of Ubuntu 24.04 installation
+```
 
 ## Dependency Installation
 
