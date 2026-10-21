@@ -40,6 +40,8 @@
 
 TEST(EventLoop, EVENT_LOOP) {
     Py_Initialize();
+    // Release the GIL. The event loop acquires it on every step, also when it runs in a separate thread
+    PyThreadState *mainThreadState = PyEval_SaveThread();
 
     std::chrono::milliseconds timestep(10);
     std::chrono::milliseconds rtDeltaThres(1);
@@ -47,7 +49,7 @@ TEST(EventLoop, EVENT_LOOP) {
     std::stringstream py_file;
     py_file << TEST_EVENT_LOOP_PYTHON_FUNCTIONS_MODULE_PATH << "/test_time_nodes.py";
     graph_config.push_back(py_file.str());
-    EventLoop e_l(graph_config, timestep, rtDeltaThres, ComputationalGraph::ALL_NODES, true, false);
+    EventLoop e_l(graph_config, timestep, rtDeltaThres, ComputationalGraph::ALL_NODES, false, false);
 
     // run loop once
     auto now = std::chrono::steady_clock::now();
@@ -76,6 +78,9 @@ TEST(EventLoop, EVENT_LOOP) {
     time_lapse = std::chrono::steady_clock::now() - now;
 
     ASSERT_GE(time_lapse.count(), 1000000000);
+
+    // Python data is accessed below, acquire the GIL again
+    PyEval_RestoreThread(mainThreadState);
     ASSERT_GE(std::chrono::duration_cast<std::chrono::milliseconds>(time_lapse).count(), bpy::extract<ulong>(*(clockOut->lastData)) + timestep.count());
     ASSERT_GE(bpy::extract<ulong>(*(clockOut->lastData)), bpy::extract<ulong>(*(iterOut->lastData)) * timestep.count());
 }
