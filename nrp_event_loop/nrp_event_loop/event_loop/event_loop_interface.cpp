@@ -91,9 +91,6 @@ void EventLoopInterface::runLoop(std::chrono::milliseconds timeout)
             (*_fileLogger) << _iterations << " " << _currentTime.count() << " " << stepDurationInt << "\n";
         }
 
-        if(useTimeout && _currentTime >= timeout)
-            break;
-
 //        if(rtDev > _rtDeltaThres) {
 //            NRPLogger::warn("Event Loop can't run at the target frequency. Actual step duration: " +
 //                            std::to_string(std::chrono::duration_cast<std::chrono::milliseconds>(stepDuration).count()) +
@@ -116,6 +113,12 @@ void EventLoopInterface::runLoop(std::chrono::milliseconds timeout)
             else
                 std::this_thread::sleep_until((startLoopTime+(_timestep*_iterations)));
         }
+
+        // Check the timeout once the step has been completed, including the time slept until its end. This way
+        // runLoop(timeout) runs timeout / timestep steps, independently of how long each step computation takes
+        _currentTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - startLoopTime);
+        if(useTimeout && _currentTime >= timeout)
+            break;
     }
 
     if(_logRTInfo && _iterations) {
