@@ -15,6 +15,7 @@ set (CMAKE_INTERPROCEDURAL_OPTIMIZATION OFF)
 ## NRP-core compilation options (NAME DESCRIPTION DEFAULT)
 # See the section "common NRP-core CMake options" for the explanation about these parameters
 option(ENABLE_ROS "Enable ROS support" ON)
+option(ENABLE_ROS2 "Enable ROS 2 support" OFF)
 option(ENABLE_MQTT "Enable MQTT support" ON)
 option(ENABLE_SPINNAKER "Enable Spinnaker support" ON)
 
@@ -190,6 +191,30 @@ if(ENABLE_ROS)
     add_subdirectory(nrp_comm_proxies/nrp_ros_proxy)
 else()
     message(STATUS "ROS msgs python bindings will not be built")
+endif()
+
+# ROS 2
+if(ENABLE_ROS2 AND ENABLE_ROS)
+    message(FATAL_ERROR "ENABLE_ROS and ENABLE_ROS2 can't be used together. Both provide the nrp_core.data.nrp_ros python bindings")
+endif()
+
+if(NOT DEFINED NRP_ROS2_MSGS_PACKAGES)
+    set(NRP_ROS2_MSGS_PACKAGES "")
+endif()
+
+set(DEFAULT_NRP_ROS2_MSGS_PACKAGES "builtin_interfaces;std_msgs;geometry_msgs;sensor_msgs" CACHE INTERNAL "ROS 2 packages containing msg definitions supported in nrp-core")
+foreach(PACK ${DEFAULT_NRP_ROS2_MSGS_PACKAGES})
+    if(NOT PACK IN_LIST NRP_ROS2_MSGS_PACKAGES)
+        list(APPEND NRP_ROS2_MSGS_PACKAGES ${PACK})
+    endif()
+endforeach()
+
+if(ENABLE_ROS2)
+    message(STATUS "Building ROS 2 msgs Python bindings")
+    message(STATUS "NRP_ROS2_MSGS_PACKAGES: ${NRP_ROS2_MSGS_PACKAGES}")
+    add_subdirectory(nrp_ros2)
+else()
+    message(STATUS "ROS 2 msgs python bindings will not be built")
 endif()
 
 # Spinnaker
