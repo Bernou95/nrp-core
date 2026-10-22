@@ -15,10 +15,12 @@ nrp-core has also been built and tested on Ubuntu 24.04 (noble). The steps below
 
 Current status on Ubuntu 24.04:
 
- - Gazebo Classic (gazebo11) and ROS Noetic aren't available on Ubuntu 24.04. Gazebo Classic is disabled, and Gazebo Harmonic engines are in progress.
+ - Gazebo Classic (gazebo11) and ROS Noetic aren't available on Ubuntu 24.04. Gazebo Classic is disabled. A Gazebo Harmonic (gz-sim 8) gRPC engine, `gz_grpc`, is available (`-DENABLE_GZ_SIM=ON`); its installation steps aren't documented here yet.
  - ROS 1 support was removed. ROS 2 Jazzy is supported instead (`-DENABLE_ROS2=ON`, `ros-jazzy-ros-base`). `/opt/ros/jazzy/setup.bash` has to be sourced before cmake and when running nrp-core.
- - NEST, MQTT and SpiNNaker are disabled for now. EDLUT is enabled with CUDA support (tested on an RTX 3060, compute capability 8.6).
- - 92/93 tests pass. `EventLoop.EVENT_LOOP` still fails.
+ - MQTT is enabled (Paho MQTT C v1.3.8 and C++ v1.2.0, built with OpenSSL 3), see step 4b. It is needed by the event loop and the datatransfer engine.
+ - NEST 3.1 is enabled (`-DENABLE_NEST=ON`, built by nrp-core, needs the NEST packages of step 1). SpiNNaker is disabled for now.
+ - EDLUT is enabled with CUDA support (tested on an RTX 3060, compute capability 8.6).
+ - All 114 tests pass with MQTT, NEST, EDLUT, Gazebo Harmonic and ROS 2 enabled (2 more are disabled upstream). `TestDatatransferGrpcEngine.MQTTClient` expects no MQTT broker running, see step 8.
 
 Versions used:
 
@@ -44,7 +46,9 @@ export NRP_DEPS_INSTALL_DIR="/home/${USER}/.local/nrp_deps"
 
 # 1- System dependencies (all from the noble repositories, no PPAs needed)
 sudo apt update
-sudo apt install cmake build-essential pkg-config git libpistache-dev libboost-python-dev libboost-filesystem-dev libboost-numpy-dev libcurl4-openssl-dev nlohmann-json3-dev libzip-dev cython3 python3-numpy libgrpc++-dev protobuf-compiler-grpc libprotobuf-dev doxygen libgsl-dev libopencv-dev python3-opencv python3-pil python3-pip python3-venv python3-dev libgmock-dev libgtest-dev libclang-dev libomp-dev llvm-dev python3-restrictedpython uwsgi-core uwsgi-plugin-python3
+sudo apt install cmake build-essential pkg-config git libpistache-dev libboost-python-dev libboost-filesystem-dev libboost-numpy-dev libcurl4-openssl-dev nlohmann-json3-dev libzip-dev cython3 python3-numpy libgrpc++-dev protobuf-compiler-grpc libprotobuf-dev doxygen libgsl-dev libopencv-dev python3-opencv python3-pil python3-pip python3-venv python3-dev libgmock-dev libgtest-dev libclang-dev libomp-dev llvm-dev python3-restrictedpython uwsgi-core uwsgi-plugin-python3 libssl-dev
+# NEST (-DENABLE_NEST=ON)
+sudo apt install libreadline-dev python3-all-dev openmpi-bin libopenmpi-dev python3-mpi4py
 
 # 2- Python virtual environment
 # Ubuntu 24.04 doesn't allow "pip install" into the system Python (PEP 668), so a venv is required.
@@ -54,7 +58,9 @@ python3 -m venv --system-site-packages ~/.venvs/nrp
 . ~/.venvs/nrp/bin/activate
 
 # 3- Python packages
-pip install flask gunicorn paho-mqtt flask_cors docopt pytest psutil docker paramiko python-on-whales pyyaml
+pip install flask gunicorn "paho-mqtt<2" flask_cors docopt pytest psutil docker paramiko python-on-whales pyyaml
+# paho-mqtt 2.x changed the mqtt.Client() signature used by the Python event loop engine (nrp_event_loop/python/event_loop_engine.py).
+# Tested with paho-mqtt 1.6.1.
 # grpcio-tools generates the Python protobuf modules during the build. It must match the protobuf Python runtime,
 # and protobuf >= 5 removed MessageFactory.GetMessages (used by nrp_client). Pin both:
 pip install "grpcio==1.62.*" "grpcio-tools==1.62.*" "protobuf<5"
@@ -75,6 +81,16 @@ echo 'export PATH=/usr/local/cuda/bin${PATH:+:${PATH}}' >> ~/.bashrc
 #   sudo apt install libnvidia-compute=$V libnvidia-cfg1=$V libnvidia-gpucomp=$V nvidia-persistenced=$V
 #   sudo apt-mark hold libnvidia-compute libnvidia-cfg1 libnvidia-gpucomp nvidia-persistenced
 
+# 4b- Paho MQTT C and C++ (needed by the event loop and the datatransfer engine; skip it and use -DENABLE_MQTT=OFF otherwise)
+# Builds with OpenSSL 3 (libssl-dev, step 1); only "SHA1_* is deprecated" warnings are expected.
+git clone https://github.com/eclipse/paho.mqtt.c.git && cd paho.mqtt.c && git checkout v1.3.8
+cmake -Bbuild -H. -DPAHO_ENABLE_TESTING=OFF -DPAHO_BUILD_STATIC=OFF -DPAHO_BUILD_SHARED=ON -DPAHO_WITH_SSL=ON -DPAHO_HIGH_PERFORMANCE=ON -DCMAKE_INSTALL_PREFIX="${NRP_DEPS_INSTALL_DIR}"
+cmake --build build/ --target install && cd ..
+git clone https://github.com/eclipse/paho.mqtt.cpp.git && cd paho.mqtt.cpp && git checkout v1.2.0
+cmake -Bbuild -H. -DPAHO_BUILD_STATIC=OFF -DPAHO_BUILD_SHARED=ON -DCMAKE_INSTALL_PREFIX="${NRP_DEPS_INSTALL_DIR}" -DCMAKE_PREFIX_PATH="${NRP_DEPS_INSTALL_DIR}"
+cmake --build build/ --target install && cd ..
+# No "sudo ldconfig" needed: ${NRP_DEPS_INSTALL_DIR}/lib is in LD_LIBRARY_PATH (steps 6 and 7)
+
 # 5- Clone (including the nrp-core-msgs submodule)
 git clone https://bitbucket.org/hbpneurorobotics/nrp-core.git
 cd nrp-core
@@ -87,12 +103,15 @@ git submodule update --init
 mkdir build && cd build
 export LD_LIBRARY_PATH=${NRP_DEPS_INSTALL_DIR}/lib:${LD_LIBRARY_PATH}
 cmake .. -DCMAKE_INSTALL_PREFIX="${NRP_INSTALL_DIR}" -DNRP_DEP_CMAKE_INSTALL_PREFIX="${NRP_DEPS_INSTALL_DIR}" \
-    -DENABLE_ROS=OFF -DENABLE_MQTT=OFF -DENABLE_SPINNAKER=OFF -DENABLE_GAZEBO=OFF \
-    -DENABLE_NEST=OFF -DENABLE_EDLUT=ON -DEDLUT_WITH_CUDA=ON -DCOVERAGE=OFF
+    -DENABLE_ROS=OFF -DENABLE_MQTT=ON -DENABLE_SPINNAKER=OFF -DENABLE_GAZEBO=OFF \
+    -DENABLE_NEST=ON -DENABLE_EDLUT=ON -DEDLUT_WITH_CUDA=ON -DCOVERAGE=OFF
 # EDLUT is downloaded and built as part of nrp-core. Its optional Python bindings (pyedlut) fail to install with
 # "InvalidVersion: ''" during "make install". This doesn't affect nrp-core, which only uses libedlut.so.
 make -j$(nproc)
 make install
+# When rebuilding after changing options that change library interfaces (e.g. enabling MQTT), remove ${NRP_INSTALL_DIR}/lib from
+# LD_LIBRARY_PATH while running make. Otherwise the test discovery step loads the old installed libraries and fails with
+# "undefined symbol". Run make install afterwards.
 
 # 7- Environment (optionally add these lines at the end of ~/.bashrc; the venv still has to be activated)
 export NRP_INSTALL_DIR=$HOME/.local/nrp
@@ -102,6 +121,10 @@ export LD_LIBRARY_PATH=$NRP_DEPS_INSTALL_DIR/lib:$LD_LIBRARY_PATH
 
 # 8- Tests (run them serially: running them in parallel with -j causes port collisions)
 ctest --output-on-failure
+# MQTT tests and the event loop need a broker on localhost:1883, e.g. the official Mosquitto image:
+#   docker run -d --name nrp-mosquitto -p 1883:1883 -p 8883:8883 \
+#     -v ${PWD}/../examples/husky_braitenberg/mosquitto.conf:/mosquitto/config/mosquitto.conf eclipse-mosquitto
+# TestDatatransferGrpcEngine.MQTTClient expects NO broker running: it fails while the broker is up (expected).
 
 # End of Ubuntu 24.04 installation
 ```
