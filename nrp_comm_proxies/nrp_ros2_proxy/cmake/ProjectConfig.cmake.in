@@ -1,0 +1,12 @@
+@PACKAGE_INIT@
+
+find_package(rclcpp REQUIRED)
+
+# NRPGeneralLibrary can't be loaded twice, e.g. when this package is loaded by NRPEventLoop
+if(NOT TARGET NRPGeneralLibrary::NRPGeneralLibrary)
+    find_package(NRPGeneralLibrary REQUIRED)
+endif()
+
+set(NRP_ROS_PROXY_TARGET @NRP_ROS_PROXY_TARGET@)
+
+include(${CMAKE_CURRENT_LIST_DIR}/@LIB_EXPORT_NAME@.cmake)
