@@ -1,0 +1,45 @@
+{
+	"SimulationName": "husky_simulation_screens_gz",
+	"SimulationDescription": "Debugging version of husky_simulation_gz: a Gazebo Harmonic world with only a ground plane and the red and blue screens, and the NEST Braitenberg brain",
+	"SimulationTimeout": 10,
+	"EngineConfigs": [
+		{
+			"EngineType": "gz_grpc",
+			"EngineName": "gazebo",
+			"ServerAddress": "localhost:9019",
+			"GazeboWorldFile": "husky_world_screens_gz.sdf",
+			"GazeboSDFModels": [
+				{
+					"Name": "husky",
+					"File": "husky_gz.sdf",
+					"InitPose": "-0.009853 0.086704 0.142752 0 0 0"
+				}
+			],
+			"EngineEnvParams": [
+				"GZ_SIM_RESOURCE_PATH=$HOME/.gazebo/models:$GZ_SIM_RESOURCE_PATH"
+			]
+		},
+		{
+			"EngineType": "nest_json",
+			"EngineName": "nest",
+			"NestInitFileName": "braitenberg.py",
+			"EngineEnvParams": [
+				"PYNEST_QUIET=1"
+			]
+		}
+	],
+	"DataPackProcessingFunctions": [
+		{
+			"Name": "cam_pf",
+			"FileName": "cam_pf.py"
+		},
+		{
+			"Name": "mot_tf",
+			"FileName": "mot_tf.py"
+		},
+		{
+			"Name": "brain_stimulation_tf",
+			"FileName": "brain_stimulation_tf.py"
+		}
+	]
+}
