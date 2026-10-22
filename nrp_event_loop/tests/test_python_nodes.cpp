@@ -362,6 +362,10 @@ TEST(ComputationalGraphPythonNodes, F2F_EDGES) {
     obj_to_int->registerF2FEdge("i1", "/int_to_int/o1");
     ASSERT_THROW( cgm.graphLoadComplete();, NRPException);
     obj_to_int->clearEdgeRequests();
+
+    // Some nodes were created by the FN factory module. Destroy them now, as NRPCoreSim does, and not at exit, when the
+    // module may already have been unloaded
+    cgm.clear();
 }
 
 TEST(ComputationalGraphPythonNodes, ENGINE_NODES) {

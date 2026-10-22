@@ -14,7 +14,7 @@ set (CMAKE_INTERPROCEDURAL_OPTIMIZATION OFF)
 
 ## NRP-core compilation options (NAME DESCRIPTION DEFAULT)
 # See the section "common NRP-core CMake options" for the explanation about these parameters
-option(ENABLE_ROS "Enable ROS support" ON)
+option(ENABLE_ROS "Enable ROS 1 support. Not supported anymore, use ENABLE_ROS2" OFF)
 option(ENABLE_ROS2 "Enable ROS 2 support" OFF)
 option(ENABLE_MQTT "Enable MQTT support" ON)
 option(ENABLE_SPINNAKER "Enable Spinnaker support" ON)
@@ -170,33 +170,11 @@ endif()
 add_subdirectory(nrp_protobuf)
 
 # ROS
-set(NRP_ROS_MSGS_PACKAGES "baxter_core_msgs;rosgraph_msgs;franka_msgs;franka_core_msgs;intera_core_msgs")
-if(NOT DEFINED NRP_ROS_MSGS_PACKAGES)
-    set(NRP_ROS_MSGS_PACKAGES "")
-endif()
-
-set(DEFAULT_NRP_ROS_MSGS_PACKAGES "std_msgs;geometry_msgs;sensor_msgs" CACHE INTERNAL "ROS Catkin packages containing msg definitions supported in nrp-core")
-foreach(PACK ${DEFAULT_NRP_ROS_MSGS_PACKAGES})
-    if(NOT PACK IN_LIST NRP_ROS_MSGS_PACKAGES)
-        list(APPEND NRP_ROS_MSGS_PACKAGES ${PACK})
-    endif()
-endforeach()
-
-message(STATUS "NRP_ROS_MSGS_PACKAGES: ${NRP_ROS_MSGS_PACKAGES}")
-
 if(ENABLE_ROS)
-    message(STATUS "Building ROS msgs Python bindings")
-    add_definitions(-DROS_ON)
-    add_subdirectory(nrp_ros)
-    add_subdirectory(nrp_comm_proxies/nrp_ros_proxy)
-else()
-    message(STATUS "ROS msgs python bindings will not be built")
+    message(FATAL_ERROR "ROS 1 is not supported anymore (it is not available on Ubuntu 24.04). Use ENABLE_ROS2 instead")
 endif()
 
 # ROS 2
-if(ENABLE_ROS2 AND ENABLE_ROS)
-    message(FATAL_ERROR "ENABLE_ROS and ENABLE_ROS2 can't be used together. Both provide the nrp_core.data.nrp_ros python bindings")
-endif()
 
 if(NOT DEFINED NRP_ROS2_MSGS_PACKAGES)
     set(NRP_ROS2_MSGS_PACKAGES "")
@@ -212,7 +190,9 @@ endforeach()
 if(ENABLE_ROS2)
     message(STATUS "Building ROS 2 msgs Python bindings")
     message(STATUS "NRP_ROS2_MSGS_PACKAGES: ${NRP_ROS2_MSGS_PACKAGES}")
+    add_definitions(-DROS_ON)
     add_subdirectory(nrp_ros2)
+    add_subdirectory(nrp_comm_proxies/nrp_ros2_proxy)
 else()
     message(STATUS "ROS 2 msgs python bindings will not be built")
 endif()

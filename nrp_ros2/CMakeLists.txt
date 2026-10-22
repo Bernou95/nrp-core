@@ -6,6 +6,9 @@ if("$ENV{ROS_DISTRO}" STREQUAL "" OR "$ENV{AMENT_PREFIX_PATH}" STREQUAL "")
 endif()
 message(STATUS "ROS 2 distribution: $ENV{ROS_DISTRO}")
 
+# Used to generate the bindings and to locate python packages
+find_package(Python3 REQUIRED COMPONENTS Interpreter)
+
 ##########################################
 ## Copy the nrp message definitions to a colcon workspace which path is specified by var ROS2_WS
 ## and build that workspace
@@ -37,6 +40,13 @@ endif()
 set(NRP_ROS2_MSGS_INSTALL_DIR "${ROS2_WS}/install/nrp_ros_msgs" CACHE INTERNAL "Install directory of the nrp_ros_msgs ROS 2 package")
 set(ENV{AMENT_PREFIX_PATH} "${NRP_ROS2_MSGS_INSTALL_DIR}:$ENV{AMENT_PREFIX_PATH}")
 list(APPEND CMAKE_PREFIX_PATH ${NRP_ROS2_MSGS_INSTALL_DIR})
+# Other components (e.g. the event loop ROS nodes) also need to find nrp_ros_msgs
+set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} PARENT_SCOPE)
+
+# add to nrp env vars: nrp_ros_msgs libraries and python package
+list(APPEND NRP_ENV_VARS "LD_LIBRARY_PATH=${NRP_ROS2_MSGS_INSTALL_DIR}/lib:\${LD_LIBRARY_PATH}")
+list(APPEND NRP_ENV_VARS "PYTHONPATH=${NRP_ROS2_MSGS_INSTALL_DIR}/lib/python${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}/site-packages:\${PYTHONPATH}")
+set(NRP_ENV_VARS ${NRP_ENV_VARS} PARENT_SCOPE)
 
 ##########################################
 ## Build nrp ros python bindings

@@ -1,10 +1,10 @@
 #include <string>
 #include <iostream>
-#include "std_msgs/Bool.h"
+#include "std_msgs/msg/bool.hpp"
 
 using namespace std;
 
-bool my_function(const std_msgs::Bool* i1, std_msgs::Bool& o1) {
+bool my_function(const std_msgs::msg::Bool* i1, std_msgs::msg::Bool& o1) {
     if(i1 != nullptr) {
         cout << "got data" << endl;
         o1 = *i1;

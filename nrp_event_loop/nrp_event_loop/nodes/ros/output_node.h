@@ -29,7 +29,7 @@
 #include "nrp_event_loop/computational_graph/output_node.h"
 #include "nrp_event_loop/python/output_edge.h"
 
-#include "nrp_ros_proxy/nrp_ros_proxy.h"
+#include "nrp_ros2_proxy/nrp_ros2_proxy.h"
 
 /*!
  * \brief Output node used to connect a ROS publisher to the computational graph
@@ -54,13 +54,22 @@ public:
 
 protected:
 
+    void configure() override
+    {
+        OutputNode<MSG_TYPE>::configure();
+
+        // ROS 2 publishers are matched with subscribers asynchronously. Create the publisher now, so that the first
+        // message isn't lost
+        if(NRPROS2Proxy::hasInstance())
+            NRPROS2Proxy::getInstance().advertise<MSG_TYPE>(this->id());
+    }
+
     void sendSingleMsg(const std::string& /*id*/, const MSG_TYPE* data) override
     {
         // TODO: check that 'id' is equal to the topic address this node publishes to?
 
-        NRPROSProxy* rosProxy = &(NRPROSProxy::getInstance());
-        if(rosProxy)
-            rosProxy->publish(this->id(), *data);
+        if(NRPROS2Proxy::hasInstance())
+            NRPROS2Proxy::getInstance().publish(this->id(), *data);
         else
             NRPLogger::warn("From OutputROSNode \"" + this->id() +
                             "\". NRPCoreSim is not connected to ROS and this node can't publish. Add \"ROSNode\" parameter to  your experiment configuration");

@@ -100,8 +100,15 @@ set(MQTT_TEST_SRC_FILES
 ##########################################
 ## Dependencies
 
-if(ENABLE_ROS)
-    find_package(catkin REQUIRED COMPONENTS roscpp nrp_ros_msgs ${NRP_ROS_MSGS_PACKAGES})
+if(ENABLE_ROS2)
+    find_package(rclcpp REQUIRED)
+
+    # Targets of the ROS 2 msg packages, including type support libraries needed to publish and subscribe
+    set(NRP_ROS2_MSG_TARGETS "")
+    foreach(PACK nrp_ros_msgs ${NRP_ROS2_MSGS_PACKAGES})
+        find_package(${PACK} REQUIRED)
+        list(APPEND NRP_ROS2_MSG_TARGETS ${${PACK}_TARGETS})
+    endforeach()
 endif()
 
 ##########################################
@@ -110,14 +117,14 @@ endif()
 configure_file("nrp_event_loop/config/cmake_constants.h.in" "${CMAKE_CURRENT_BINARY_DIR}/include/${HEADER_DIRECTORY}/config/cmake_constants.h" @ONLY)
 
 # Configures ros_edge_factory.h
-if(ENABLE_ROS)
-    file(READ "${CMAKE_BINARY_DIR}/nrp_ros_msg_headers.txt" NRP_ROS_MSG_HEADERS)
+if(ENABLE_ROS2)
+    file(READ "${CMAKE_BINARY_DIR}/nrp_ros2_msg_headers.txt" NRP_ROS_MSG_HEADERS)
     set(ROS_MSG_TYPES_INCLUDE "")
     foreach(MSG ${NRP_ROS_MSG_HEADERS})
         string(APPEND ROS_MSG_TYPES_INCLUDE "#include \"${MSG}\"\n")
     endforeach()
 
-    file(READ "${CMAKE_BINARY_DIR}/nrp_ros_msg_types.txt" NRP_ROS_MSG_TYPES)
+    file(READ "${CMAKE_BINARY_DIR}/nrp_ros2_msg_types.txt" NRP_ROS_MSG_TYPES)
     set(ROS_MSG_TYPES_CHECK "")
     foreach(MSG ${NRP_ROS_MSG_TYPES})
         string(APPEND ROS_MSG_TYPES_CHECK "if (rosType == \"${MSG}\")\n        {\n            if(_isInput)\n                return pySetupInput<${MSG}>(obj);\n            else\n                return pySetupOutput<${MSG}>(obj);\n        }\n        else ")
@@ -158,7 +165,7 @@ target_link_libraries(${LIBRARY_NAME}
     PUBLIC
         ${NRP_GEN_LIB_TARGET}
         ${Boost_LIBRARIES}
-        ${catkin_LIBRARIES}
+        ${NRP_ROS_PROXY_TARGET}
 
 
     PRIVATE
@@ -171,13 +178,12 @@ target_include_directories(${LIBRARY_NAME} BEFORE
         "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>"
 
         ${Boost_INCLUDE_DIRS}
-        ${catkin_INCLUDE_DIRS}
 
     PRIVATE
 )
 
 # ROS nodes target
-if(ENABLE_ROS)
+if(ENABLE_ROS2)
     set(ROS_LIBRARY_NAME "${LIBRARY_NAME}ROSNodes")
     add_library(${ROS_LIBRARY_NAME} SHARED ${ROS_SRC_FILES})
     add_library(${NAMESPACE_NAME}::${ROS_LIBRARY_NAME} ALIAS ${ROS_LIBRARY_NAME})
@@ -189,7 +195,6 @@ if(ENABLE_ROS)
             "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>"
             "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>"
 
-            ${catkin_INCLUDE_DIRS}
             ${Boost_INCLUDE_DIRS}
             )
 
@@ -198,7 +203,7 @@ if(ENABLE_ROS)
             ${NRP_EVENT_LOOP_TARGET}
             ${NRP_GEN_LIB_TARGET}
             ${NRP_ROS_PROXY_TARGET}
-            ${catkin_LIBRARIES}
+            ${NRP_ROS2_MSG_TARGETS}
             ${Boost_LIBRARIES}
             )
 endif()
@@ -324,7 +329,7 @@ if(NOT ${PYTHON_MODULE_SRC_FILES} STREQUAL "")
             ${NRP_EVENT_LOOP_TARGET}
     )
 
-    if(ENABLE_ROS)
+    if(ENABLE_ROS2)
         target_link_libraries(${PYTHON_MODULE_NAME}
                 PUBLIC
                 ${NAMESPACE_NAME}::${ROS_LIBRARY_NAME}
@@ -425,7 +430,7 @@ if(${ENABLE_TESTING} AND NOT "${TEST_SRC_FILES}" STREQUAL "")
     # Add python Event Loop test
     add_test(NAME EventLoopPython COMMAND py.test --junitxml "${CMAKE_BINARY_DIR}/xml/EventLoopPython.xml" test_event_loop.py WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests)
 
-    if(ENABLE_ROS AND NOT "${ROS_TEST_SRC_FILES}" STREQUAL "")
+    if(ENABLE_ROS2 AND NOT "${ROS_TEST_SRC_FILES}" STREQUAL "")
         enable_testing()
         set(ROS_TEST_NAME "${TEST_NAME}ROS")
         add_executable(${ROS_TEST_NAME} ${ROS_TEST_SRC_FILES})
@@ -436,9 +441,13 @@ if(${ENABLE_TESTING} AND NOT "${TEST_SRC_FILES}" STREQUAL "")
                 GTest::GTest
                 GTest::Main)
 
+        # The test needs the libraries of nrp_ros_msgs, which are added to the environment by .nrp_env. List its tests
+        # when ctest runs instead of after building it. Don't communicate with other machines running ROS 2
         gtest_discover_tests(${ROS_TEST_NAME}
                 WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/tests"
-                EXTRA_ARGS -VV)
+                EXTRA_ARGS -VV
+                DISCOVERY_MODE PRE_TEST
+                PROPERTIES ENVIRONMENT "ROS_AUTOMATIC_DISCOVERY_RANGE=LOCALHOST")
     endif()
 
     if(ENABLE_MQTT AND NOT "${MQTT_TEST_SRC_FILES}" STREQUAL "")
@@ -488,7 +497,7 @@ if(ENABLE_EXAMPLES_TESTING)
 
         # Disable test if ROS is not installed
         if("${EXAMPLE}" STREQUAL "ros_nodes_std_bool")
-            set_tests_properties("${EXAMPLE}_BuildFNModule" PROPERTIES DISABLED $<NOT:$<BOOL:${ENABLE_ROS}>>)
+            set_tests_properties("${EXAMPLE}_BuildFNModule" PROPERTIES DISABLED $<NOT:$<BOOL:${ENABLE_ROS2}>>)
         endif()
 
         if("${EXAMPLE}" STREQUAL "engine_nodes_protobuf_custom")
@@ -586,7 +595,7 @@ if(TARGET ${PYTHON_MODULE_NAME})
             DESTINATION "${PYTHON_INSTALL_DIR_REL}/${NRP_PYTHON_MODULE_NAME}/${PYTHON_MODULE_NAME}")
 endif()
 
-if(ENABLE_ROS)
+if(ENABLE_ROS2)
     if(TARGET ${ROS_LIBRARY_NAME})
         install(TARGETS ${ROS_LIBRARY_NAME}
                 DESTINATION "${NRP_PLUGIN_INSTALL_DIR}")

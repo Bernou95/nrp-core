@@ -33,15 +33,32 @@ endif()
 # Find dependencies
 find_package(NRPEventLoop REQUIRED)
 
-if(NOT ${NRP_ROS_MSGS_PACKAGES} STREQUAL "")
-    find_package(catkin REQUIRED COMPONENTS roscpp ${NRP_ROS_MSGS_PACKAGES})
+# ROS 2 msg packages. The ROS 2 environment (and the workspace containing custom msg packages) must be sourced
+set(ROS_INCLUDE_DIRS "")
+set(ROS_MSG_TARGETS "")
+if(NOT "${NRP_ROS_MSGS_PACKAGES}" STREQUAL "")
+    foreach(PACK ${NRP_ROS_MSGS_PACKAGES})
+        find_package(${PACK} REQUIRED)
+        list(APPEND ROS_MSG_TARGETS ${${PACK}_TARGETS})
+    endforeach()
+
+    # Each ROS 2 package installs its headers in <prefix>/include/<package>
+    string(REPLACE ":" ";" AMENT_PREFIXES "$ENV{AMENT_PREFIX_PATH}")
+    foreach(PREFIX ${AMENT_PREFIXES})
+        file(GLOB PREFIX_INCLUDE_DIRS LIST_DIRECTORIES true "${PREFIX}/include/*")
+        foreach(DIR ${PREFIX_INCLUDE_DIRS})
+            if(IS_DIRECTORY ${DIR})
+                list(APPEND ROS_INCLUDE_DIRS ${DIR})
+            endif()
+        endforeach()
+    endforeach()
 endif()
 
 # clang include statement
 set(GENERATE_FN_TOOL "generateFNFactoryModule")
 set(FN_GEN_CMND ${GENERATE_FN_TOOL} ${HEADER_FILE_PATH} ${FN_FACTORY_MODULE_INSTALL_DIR} -x c++ -std=c++17 -I ${NRP_INSTALL_DIR}/include -I ${NRP_DEPS_INSTALL_DIR}/include)
 
-foreach(DIR ${catkin_INCLUDE_DIRS})
+foreach(DIR ${ROS_INCLUDE_DIRS})
     list(APPEND FN_GEN_CMND -I ${DIR})
 endforeach() 
 
@@ -67,6 +84,7 @@ add_library(FNFactoryModule SHARED fn_factory_module.cpp ${SOURCE_FILE_PATH})
 target_link_libraries(FNFactoryModule
             PUBLIC
             ${NRP_EVENT_LOOP_TARGET}
+            ${ROS_MSG_TARGETS}
             )
 
 # Link to specified NRP compiled Protobuf libraries

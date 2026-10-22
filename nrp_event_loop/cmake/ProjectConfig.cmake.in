@@ -7,6 +7,11 @@ else()
     find_package(NRPGeneralLibrary REQUIRED)
 endif()
 
+option(ENABLE_ROS2 "Enable ROS 2 support" @ENABLE_ROS2@)
+if(ENABLE_ROS2)
+    find_package(NRPRos2Proxy REQUIRED)
+endif()
+
 set(NRP_EVENT_LOOP_TARGET @NRP_EVENT_LOOP_TARGET@)
 
 include(${CMAKE_CURRENT_LIST_DIR}/@LIB_EXPORT_NAME@.cmake)

@@ -21,8 +21,7 @@
 //
 
 #ifdef ROS_ON
-#include "ros/ros.h"
-#include "nrp_ros_proxy/nrp_ros_proxy.h"
+#include "nrp_ros2_proxy/nrp_ros2_proxy.h"
 #endif
 
 #ifdef MQTT_ON
@@ -286,10 +285,12 @@ int main(int argc, char *argv[])
 
     // Connect to ROS
 #ifdef ROS_ON
+    // Shuts ROS 2 down on every exit path. Declared before the simulation manager, so that its ROS nodes are destroyed first
+    struct ROS2Shutdown { ~ROS2Shutdown() { NRPROS2Proxy::shutdown(); } } ros2Shutdown;
+
     if(simConfig->contains("ROSNode")) {
         nlohmann::json nodeProperties = simConfig->at("ROSNode");
-        ros::init(std::map<std::string, std::string>(), nodeProperties.at("NodeName"));
-        NRPROSProxy::resetInstance();
+        NRPROS2Proxy::resetInstance(nodeProperties.at("NodeName").get<std::string>());
     }
 #else
     if(simConfig->contains("ROSNode"))

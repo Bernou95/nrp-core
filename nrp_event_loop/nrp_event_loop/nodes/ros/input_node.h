@@ -23,14 +23,14 @@
 #define INPUT_ROS_NODE_H
 
 #include <boost/python.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/function.hpp>
+#include <functional>
+#include <memory>
 #include <mutex>
 
 #include "nrp_event_loop/computational_graph/input_node.h"
 #include "nrp_event_loop/python/input_edge.h"
 
-#include "nrp_ros_proxy/nrp_ros_proxy.h"
+#include "nrp_ros2_proxy/nrp_ros2_proxy.h"
 
 /*!
  * \brief Input node used to connect a ROS subscriber to the computational graph
@@ -56,11 +56,10 @@ protected:
     void configure() override
     {
         // creates ROS subscriber
-        using boost::placeholders::_1;
-        boost::function<void (const boost::shared_ptr<MSG_TYPE const>&)> callback = boost::bind(&InputROSNode::topic_callback, this, _1);
-        NRPROSProxy* rosProxy = &(NRPROSProxy::getInstance());
-        if(rosProxy)
-            rosProxy->subscribe(this->id(), callback);
+        std::function<void (const std::shared_ptr<const MSG_TYPE>&)> callback =
+                [this](const std::shared_ptr<const MSG_TYPE>& msg) { this->topic_callback(msg); };
+        if(NRPROS2Proxy::hasInstance())
+            NRPROS2Proxy::getInstance().subscribe<MSG_TYPE>(this->id(), callback);
         else
             NRPLogger::warn("From InputROSNode \"" + this->id() +
                             "\". NRPCoreSim is not connected to ROS and this node can't subscribe to topics. Add \"ROSNode\" parameter to your experiment configuration");
@@ -73,7 +72,7 @@ protected:
     /*!
      * \brief callback function used in the ROS subscriber
      */
-    void topic_callback(const boost::shared_ptr<MSG_TYPE const>& msg)
+    void topic_callback(const std::shared_ptr<const MSG_TYPE>& msg)
     {
         std::lock_guard<std::mutex> lock(_msgMutex);
 
@@ -112,9 +111,9 @@ private:
     /*! \brief mutex used in ROS msgs access operations */
     std::mutex _msgMutex;
     /*! \brief vector storing incoming ROS msgs temporarily  */
-    std::vector<boost::shared_ptr<MSG_TYPE const>> _msgTemp;
+    std::vector<std::shared_ptr<const MSG_TYPE>> _msgTemp;
     /*! \brief vector storing incoming ROS msgs which pointers are connected to this node ports  */
-    std::vector<boost::shared_ptr<MSG_TYPE const>> _msgStore;
+    std::vector<std::shared_ptr<const MSG_TYPE>> _msgStore;
 
 
 };

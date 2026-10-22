@@ -56,10 +56,6 @@ pkg_check_modules(Pistache REQUIRED IMPORTED_TARGET libpistache)
 pkg_check_modules(PROTOBUF REQUIRED protobuf)
 pkg_check_modules(GRPC REQUIRED grpc++)
 
-if(NOT ENABLE_ROS STREQUAL OFF)
-    find_package(catkin REQUIRED COMPONENTS roscpp)
-endif()
-
 
 ##########################################
 ## Header configuration
@@ -87,7 +83,6 @@ target_link_libraries(${LIBRARY_NAME}
     ${NRP_EVENT_LOOP_TARGET}
     ${NRP_ROS_PROXY_TARGET}
     ${NRP_MQTT_PROXY_TARGET}
-    ${catkin_LIBRARIES}
 )
 
 target_include_directories(${LIBRARY_NAME} BEFORE
@@ -95,8 +90,6 @@ target_include_directories(${LIBRARY_NAME} BEFORE
         "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
         "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>"
         "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>"
-
-        ${catkin_INCLUDE_DIRS}
 
     PRIVATE
 )

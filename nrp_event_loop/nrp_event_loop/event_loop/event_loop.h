@@ -71,7 +71,7 @@ class EventLoop : public EventLoopInterface
         ComputationalGraph::ExecMode _execMode;
         /*! \brief true if the EventLoop is assumed to always owns the GIL, false if it is shared with other threads  */
         bool _ownGIL;
-        /*! \brief if true ros::spin is called in every loop  */
+        /*! \brief if true ROS callbacks are processed in every loop  */
         bool _spinROS;
         /*! \brief GIL state object used to request the GIL ownership when needed  */
         PyGILState_STATE _pyGILState;

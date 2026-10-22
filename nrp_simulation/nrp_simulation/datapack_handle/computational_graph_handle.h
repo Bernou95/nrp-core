@@ -23,7 +23,7 @@
 #define COMPUTATION_GRAPH_HANDLE_H
 
 #ifdef ROS_ON
-#include "ros/ros.h"
+#include "nrp_ros2_proxy/nrp_ros2_proxy.h"
 #endif
 
 #include "nrp_event_loop/computational_graph/computational_graph_manager.h"
@@ -129,8 +129,8 @@ struct ComputationalGraphHandle : public DataPackProcessor {
     {
         if(!_slaveMode) {
 #ifdef ROS_ON
-            if(_spinROS)
-                ros::spinOnce();
+            if(_spinROS && NRPROS2Proxy::hasInstance())
+                NRPROS2Proxy::getInstance().spinOnce();
 #endif
             for(auto &engine : engines)
                 if(_outputs.count(engine->engineName()))

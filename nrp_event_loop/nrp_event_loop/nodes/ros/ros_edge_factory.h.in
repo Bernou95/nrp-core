@@ -74,7 +74,8 @@ public:
             throw NRPException::logCreate("Error occurred while processing "+ dec_type + _address +"\". ROS message type must be an \"nrp_core.data.nrp_ros\" class.");
         }
 
-        std::string rosType = _moduleName.substr(_moduleName.rfind('.')+1) + "::" + _className;
+        // ROS 2 C++ msg type, e.g. "std_msgs::msg::Bool" for the python class nrp_core.data.nrp_ros.std_msgs.Bool
+        std::string rosType = _moduleName.substr(_moduleName.rfind('.')+1) + "::msg::" + _className;
 
         // 'if' statements selecting the right ROS msg type. Configured from cmake.
         @ROS_MSG_TYPES_CHECK@

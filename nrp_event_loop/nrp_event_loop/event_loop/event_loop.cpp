@@ -21,7 +21,7 @@
 //
 
 #ifdef ROS_ON
-#include "ros/ros.h"
+#include "nrp_ros2_proxy/nrp_ros2_proxy.h"
 #endif
 
 #include "nrp_event_loop/event_loop/event_loop.h"
@@ -72,8 +72,8 @@ void EventLoop::runLoopCB()
         _pyGILState = PyGILState_Ensure();
 
 #ifdef ROS_ON
-    if(_spinROS)
-        ros::spinOnce();
+    if(_spinROS && NRPROS2Proxy::hasInstance())
+        NRPROS2Proxy::getInstance().spinOnce();
 #endif
 
     if(_clock)
