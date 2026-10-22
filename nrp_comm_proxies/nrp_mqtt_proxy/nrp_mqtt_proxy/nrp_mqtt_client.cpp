@@ -54,12 +54,14 @@ void NRPMQTTClient::publish(const std::string& address, const std::string& msg, 
 
 void NRPMQTTClient::publishDirect(const std::string& address, const std::string& msg)
 {
+    std::lock_guard<std::recursive_mutex> lock(_subscribersMutex);
     if(_subscribers.count(address))
         _subscribers.at(address)(msg);
 }
 
 void NRPMQTTClient::subscribe(const std::string& address, const std::function<void (const std::string&)>& callback)
 {
+    std::lock_guard<std::recursive_mutex> lock(_subscribersMutex);
     if(!_subscribers.count(address)) {
         _subscribers.emplace(address, callback);
 
@@ -68,6 +70,25 @@ void NRPMQTTClient::subscribe(const std::string& address, const std::function<vo
     }
     else
         NRPLogger::warn("Subscribe to " + address + " failed. The address is already in use.");
+}
+
+void NRPMQTTClient::unsubscribe(const std::string& address)
+{
+    {
+        std::lock_guard<std::recursive_mutex> lock(_subscribersMutex);
+        if(!_subscribers.erase(address))
+            return;
+    }
+
+    // Not waiting for the broker acknowledgement: messages still arriving for this topic are ignored
+    if(isConnected()) {
+        try {
+            _mqttClient->unsubscribe(address);
+        }
+        catch(std::exception &e) {
+            NRPLogger::debug("MQTT unsubscribe from {} failed: {}", address, e.what());
+        }
+    }
 }
 
 NRPMQTTClient::NRPMQTTClient(nlohmann::json clientParams) :
@@ -133,6 +154,7 @@ MQTTCallback::MQTTCallback(NRPMQTTClient* proxy) :
 
 void MQTTCallback::message_arrived(mqtt::const_message_ptr msg)
 {
+    std::lock_guard<std::recursive_mutex> lock(_proxy->_subscribersMutex);
     if(_proxy->_subscribers.count(msg->get_topic()))
         _proxy->_subscribers.at(msg->get_topic())(msg->to_string());
 }

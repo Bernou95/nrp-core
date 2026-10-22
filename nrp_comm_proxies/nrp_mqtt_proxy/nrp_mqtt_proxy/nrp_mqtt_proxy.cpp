@@ -28,6 +28,11 @@ NRPMQTTProxy &NRPMQTTProxy::getInstance()
     return *(NRPMQTTProxy::_instance);
 }
 
+NRPMQTTProxy *NRPMQTTProxy::getInstancePtr()
+{
+    return NRPMQTTProxy::_instance.get();
+}
+
 NRPMQTTProxy &NRPMQTTProxy::resetInstance(const nlohmann::json& clientParams)
 {
     NRPMQTTProxy::_instance.reset(new NRPMQTTProxy(clientParams));
@@ -44,6 +49,9 @@ void NRPMQTTProxy::publish(const std::string& address, const std::string& msg, b
 
 void NRPMQTTProxy::subscribe(const std::string& address, const std::function<void (const std::string&)>& callback)
 { _mqttClient->subscribe(address, callback); }
+
+void NRPMQTTProxy::unsubscribe(const std::string& address)
+{ _mqttClient->unsubscribe(address); }
 
 NRPMQTTProxy::NRPMQTTProxy(const nlohmann::json& clientParams) :
         _mqttClient(new NRPMQTTClient(clientParams))

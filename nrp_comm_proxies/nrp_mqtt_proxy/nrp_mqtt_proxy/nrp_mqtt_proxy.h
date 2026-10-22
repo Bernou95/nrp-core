@@ -48,9 +48,20 @@ public:
     static NRPMQTTProxy &resetInstance(const nlohmann::json& clientParams);
 
     /*!
+     * \brief Get a pointer to the singleton instance, nullptr if it hasn't been created
+     */
+    static NRPMQTTProxy *getInstancePtr();
+
+    /*!
      * \brief Subscribe to MQTT topic 'address' with callback function 'callback'
      */
     void subscribe(const std::string& address, const std::function<void (const std::string&)>& callback);
+
+    /*!
+     * \brief Unsubscribe from MQTT topic 'address'. When it returns, the callback of the topic is not running and
+     * won't be called anymore
+     */
+    void unsubscribe(const std::string& address);
 
     /*!
      * \brief Publishes 'msg' to MQTT topic 'address'

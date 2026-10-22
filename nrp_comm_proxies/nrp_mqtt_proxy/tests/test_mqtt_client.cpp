@@ -55,3 +55,28 @@ TEST(TestDatatransferGrpcEngine, MQTTClient)
     nrpMQTTClientMock3.DelegateToFake();
     EXPECT_FALSE(nrpMQTTClientMock3.isConnected());
 }
+
+TEST(TestMQTTClient, Unsubscribe)
+{
+    // Client not connected to a broker, messages are delivered with publishDirect
+    NRPMQTTClient client;
+
+    int calls = 0;
+    client.subscribe("test/topic", [&] (const std::string&) { calls++; });
+
+    client.publishDirect("test/topic", "msg");
+    EXPECT_EQ(calls, 1);
+
+    // After unsubscribing, the callback is not called anymore
+    client.unsubscribe("test/topic");
+    client.publishDirect("test/topic", "msg");
+    EXPECT_EQ(calls, 1);
+
+    // Unsubscribing from a topic without subscription does nothing
+    EXPECT_NO_THROW(client.unsubscribe("test/topic"));
+
+    // The topic can be subscribed to again
+    client.subscribe("test/topic", [&] (const std::string&) { calls += 10; });
+    client.publishDirect("test/topic", "msg");
+    EXPECT_EQ(calls, 11);
+}

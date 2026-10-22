@@ -24,6 +24,7 @@
 
 
 #include <functional>
+#include <mutex>
 
 #include "nlohmann/json.hpp"
 
@@ -68,6 +69,12 @@ public:
     virtual void subscribe(const std::string& address, const std::function<void (const std::string&)>& callback);
 
     /*!
+     * \brief Unsubscribe from MQTT topic 'address'. When it returns, the callback of the topic is not running and
+     * won't be called anymore
+     */
+    virtual void unsubscribe(const std::string& address);
+
+    /*!
      * \brief Publishes 'msg' to MQTT topic 'address'
      */
     virtual void publish(const std::string& address, const std::string& msg, bool retained=false);
@@ -108,6 +115,12 @@ private:
      * \brief Subscriptions
      */
     std::map<std::string, std::function<void (const std::string&)>> _subscribers;
+
+    /*!
+     * \brief Protects _subscribers. Callbacks are called by the MQTT client thread while the lock is held, so that
+     * unsubscribe() doesn't return while the callback of the topic is running
+     */
+    std::recursive_mutex _subscribersMutex;
 
     /*!
      * \brief Object containing callbacks to process events in the mqtt client

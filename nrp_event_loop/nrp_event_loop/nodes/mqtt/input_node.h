@@ -51,6 +51,16 @@ public:
             _address(address)
     {}
 
+    /*!
+     * \brief Destructor. Unsubscribes from the topic, so the MQTT client doesn't call topic_callback on a destroyed node
+     */
+    ~InputMQTTNode() override
+    {
+        // If the proxy has been reset, the client this node subscribed to doesn't exist anymore
+        if(_mqttProxy && _mqttProxy == NRPMQTTProxy::getInstancePtr())
+            _mqttProxy->unsubscribe(_address);
+    }
+
     std::string typeStr() const override
     { return "MQTTSubscriber"; }
 
@@ -61,10 +71,11 @@ protected:
         setMsgFromString();
 
         // Subscribes to mqtt topic
-        NRPMQTTProxy* mqttProxy = &(NRPMQTTProxy::getInstance());
+        NRPMQTTProxy* mqttProxy = NRPMQTTProxy::getInstancePtr();
         if(mqttProxy) {
             using std::placeholders::_1;
             mqttProxy->subscribe(_address, std::bind(&InputMQTTNode::topic_callback, this, _1));
+            _mqttProxy = mqttProxy;
         }
         else
             NRPLogger::warn("From InputMQTTNode \"" + this->id() +
@@ -158,6 +169,8 @@ private:
     std::vector<MSG_TYPE> _msgStore;
     /*! \brief address of the MQTT topic this node connects to */
     std::string _address;
+    /*! \brief proxy this node subscribed to, nullptr if it didn't subscribe */
+    NRPMQTTProxy* _mqttProxy = nullptr;
 };
 
 
