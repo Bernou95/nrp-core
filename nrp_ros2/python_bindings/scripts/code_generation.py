@@ -22,7 +22,7 @@
 # Bhaskara Marthi with license BSD.
 # The original file can be found at: https://github.com/bhaskara/boost_python_ros
 #
-# ROS 2 version of nrp_ros/python_bindings/scripts/code_generation.py. Messages are read with rosidl_adapter
+# ROS 2 version of the ROS 1 nrp_ros/python_bindings/scripts/code_generation.py (removed). Messages are read with rosidl_adapter
 # from the packages installed in the ament index. Bindings are generated for the C++ message structs created
 # by rosidl_generator_cpp (pkg::msg::Name).
 

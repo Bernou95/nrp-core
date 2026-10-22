@@ -155,10 +155,6 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/nrp-core-msgs")
         message(FATAL_ERROR "The Proto definitions are not found in submodule nrp-core-msgs! Please update submodules and try again.")
     endif()
     set(NRP_CORE_MSGS_PROTO_PATH "${NRP_CORE_MSGS_PATH}/protobuf/")
-
-    if(NOT EXISTS "${NRP_CORE_MSGS_PATH}/nrp_ros_msgs")
-        message(FATAL_ERROR "ROS definitions are not found in submodule nrp-core-msgs! Please update submodules and try again.")
-    endif()
 else()
     message(FATAL_ERROR "The submodule nrp-core-msgs does not exist! GIT_SUBMODULE was turned off or failed. Please update submodules and try again.")
 endif()
@@ -368,7 +364,6 @@ set(DOXYGEN_EXAMPLE_PATH
         "${NRP_CORE_MSGS_PROTO_PATH}/engine_proto_defs"
         "nrp_general_library/CMakeLists.txt"
         "CMakeLists.txt"
-        "${NRP_CORE_MSGS_PATH}/nrp_ros_msgs/CMakeLists.txt"
         "README.md")
 
 ## Example Engine. It is built to ensure the examples are not out of date in the documentation

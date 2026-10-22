@@ -15,7 +15,8 @@ nrp-core has also been built and tested on Ubuntu 24.04 (noble). The steps below
 
 Current status on Ubuntu 24.04:
 
- - Gazebo Classic (gazebo11) and ROS Noetic aren't available on Ubuntu 24.04. They are disabled, and Gazebo Harmonic engines are in progress.
+ - Gazebo Classic (gazebo11) and ROS Noetic aren't available on Ubuntu 24.04. Gazebo Classic is disabled, and Gazebo Harmonic engines are in progress.
+ - ROS 1 support was removed. ROS 2 Jazzy is supported instead (`-DENABLE_ROS2=ON`, `ros-jazzy-ros-base`). `/opt/ros/jazzy/setup.bash` has to be sourced before cmake and when running nrp-core.
  - NEST, MQTT and SpiNNaker are disabled for now. EDLUT is enabled with CUDA support (tested on an RTX 3060, compute capability 8.6).
  - 92/93 tests pass. `EventLoop.EVENT_LOOP` still fails.
 
