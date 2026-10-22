@@ -118,6 +118,7 @@ TEST(EventLoop, EVENT_LOOP_ENGINE) {
     auto engine = new TestEngine();
     nlohmann::json engineConfig;
     engineConfig["test"] = true;
+    engineConfig["EngineTimestep"] = 0.01;  // required by EventLoopEngine::initializeCB, must match the ELE timestep (10ms)
     EventLoopEngine ele(10ms, 1ms, 2, true, engineConfig, engine);
 
     ASSERT_ANY_THROW(ele.initialize());
