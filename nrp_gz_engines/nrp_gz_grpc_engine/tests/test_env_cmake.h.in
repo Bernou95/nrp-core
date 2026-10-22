@@ -30,4 +30,8 @@
 
 #define TEST_CAMERA_WORLD_FILE "@CMAKE_CURRENT_SOURCE_DIR@/tests/test_files/test_camera_world.sdf"
 
+#define TEST_INCLUDE_WORLD_FILE "@CMAKE_CURRENT_SOURCE_DIR@/tests/test_files/test_include_world.sdf"
+
+#define TEST_GZ_MODELS_DIR "@CMAKE_CURRENT_SOURCE_DIR@/tests/test_files/models"
+
 #endif // TEST_ENV_CMAKE_H

@@ -23,6 +23,10 @@
 
 #include "nrp_general_library/utils/nrp_exceptions.h"
 
+#include <gz/common/Util.hh>
+#include <gz/sim/Util.hh>
+
+#include <sdf/ParserConfig.hh>
 #include <sdf/Root.hh>
 #include <sdf/World.hh>
 #include <sdf/Model.hh>
@@ -67,8 +71,14 @@ gz::sim::ServerConfig GzGrpcEngine::createServerConfig(const json &data)
 {
     const auto worldFile = data.at("GazeboWorldFile").get<std::string>();
 
+    // gz-sim resolves URIs such as model:// with its resource paths (GZ_SIM_RESOURCE_PATH) once the server has
+    // been created. The SDF files are loaded before, so resolve them the same way here
+    gz::sim::addResourcePaths();
+    sdf::ParserConfig parserConfig = sdf::ParserConfig::GlobalConfig();
+    parserConfig.SetFindCallback([](const std::string &uri) { return gz::common::findFile(uri); });
+
     sdf::Root root;
-    const auto loadErrors = root.Load(worldFile);
+    const auto loadErrors = root.Load(worldFile, parserConfig);
     if(!loadErrors.empty())
         throw NRPException::logCreate("Failed to load world file \"" + worldFile + "\":" + sdfErrorsToString(loadErrors));
 
@@ -96,7 +106,7 @@ gz::sim::ServerConfig GzGrpcEngine::createServerConfig(const json &data)
                                         std::stod(poseArgs[3]), std::stod(poseArgs[4]), std::stod(poseArgs[5]));
 
             sdf::Root modelRoot;
-            const auto modelErrors = modelRoot.Load(modelFile);
+            const auto modelErrors = modelRoot.Load(modelFile, parserConfig);
             if(!modelErrors.empty() || modelRoot.Model() == nullptr)
                 throw NRPException::logCreate("Failed to load model \"" + modelName + "\" from file \"" + modelFile + "\":" +
                                               sdfErrorsToString(modelErrors));

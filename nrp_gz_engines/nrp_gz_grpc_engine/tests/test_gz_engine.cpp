@@ -216,6 +216,22 @@ TEST(TestGzGrpcEngine, AdditionalModels)
     ASSERT_NO_THROW(engine->shutdown());
 }
 
+TEST(TestGzGrpcEngine, IncludedModels)
+{
+    // Models included with model:// URIs are found through GZ_SIM_RESOURCE_PATH
+    auto config = createConfig(TEST_INCLUDE_WORLD_FILE);
+    config["EngineEnvParams"] = std::vector<std::string>({"GZ_SIM_RESOURCE_PATH=" TEST_GZ_MODELS_DIR ":$GZ_SIM_RESOURCE_PATH"});
+
+    auto engine = launchEngine(config);
+    ASSERT_NE(engine, nullptr);
+
+    ASSERT_NO_THROW(engine->initialize());
+
+    ASSERT_NEAR(getData<Gazebo::Model>(engine, "included_box").position(2), 3.0, 1e-4);
+
+    ASSERT_NO_THROW(engine->shutdown());
+}
+
 TEST(TestGzGrpcEngine, CameraSystem)
 {
     auto config = createConfig(TEST_CAMERA_WORLD_FILE);
