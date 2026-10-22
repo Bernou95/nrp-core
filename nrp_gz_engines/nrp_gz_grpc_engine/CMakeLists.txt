@@ -7,6 +7,7 @@ set(LIBRARY_NAME "${PROJECT_NAME}")
 set(SERVER_LIBRARY_NAME "${PROJECT_NAME}Server")
 set(SYSTEMS_LIBRARY_NAME "NRPGzGrpcSystems")
 set(EXECUTABLE_NAME "${PROJECT_NAME}Executable")
+set(EXECUTABLE_ASYNC_NAME "${PROJECT_NAME}Async")
 set(TEST_NAME "${PROJECT_NAME}Tests")
 
 set(LIB_EXPORT_NAME "${LIBRARY_NAME}Targets")
@@ -41,6 +42,11 @@ set(SYSTEMS_SRC_FILES
 # List executable build files
 set(EXEC_SRC_FILES
     nrp_gz_grpc_engine/server_executable/main.cpp
+)
+
+# List async executable build files (Event Loop, needs MQTT)
+set(EXEC_ASYNC_SRC_FILES
+    nrp_gz_grpc_engine/server_executable/main_async.cpp
 )
 
 # List testing build files
@@ -139,10 +145,18 @@ if(NOT "${EXEC_SRC_FILES}" STREQUAL "")
     target_link_libraries("${EXECUTABLE_NAME}" ${NAMESPACE_NAME}::${SERVER_LIBRARY_NAME})
 endif()
 
+if(NOT "${EXEC_ASYNC_SRC_FILES}" STREQUAL "" AND ENABLE_MQTT)
+    add_executable("${EXECUTABLE_ASYNC_NAME}" ${EXEC_ASYNC_SRC_FILES})
+    target_link_libraries("${EXECUTABLE_ASYNC_NAME}"
+        ${NAMESPACE_NAME}::${SERVER_LIBRARY_NAME}
+        ${NAMESPACE_NAME}::${LIBRARY_NAME}
+        ${NRP_ELE_TARGET})
+endif()
+
 
 ##########################################
 ## Append Doxygen files
-add_doxygen_source("${CMAKE_CURRENT_SOURCE_DIR}" ${EXEC_SRC_FILES} ${LIB_SRC_FILES} ${SERVER_LIB_SRC_FILES} ${SYSTEMS_SRC_FILES} ${HEADER_DIRECTORY})
+add_doxygen_source("${CMAKE_CURRENT_SOURCE_DIR}" ${EXEC_SRC_FILES} ${EXEC_ASYNC_SRC_FILES} ${LIB_SRC_FILES} ${SERVER_LIB_SRC_FILES} ${SYSTEMS_SRC_FILES} ${HEADER_DIRECTORY})
 
 
 ##########################################
@@ -217,6 +231,11 @@ install(DIRECTORY "${HEADER_DIRECTORY}" "${CMAKE_CURRENT_BINARY_DIR}/include/${H
 # Install executable files
 if(TARGET ${EXECUTABLE_NAME})
     install(TARGETS ${EXECUTABLE_NAME}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+endif()
+
+if(TARGET ${EXECUTABLE_ASYNC_NAME})
+    install(TARGETS ${EXECUTABLE_ASYNC_NAME}
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 endif()
 
