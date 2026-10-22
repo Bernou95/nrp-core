@@ -38,5 +38,11 @@ int main(int argc, char *argv[])
     server.waitForInit();
 
     // Run server
-    return server.run();
+    const int res = server.run();
+
+    // Destroy the server before returning, as the SIGTERM handler does. Otherwise it is destroyed by the exit
+    // handlers, after loggers used by its destructors may have been shut down
+    NestServerExecutable::shutdown();
+
+    return res;
 }
