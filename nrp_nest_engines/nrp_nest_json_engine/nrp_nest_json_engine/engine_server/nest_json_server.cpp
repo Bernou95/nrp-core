@@ -258,7 +258,10 @@ nlohmann::json NestJSONServer::shutdown(const nlohmann::json &)
     
     PythonGILLock lock(this->_pyGILState, true);
 
-    this->_pyNest["ResetKernel"]();
+    // The nest module is only loaded by initialize(). Shutdown may be requested without it, e.g. when another
+    // engine failed to initialize
+    if(this->_pyNest.has_key("ResetKernel"))
+        this->_pyNest["ResetKernel"]();
 
     // TODO: _nestPreparedFlag can't be tru currently.
     // Probably, due to the context of https://hbpneurorobotics.atlassian.net/browse/NRRPLT-8209
@@ -273,7 +276,8 @@ nlohmann::json NestJSONServer::shutdown(const nlohmann::json &)
     this->_datapackControllerPtrs.clear();
 
     // Flush stdout and stderr, when they are redirected externally they need to be flushed manually
-    python::exec("sys.stdout.flush(); sys.stderr.flush()", this->_pyGlobals, this->_pyGlobals);
+    if(this->_pyGlobals.has_key("sys"))
+        python::exec("sys.stdout.flush(); sys.stderr.flush()", this->_pyGlobals, this->_pyGlobals);
 
     return nlohmann::json();
 }
