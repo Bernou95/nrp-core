@@ -24,6 +24,7 @@
 
 #include <boost/python.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
+#include <rosidl_runtime_cpp/bounded_vector.hpp>
 
 #include <array>
 #include <string>
@@ -107,6 +108,20 @@ namespace nrp_ros2
             for(long i = 0; i < len; ++i)
                 container[i] = bpy::extract<T>(seq[i]);
         }
+
+        template<class T, std::size_t N>
+        static void fill(rosidl_runtime_cpp::BoundedVector<T, N> &container, const bpy::object &seq, long len)
+        {
+            if(len > static_cast<long>(N))
+            {
+                PyErr_SetString(PyExc_ValueError, ("Expected a sequence of at most length " + std::to_string(N) +
+                                                   ", got one of length " + std::to_string(len)).c_str());
+                bpy::throw_error_already_set();
+            }
+
+            for(long i = 0; i < len; ++i)
+                container.push_back(bpy::extract<T>(seq[i]));
+        }
     };
 
     /*!
@@ -144,6 +159,28 @@ namespace nrp_ros2
         static void append(CONTAINER &c, const value_type &v)
         {   c.push_back(v); }
     };
+
+    /*!
+     * \brief Registers rosidl_runtime_cpp::BoundedVector<T, N> (bounded sequence, e.g. "float64[<=3]") as python
+     * class NAME. Appending beyond N raises an error
+     */
+    template<class T, std::size_t N>
+    void exposeBoundedVector(const char *name)
+    {
+        using container_t = rosidl_runtime_cpp::BoundedVector<T, N>;
+        using protocol_t = SequenceProtocol<container_t>;
+
+        if(isRegistered<container_t>())
+            return;
+
+        bpy::class_<container_t>(name)
+                .def("__len__", &protocol_t::len)
+                .def("__getitem__", &protocol_t::get)
+                .def("__setitem__", &protocol_t::set)
+                .def("append", &protocol_t::append);
+
+        SequenceConverter<container_t>::registerConverter();
+    }
 
     /*!
      * \brief Registers std::vector<T> as python class NAME

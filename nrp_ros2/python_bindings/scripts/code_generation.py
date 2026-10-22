@@ -71,10 +71,9 @@ def generate_export_function(pkg, msg, spec, s):
                 continue
 
             if t.is_upper_bound:
-                raise ValueError("Field '{0}' of message '{1}/{2}': bounded sequences are not supported"
-                                 .format(f.name, pkg, msg))
-
-            if t.array_size:
+                s.write('nrp_ros2::exposeBoundedVector<{0}, {1}>("{2}_{3}");'.format(cpp_base_type(t), t.array_size, msg,
+                                                                                     f.name))
+            elif t.array_size:
                 s.write('nrp_ros2::exposeArray<{0}, {1}>("{2}_{3}");'.format(cpp_base_type(t), t.array_size, msg, f.name))
             else:
                 s.write('nrp_ros2::exposeVector<{0}>("{1}_{2}");'.format(cpp_base_type(t), msg, f.name))
