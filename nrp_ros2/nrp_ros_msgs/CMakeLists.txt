@@ -13,6 +13,8 @@ find_package(geometry_msgs REQUIRED)
 ## Generate msgs
 rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/Test.msg"
+  "msg/SpikeGroup.msg"
+  "msg/FullStateCompactDelay.msg"
   DEPENDENCIES builtin_interfaces std_msgs geometry_msgs
   )
 
